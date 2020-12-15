@@ -1,0 +1,6 @@
+name: Skyblock
+version: 1
+main: me.illusion.skyblockcore.CorePlugin
+
+depend:
+  - FastAsyncWorldEdit

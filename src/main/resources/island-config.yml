@@ -1,0 +1,9 @@
+island:
+  overworld:
+    distance: 2000
+    world: SkyblockWorld
+    max-size: 500
+    inicial-size: 100
+  nether:
+    enabled: false
+    world: SkyblockNetherWorld
