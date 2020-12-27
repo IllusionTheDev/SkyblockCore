@@ -16,6 +16,7 @@ public class LeaveListener implements Listener {
     @EventHandler
     private void onLeave(PlayerQuitEvent e) {
         main.getPlayerManager().get(e.getPlayer()).save();
+        e.getPlayer().getInventory().clear();
         main.getPlayerManager().unregister(e.getPlayer().getUniqueId());
     }
 }

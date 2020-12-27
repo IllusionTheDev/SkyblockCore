@@ -1,14 +1,11 @@
 package me.illusion.skyblockcore.sql;
 
-import org.bukkit.event.EventHandler;
+import org.bukkit.Bukkit;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class SQLSerializer {
 
@@ -19,9 +16,10 @@ public class SQLSerializer {
                                  Object objectToSerialize) throws SQLException {
 
         PreparedStatement pstmt = connection
-                .prepareStatement(SQL_SERIALIZE_OBJECT);
+                .prepareStatement(SQL_SERIALIZE_OBJECT, Statement.RETURN_GENERATED_KEYS);
 
         // just setting the class name
+        System.out.println(objectToSerialize.getClass().getName().length());
         pstmt.setString(1, objectToSerialize.getClass().getName());
         pstmt.setObject(2, objectToSerialize);
         pstmt.executeUpdate();
@@ -32,8 +30,7 @@ public class SQLSerializer {
         }
         rs.close();
         pstmt.close();
-        System.out.println("Java object serialized to database. Object: "
-                + objectToSerialize);
+        Bukkit.getLogger().info("Serialized object with id " + serialized_id);
         return serialized_id;
     }
 
@@ -55,6 +52,7 @@ public class SQLSerializer {
 
         // Object object = rs.getObject(1);
 
+        Bukkit.getLogger().info("Deserializing object with id " + serialized_id);
         byte[] buf = rs.getBytes(1);
         ObjectInputStream objectIn = null;
         if (buf != null)

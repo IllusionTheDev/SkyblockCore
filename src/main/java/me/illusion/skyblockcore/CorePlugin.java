@@ -4,16 +4,18 @@ import lombok.Getter;
 import me.illusion.skyblockcore.data.PlayerManager;
 import me.illusion.skyblockcore.file.IslandConfig;
 import me.illusion.skyblockcore.island.IslandManager;
+import me.illusion.skyblockcore.island.grid.IslandGrid;
+import me.illusion.skyblockcore.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.listener.JoinListener;
 import me.illusion.skyblockcore.listener.LeaveListener;
 import me.illusion.skyblockcore.sql.SQLUtil;
-import me.illusion.skyblockcore.world.EmptyWorldGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.sql.Connection;
+import java.util.concurrent.CompletableFuture;
 
 @Getter
 public class CorePlugin extends JavaPlugin {
@@ -22,6 +24,7 @@ public class CorePlugin extends JavaPlugin {
     private IslandConfig islandConfig;
     private IslandManager islandManager;
     private PlayerManager playerManager;
+    private IslandGrid grid;
 
     private File startSchematic;
 
@@ -29,18 +32,14 @@ public class CorePlugin extends JavaPlugin {
     public void onEnable() {
         startSchematic = new File(getDataFolder(), "skyblock-schematic.schematic");
 
-        if(!startSchematic.exists())
+        if (!startSchematic.exists())
             saveResource("skyblock-schematic.schematic", false);
 
-        if(!setupSQL()) {
-            getLogger().warning("Could not load SQL Database.");
-            getLogger().warning("This plugin requires a valid SQL database to work.");
-            getPluginLoader().disablePlugin(this);
-            return;
-        }
+        setupSQL();
 
         islandConfig = new IslandConfig(this);
-        islandManager = new IslandManager();
+        grid = new IslandGrid(5, 5);
+        islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, this::setupWorld, 1L);
@@ -55,8 +54,8 @@ public class CorePlugin extends JavaPlugin {
                 .generateStructures(false)
                 .createWorld();
     }
-    private boolean setupSQL()
-    {
+
+    private void setupSQL() {
         saveDefaultConfig();
 
         String host = getConfig().getString("database.host");
@@ -65,14 +64,19 @@ public class CorePlugin extends JavaPlugin {
         String password = getConfig().getString("database.password");
         int port = getConfig().getInt("database.port");
 
-        SQLUtil sql = new SQLUtil(this, host, database, username, password, port);
+        CompletableFuture.runAsync(() -> {
+            SQLUtil sql = new SQLUtil(this, host, database, username, password, port);
 
-        if(!sql.openConnection())
-            return false;
+            if (!sql.openConnection()) {
+                getLogger().warning("Could not load SQL Database.");
+                getLogger().warning("This plugin requires a valid SQL database to work.");
+                getPluginLoader().disablePlugin(this);
+                return;
+            }
 
-        sql.createTable();
-        mySQLConnection = sql.getConnection();
-        return true;
+            sql.createTable();
+            mySQLConnection = sql.getConnection();
+        });
     }
 
 }
