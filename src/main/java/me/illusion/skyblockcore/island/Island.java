@@ -5,6 +5,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.illusion.skyblockcore.island.grid.GridCell;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -17,6 +18,8 @@ public class Island {
     private final Location center;
 
     private final IslandData data;
+
+    private final GridCell cell;
 
     public void cleanIsland() {
         World world = getCenter().getWorld();

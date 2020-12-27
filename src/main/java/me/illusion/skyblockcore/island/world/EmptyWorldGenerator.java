@@ -1,8 +1,7 @@
-package me.illusion.skyblockcore.world;
+package me.illusion.skyblockcore.island.world;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Random;
