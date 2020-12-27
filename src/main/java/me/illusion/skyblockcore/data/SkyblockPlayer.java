@@ -63,7 +63,7 @@ public class SkyblockPlayer {
                 }
 
                 System.out.println("Creating island data");
-                islandData = new IslandData(null, uuid.toString(), uuid, new ArrayList<>());
+                islandData = new IslandData(uuid.toString(), uuid, new ArrayList<>(), null);
 
                 System.out.println("Setting final data");
                 data.setIslandSchematic(target);
