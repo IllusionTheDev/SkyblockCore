@@ -180,11 +180,7 @@ public class SkyblockPlayer {
             two = two.add(cell.getXPos() * distance, 0, cell.getYPos() * distance);
 
             Bukkit.getLogger().info(String.format("Pasting island at %s %s %s (%s)", center.getX(), center.getY(), center.getZ(), center.getWorld().getName()));
-            schematic.paste(
-                    FaweAPI.getWorld(
-                            world.getName()),
-                    clipboard.getOrigin(),
-                    false);
+            schematic.paste(FaweAPI.getWorld(world.getName()), clipboard.getOrigin(), false);
 
 
         } catch (Exception e) {

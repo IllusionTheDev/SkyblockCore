@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.*;
 
+import static me.illusion.skyblockcore.sql.SQLOperation.SQL_DESERIALIZE_OBJECT;
+import static me.illusion.skyblockcore.sql.SQLOperation.SQL_SERIALIZE_OBJECT;
+
 public final class SQLSerializer {
 
     private SQLSerializer() {
         // Empty constructor for utility class
     }
-
-    private static final String SQL_SERIALIZE_OBJECT = "INSERT INTO serialized_java_objects(object_name, serialized_object) VALUES (?, ?)";
-    private static final String SQL_DESERIALIZE_OBJECT = "SELECT serialized_object FROM serialized_java_objects WHERE serialized_id = ?";
 
     /**
      * Serializes an object into SQL
