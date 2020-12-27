@@ -9,6 +9,11 @@ public class SerializedLocation implements Serializable {
 
     private String format;
 
+    /**
+     * Obtains the Bukkit location
+     *
+     * @return the bukkit location
+     */
     public Location getLocation() {
         String[] split = format.split(" ");
         double x = Double.parseDouble(split[0]);
@@ -20,6 +25,11 @@ public class SerializedLocation implements Serializable {
         return new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
     }
 
+    /**
+     * Updates its internal location
+     *
+     * @param location - The new location to update to
+     */
     public void update(Location location) {
         double x = location.getX();
         double y = location.getY();

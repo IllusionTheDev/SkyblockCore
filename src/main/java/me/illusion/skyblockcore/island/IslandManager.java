@@ -14,6 +14,12 @@ public class IslandManager {
         this.main = main;
     }
 
+    /**
+     * Gets the island passed a belonging location
+     *
+     * @param location - The location to match
+     * @return NULL if no match is found, Island object otherwise
+     */
     public Island getIslandAt(Location location) {
         return Bukkit.getOnlinePlayers()
                 .stream()

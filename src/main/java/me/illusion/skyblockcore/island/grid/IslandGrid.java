@@ -22,6 +22,11 @@ public class IslandGrid {
         }
     }
 
+    /**
+     * Obtains the first available cell
+     *
+     * @return Available cell closest to middle, NULL if all cells are occupied
+     */
     public GridCell getFirstCell() {
         return grid.values()
                 .stream()

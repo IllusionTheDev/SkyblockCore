@@ -10,6 +10,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import me.illusion.skyblockcore.CorePlugin;
 import me.illusion.skyblockcore.island.Island;
 import me.illusion.skyblockcore.island.IslandData;
@@ -91,11 +92,22 @@ public class SkyblockPlayer {
         main.getPlayerManager().register(uuid, this);
     }
 
+    /**
+     * Gets the Bukkit Player
+     *
+     * @return null if offline, Bukkit player otherwise
+     */
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
+
     // ----- DATA LOADING -----
 
+    /**
+     * Loads the player and island data
+     *
+     * @return TRUE if data exists, FALSE otherwise
+     */
     private boolean load() {
         data = (PlayerData) load(GET_SERIALIZED);
 
@@ -120,6 +132,10 @@ public class SkyblockPlayer {
         return true;
     }
 
+    /**
+     * Teleports the player to its island relative position
+     * If the location isn't on the island world, the location is no longer relative
+     */
     private void checkTeleport() {
         System.out.println("Teleporting");
 
@@ -129,11 +145,19 @@ public class SkyblockPlayer {
         String targetName = data.getLastLocation().getLocation().getWorld().getName();
 
         if (worldName.equalsIgnoreCase(targetName))
-            getPlayer().teleport(data.getLastLocation().getLocation().add(island.getCenter()));
+            getPlayer().teleport(data.getLastLocation().getLocation().add(island.getCenter().getX(), 0, island.getCenter().getZ()));
         else
             getPlayer().teleport(data.getLastLocation().getLocation());
     }
 
+    /**
+     * Pastes an island
+     *
+     * @param data  - The island data, used in the island object
+     * @param world - The world to paste the island on
+     * @param schem - The island schematic file
+     * @return island object
+     */
     private Island loadIsland(IslandData data, World world, File schem) {
         Location one = null;
         Location two = null;
@@ -172,26 +196,41 @@ public class SkyblockPlayer {
         return new Island(one, two, center, data, cell);
     }
 
+    /**
+     * Obtains a serialized object
+     *
+     * @param sql - The SQL query used to obtain the ID
+     * @return deserialized object
+     */
+    @SneakyThrows
     private Object load(String sql) {
+        PreparedStatement statement = null;
+        ResultSet result = null;
         try {
-            PreparedStatement statement = main.getMySQLConnection().prepareStatement(sql);
-
+            statement = main.getMySQLConnection().prepareStatement(sql);
             statement.setString(1, uuid.toString());
+            result = statement.executeQuery();
 
-            ResultSet result = statement.executeQuery();
-
-            if(!result.first())
+            if (!result.first())
                 return null;
 
             long serialized = result.getLong("id");
             return SQLSerializer.deserialize(main.getMySQLConnection(), serialized);
         } catch (SQLException | IOException | ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            if (statement != null)
+                statement.close();
+            if (result != null)
+                result.close();
         }
         return null;
     }
     // ----- DATA SAVING -----
 
+    /**
+     * Saves all the player data, and cleans the island if possible
+     */
     public void save() {
         data.getInventory().updateArray(getPlayer().getInventory().getContents());
         saveIsland();
@@ -203,6 +242,12 @@ public class SkyblockPlayer {
         data.getIslandSchematic().delete();
     }
 
+    /**
+     * Serializes the object and sets the serialized ID into the SQL statement
+     *
+     * @param object - The object to serialize
+     * @param SQL    - The SQL query
+     */
     private void saveObject(Object object, String SQL) {
 
         try {
@@ -220,6 +265,9 @@ public class SkyblockPlayer {
 
     // ----- DATA POST-LOAD -----
 
+    /**
+     * Loads the inventory from serialized data
+     */
     private void updateInventory() {
         if (data == null)
             getPlayer().getInventory().clear();
@@ -229,6 +277,9 @@ public class SkyblockPlayer {
 
     // ----- DATA PRE-SAVE -----
 
+    /**
+     * Saves the island
+     */
     public void saveIsland() {
         CuboidRegion region = new CuboidRegion(FaweAPI.getWorld(island.getCenter().getWorld().getName()),
                 new Vector(island.getPointOne().getBlockX(), island.getPointOne().getBlockY(), island.getPointOne().getBlockZ()),

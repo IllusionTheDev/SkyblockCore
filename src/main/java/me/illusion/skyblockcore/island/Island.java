@@ -21,6 +21,9 @@ public class Island {
 
     private final GridCell cell;
 
+    /**
+     * Cleans the island, by regenerating its chunks
+     */
     public void cleanIsland() {
         World world = getCenter().getWorld();
 

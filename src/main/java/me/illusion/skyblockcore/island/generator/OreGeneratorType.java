@@ -28,6 +28,12 @@ public enum OreGeneratorType {
         this.cooldownSeconds = cooldownSeconds;
     }
 
+    /**
+     * Obtains an OreGeneratorType from its ID
+     *
+     * @param id - The ID to mathc
+     * @return an OreGeneratorType if it matches, NULL otherwise
+     */
     public static OreGeneratorType fromId(int id) {
         return Stream.of(values()).filter(type -> type.id == id).findFirst().orElse(null);
     }

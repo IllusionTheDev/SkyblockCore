@@ -48,6 +48,9 @@ public class CorePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
     }
 
+    /**
+     * Generates the empty island worlds
+     */
     private void setupWorld() {
         new WorldCreator(islandConfig.getOverworldSettings().getWorld())
                 .generator(new EmptyWorldGenerator())
@@ -55,6 +58,9 @@ public class CorePlugin extends JavaPlugin {
                 .createWorld();
     }
 
+    /**
+     * Opens the SQL connection async
+     */
     private void setupSQL() {
         saveDefaultConfig();
 

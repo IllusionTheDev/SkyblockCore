@@ -7,11 +7,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.*;
 
-public class SQLSerializer {
+public final class SQLSerializer {
+
+    private SQLSerializer() {
+        // Empty constructor for utility class
+    }
 
     private static final String SQL_SERIALIZE_OBJECT = "INSERT INTO serialized_java_objects(object_name, serialized_object) VALUES (?, ?)";
     private static final String SQL_DESERIALIZE_OBJECT = "SELECT serialized_object FROM serialized_java_objects WHERE serialized_id = ?";
 
+    /**
+     * Serializes an object into SQL
+     *
+     * @param connection        - The SQL connection
+     * @param objectToSerialize - The object to serialize
+     * @return the serialized ID
+     * @throws SQLException if the operation isn't successful
+     */
     public static long serialize(Connection connection,
                                  Object objectToSerialize) throws SQLException {
 
@@ -28,6 +40,7 @@ public class SQLSerializer {
         if (rs.next()) {
             serialized_id = rs.getInt(1);
         }
+
         rs.close();
         pstmt.close();
         Bukkit.getLogger().info("Serialized object with id " + serialized_id);
@@ -35,11 +48,13 @@ public class SQLSerializer {
     }
 
     /**
-     * To de-serialize a java object from database
-     *
-     * @throws SQLException
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * Deserializes a SQL object
+     * @param connection - The SQL connection
+     * @param serialized_id - The serialized ID
+     * @return deserialized object
+     * @throws SQLException if the operation isn't successful
+     * @throws IOException if the object stream is inaccessible
+     * @throws ClassNotFoundException if the object class is not found
      */
     public static Object deserialize(Connection connection,
                                      long serialized_id) throws SQLException, IOException,
@@ -60,6 +75,7 @@ public class SQLSerializer {
 
         Object deSerializedObject = objectIn.readObject();
 
+        objectIn.close();
         rs.close();
         pstmt.close();
 

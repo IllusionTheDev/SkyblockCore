@@ -19,10 +19,19 @@ public class OreGenerator implements Serializable {
     private final OreGeneratorType type;
     private long nextGenerationEpochSecond;
 
+    /**
+     * Check if the OreGenerator is at a specific location
+     *
+     * @param loc - The location to compare to
+     * @return TRUE if the locations match, FALSE otherwise
+     */
     public boolean isAtLocation(Location loc) {
         return center.add(relativeLocation.getLocation().getX(), 0, relativeLocation.getLocation().getZ()).equals(loc);
     }
 
+    /**
+     * Internal tick method
+     */
     public void tick() {
         long current = Instant.now().getEpochSecond();
 
@@ -39,6 +48,9 @@ public class OreGenerator implements Serializable {
         nextGenerationEpochSecond = -1;
     }
 
+    /**
+     * Handles block breaking
+     */
     public void handleBreak() {
         Block b = relativeLocation.getLocation().add(center.getX(), 0, center.getZ()).getBlock();
 

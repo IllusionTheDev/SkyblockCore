@@ -14,7 +14,13 @@ public class SerializedItemStackArray implements Serializable {
 
     private String base64;
 
-    private static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
+    /**
+     * Serializes an ItemStack[] into base64
+     *
+     * @param items - The ItemStack[] to serialize
+     * @return the base64 encoded String
+     */
+    private static String itemStackArrayToBase64(ItemStack[] items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
@@ -35,6 +41,13 @@ public class SerializedItemStackArray implements Serializable {
         }
     }
 
+    /**
+     * Deserializes a base64 encoded String into an ItemStack
+     *
+     * @param data - The base64 encoded String
+     * @return deserialized ItemStack[]
+     * @throws IOException if unable to deserialize (invalid class)
+     */
     private static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
@@ -53,10 +66,20 @@ public class SerializedItemStackArray implements Serializable {
         }
     }
 
+    /**
+     * Updates the array internally
+     *
+     * @param items - The new array
+     */
     public void updateArray(ItemStack[] items) {
         base64 = itemStackArrayToBase64(items);
     }
 
+    /**
+     * Obtains the array
+     *
+     * @return the array
+     */
     public ItemStack[] getArray() {
         try {
             return itemStackArrayFromBase64(base64);

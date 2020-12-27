@@ -21,10 +21,20 @@ public class IslandData implements Serializable {
     @Setter
     private transient Island island;
 
+    /**
+     * Registers an OreGenerator
+     *
+     * @param generator - The ore generator
+     */
     public void addGenerator(OreGenerator generator) {
         oreGenerators.add(generator);
     }
 
+    /**
+     * Gets its users, as a UUID list
+     *
+     * @return the list of UUIDs
+     */
     public List<UUID> getUsers() {
         return Stream.of(serialized.split(" ")).map(UUID::fromString).collect(Collectors.toList());
     }
