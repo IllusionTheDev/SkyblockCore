@@ -21,6 +21,7 @@ All storage operations are done async (Island saving, pasting and regenerating) 
 Player inventories are stored via SQL aswell, meaning you can have 20 servers hosting this same plugin connected to the same database and it will seem as one.
 
 Now for RAM / DISK usage on the instance itself, I'd say around 2GB DISK and 2GB RAM
+
 The 2GB DISK is due to the loaded blocks / lobbies etc that you might have, aswell as plugins that you might want to run, since all the islands
 are unloaded and saved to SQL once all the players leave the server.
 
