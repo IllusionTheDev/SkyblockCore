@@ -15,6 +15,9 @@ public class SerializedLocation implements Serializable {
      * @return the bukkit location
      */
     public Location getLocation() {
+        if (format == null || format.equalsIgnoreCase(""))
+            return null;
+
         String[] split = format.split(" ");
         double x = Double.parseDouble(split[0]);
         double y = Double.parseDouble(split[1]);

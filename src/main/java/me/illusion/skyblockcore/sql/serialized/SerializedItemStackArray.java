@@ -83,9 +83,8 @@ public class SerializedItemStackArray implements Serializable {
     public ItemStack[] getArray() {
         try {
             return itemStackArrayFromBase64(base64);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
+            return new ItemStack[]{};
         }
-        return null;
     }
 }

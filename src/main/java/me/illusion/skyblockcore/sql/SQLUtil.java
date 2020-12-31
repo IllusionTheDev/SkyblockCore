@@ -16,7 +16,8 @@ public class SQLUtil {
     private static final String[] TABLES = {
             CREATE_DATA_TABLE,
             CREATE_ISLAND_TABLE,
-            CREATE_UUID_TABLE
+            CREATE_UUID_TABLE,
+            CREATE_ISLAND_DATA_TABLE
     };
 
     private final JavaPlugin main; //MAIN

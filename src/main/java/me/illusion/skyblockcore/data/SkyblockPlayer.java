@@ -3,11 +3,8 @@ package me.illusion.skyblockcore.data;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.google.common.io.Files;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -47,47 +44,7 @@ public class SkyblockPlayer {
         this.main = main;
         this.uuid = uuid;
 
-        CompletableFuture.runAsync(() -> {
-            File target = null;
-            IslandData islandData = null;
-            if (!this.load()) {
-                System.out.println("Inicializing Data");
-                data = new PlayerData();
-                System.out.println("Loading cache");
-                target = new File(main.getDataFolder() + File.separator + "cache", uuid.toString() + ".schematic");
-                try {
-                    target.getParentFile().mkdirs();
-                    target.createNewFile();
-                    Files.copy(main.getStartSchematic(), target);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                System.out.println("Creating island data");
-                islandData = new IslandData(uuid.toString(), uuid, new ArrayList<>(), null);
-
-                System.out.println("Setting final data");
-                data.setIslandSchematic(target);
-                data.setMoney(0);
-                data.getInventory().updateArray(getPlayer().getInventory().getContents());
-            }
-
-            IslandData finalIslandData = islandData;
-            File finalTarget = target;
-            Bukkit.getScheduler().runTask(main, () -> {
-
-                System.out.println("Loading island");
-                island = loadIsland(finalIslandData, main.getIslandConfig().getOverworldSettings().getBukkitWorld(), finalTarget);
-                finalIslandData.setIsland(island);
-
-                System.out.println("Running update task");
-
-                data.getLastLocation().update(island.getCenter());
-                checkTeleport();
-                updateInventory();
-                saveIsland();
-            });
-        });
+        CompletableFuture.runAsync(this::load);
 
         main.getPlayerManager().register(uuid, this);
     }
@@ -105,31 +62,46 @@ public class SkyblockPlayer {
 
     /**
      * Loads the player and island data
-     *
-     * @return TRUE if data exists, FALSE otherwise
      */
-    private boolean load() {
-        data = (PlayerData) load(GET_SERIALIZED);
+    @SneakyThrows
+    private void load() {
 
-        if (data == null)
-            return false;
+        data = (PlayerData) load(GET_PLAYER, "PLAYER", uuid.toString());
+        File schematic = new File(main.getDataFolder() + File.separator + "cache", uuid.toString() + ".schematic");
+        IslandData islandData;
 
-        IslandData islandData = (IslandData) load(LOAD_ISLAND);
+        try {
+            schematic.getParentFile().mkdirs();
+            schematic.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        getPlayer().teleport(data.getLastLocation().getLocation());
+        if (data == null) {
+            data = new PlayerData();
+            Files.copy(main.getStartSchematic(), schematic);
+            islandData = new IslandData(UUID.randomUUID(), schematic, uuid.toString(), uuid, new ArrayList<>(), null);
+            data.getInventory().updateArray(getPlayer().getInventory().getContents());
 
-        for (UUID uuid : islandData.getUsers())
-            if (Bukkit.getPlayer(uuid) != null) {
-                island = main.getPlayerManager().get(uuid).island;
-                checkTeleport();
-                return true;
+        } else {
+            islandData = (IslandData) load(GET_ISLAND, "ISLAND", data.getIslandId().toString());
+            Files.copy(islandData.getIslandSchematic(), schematic);
+        }
+
+        data.setIslandId(islandData.getId());
+
+        Bukkit.getScheduler().runTask(main, () -> {
+            island = loadIsland(islandData, main.getIslandConfig().getOverworldSettings().getBukkitWorld());
+            islandData.setIsland(island);
+
+            if (data.getLastLocation().getLocation() == null) {
+                data.getLastLocation().update(getPlayer().getLocation());
+                data.getIslandLocation().update(getPlayer().getLocation());
             }
 
-        World world = main.getIslandConfig().getOverworldSettings().getBukkitWorld();
-
-        island = loadIsland(islandData, world, data.getIslandSchematic());
-        checkTeleport();
-        return true;
+            checkTeleport();
+            updateInventory();
+        });
     }
 
     /**
@@ -142,9 +114,9 @@ public class SkyblockPlayer {
         World world = main.getIslandConfig().getOverworldSettings().getBukkitWorld();
 
         String worldName = world.getName();
-        String targetName = data.getLastLocation().getLocation().getWorld().getName();
+        String schematicName = data.getLastLocation().getLocation().getWorld().getName();
 
-        if (worldName.equalsIgnoreCase(targetName))
+        if (worldName.equalsIgnoreCase(schematicName))
             getPlayer().teleport(data.getLastLocation().getLocation().add(island.getCenter().getX(), 0, island.getCenter().getZ()));
         else
             getPlayer().teleport(data.getLastLocation().getLocation());
@@ -155,10 +127,9 @@ public class SkyblockPlayer {
      *
      * @param data  - The island data, used in the island object
      * @param world - The world to paste the island on
-     * @param schem - The island schematic file
      * @return island object
      */
-    private Island loadIsland(IslandData data, World world, File schem) {
+    private Island loadIsland(IslandData data, World world) {
         Location one = null;
         Location two = null;
         Location center = null;
@@ -167,7 +138,7 @@ public class SkyblockPlayer {
         cell.setOccupied(true);
 
         try {
-            Schematic schematic = ClipboardFormat.SCHEMATIC.load(schem);
+            Schematic schematic = ClipboardFormat.SCHEMATIC.load(data.getIslandSchematic());
             Clipboard clipboard = schematic.getClipboard();
 
             one = new Location(world, clipboard.getMinimumPoint().getBlockX(), clipboard.getMinimumPoint().getBlockY(), clipboard.getMinimumPoint().getBlockZ());
@@ -189,7 +160,7 @@ public class SkyblockPlayer {
 
         Bukkit.broadcastMessage("post-paste");
 
-        return new Island(one, two, center, data, cell);
+        return new Island(main, one, two, center, data, cell);
     }
 
     /**
@@ -199,19 +170,21 @@ public class SkyblockPlayer {
      * @return deserialized object
      */
     @SneakyThrows
-    private Object load(String sql) {
+    private Object load(String sql, String table, String... values) {
         PreparedStatement statement = null;
         ResultSet result = null;
         try {
             statement = main.getMySQLConnection().prepareStatement(sql);
-            statement.setString(1, uuid.toString());
+            for (int i = 1; i <= values.length; i++)
+                statement.setString(i, values[i - 1]);
+
             result = statement.executeQuery();
 
             if (!result.first())
                 return null;
 
             long serialized = result.getLong("id");
-            return SQLSerializer.deserialize(main.getMySQLConnection(), serialized);
+            return SQLSerializer.deserialize(main.getMySQLConnection(), serialized, table);
         } catch (SQLException | IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
@@ -228,14 +201,16 @@ public class SkyblockPlayer {
      * Saves all the player data, and cleans the island if possible
      */
     public void save() {
+        data.getLastLocation().update(getPlayer().getLocation());
+        data.getIslandLocation().update(getPlayer().getLocation());
         data.getInventory().updateArray(getPlayer().getInventory().getContents());
-        saveIsland();
-        CompletableFuture.runAsync(() -> saveObject(data, SAVE_SERIALIZED));
+        island.save();
+        CompletableFuture.runAsync(() -> saveObject(data, SAVE_PLAYER));
 
         if (island.getData().getUsers().stream().noneMatch(uuid -> !this.uuid.equals(uuid) && Bukkit.getPlayer(uuid) == null))
             island.cleanIsland();
 
-        data.getIslandSchematic().delete();
+        island.getData().getIslandSchematic().delete();
     }
 
     /**
@@ -247,7 +222,7 @@ public class SkyblockPlayer {
     private void saveObject(Object object, String SQL) {
 
         try {
-            long id = SQLSerializer.serialize(main.getMySQLConnection(), object);
+            long id = SQLSerializer.serialize(main.getMySQLConnection(), object, "PLAYER");
             PreparedStatement statement = main.getMySQLConnection().prepareStatement(SQL);
 
             statement.setString(1, uuid.toString());
@@ -271,28 +246,5 @@ public class SkyblockPlayer {
         getPlayer().getInventory().setContents(data.getInventory().getArray());
     }
 
-    // ----- DATA PRE-SAVE -----
-
-    /**
-     * Saves the island
-     */
-    public void saveIsland() {
-        CuboidRegion region = new CuboidRegion(FaweAPI.getWorld(island.getCenter().getWorld().getName()),
-                new Vector(island.getPointOne().getBlockX(), island.getPointOne().getBlockY(), island.getPointOne().getBlockZ()),
-                new Vector(island.getPointTwo().getBlockX(), island.getPointTwo().getBlockY(), island.getPointTwo().getBlockZ()));
-
-        Schematic schematic = new Schematic(region);
-        Clipboard board = schematic.getClipboard();
-
-        board.setOrigin(new Vector(island.getCenter().getBlockX(), island.getCenter().getBlockY(), island.getCenter().getBlockZ()));
-
-        try {
-            schematic.save(data.getIslandSchematic(), ClipboardFormats.findByFile(data.getIslandSchematic()));
-
-            CompletableFuture.runAsync(() -> saveObject(island.getData(), SAVE_ISLAND));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 }

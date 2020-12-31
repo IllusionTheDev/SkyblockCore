@@ -2,6 +2,7 @@ package me.illusion.skyblockcore;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.data.PlayerManager;
+import me.illusion.skyblockcore.data.SkyblockPlayer;
 import me.illusion.skyblockcore.file.IslandConfig;
 import me.illusion.skyblockcore.island.IslandManager;
 import me.illusion.skyblockcore.island.grid.IslandGrid;
@@ -85,4 +86,10 @@ public class CorePlugin extends JavaPlugin {
         });
     }
 
+    @Override
+    public void onDisable() {
+        Bukkit.getOnlinePlayers().stream()
+                .map(playerManager::get)
+                .forEach(SkyblockPlayer::save);
+    }
 }

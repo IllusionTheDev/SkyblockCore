@@ -5,14 +5,14 @@ import lombok.Setter;
 import me.illusion.skyblockcore.sql.serialized.SerializedItemStackArray;
 import me.illusion.skyblockcore.sql.serialized.SerializedLocation;
 
-import java.io.File;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class PlayerData implements Serializable {
 
-    private File islandSchematic = null;
+    private UUID islandId;
     private double money = 0;
     private SerializedItemStackArray inventory = new SerializedItemStackArray();
     private SerializedLocation islandLocation = new SerializedLocation();

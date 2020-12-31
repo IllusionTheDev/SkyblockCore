@@ -3,7 +3,6 @@ package me.illusion.skyblockcore.file;
 import lombok.Getter;
 import me.illusion.skyblockcore.file.path.ExtendedYMLBase;
 import me.illusion.skyblockcore.file.settings.WorldSettings;
-import me.illusion.utilities.storage.YMLBase;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter

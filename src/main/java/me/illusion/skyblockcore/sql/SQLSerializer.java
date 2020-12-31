@@ -25,13 +25,12 @@ public final class SQLSerializer {
      * @throws SQLException if the operation isn't successful
      */
     public static long serialize(Connection connection,
-                                 Object objectToSerialize) throws SQLException {
+                                 Object objectToSerialize, String table) throws SQLException {
 
         PreparedStatement pstmt = connection
-                .prepareStatement(SQL_SERIALIZE_OBJECT, Statement.RETURN_GENERATED_KEYS);
+                .prepareStatement(SQL_SERIALIZE_OBJECT.replaceFirst("\\?", table), Statement.RETURN_GENERATED_KEYS);
 
         // just setting the class name
-        System.out.println(objectToSerialize.getClass().getName().length());
         pstmt.setString(1, objectToSerialize.getClass().getName());
         pstmt.setObject(2, objectToSerialize);
         pstmt.executeUpdate();
@@ -49,18 +48,19 @@ public final class SQLSerializer {
 
     /**
      * Deserializes a SQL object
-     * @param connection - The SQL connection
+     *
+     * @param connection    - The SQL connection
      * @param serialized_id - The serialized ID
      * @return deserialized object
-     * @throws SQLException if the operation isn't successful
-     * @throws IOException if the object stream is inaccessible
+     * @throws SQLException           if the operation isn't successful
+     * @throws IOException            if the object stream is inaccessible
      * @throws ClassNotFoundException if the object class is not found
      */
     public static Object deserialize(Connection connection,
-                                     long serialized_id) throws SQLException, IOException,
+                                     long serialized_id, String table) throws SQLException, IOException,
             ClassNotFoundException {
         PreparedStatement pstmt = connection
-                .prepareStatement(SQL_DESERIALIZE_OBJECT);
+                .prepareStatement(SQL_DESERIALIZE_OBJECT.replaceFirst("\\?", table));
         pstmt.setLong(1, serialized_id);
         ResultSet rs = pstmt.executeQuery();
         rs.next();
