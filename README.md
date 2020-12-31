@@ -12,7 +12,7 @@ SETUP INSTRUCTIONS:
 
 Technical Aspects:
 
-Each player currently occupies ~32.5KB, with each island occupying ~4MB max on the SQL database.
+Each player currently occupies ~32.5KB max, with each island occupying ~4MB max on the SQL database.
 This means that group islands are heavily optimized, as each player stores an Island UUID, which is then referenced to get the Island itself.
 
 All storage operations are done async (Island saving, pasting and regenerating) when possible.
