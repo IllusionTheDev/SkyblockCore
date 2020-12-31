@@ -1,20 +1,19 @@
 This project consists on an advanced Skyblock core made to scale massively.
 
-To start, the plugin requires a MySQL connection, used to store the islands and all the player data
+To start, the plugin requires a SQL connection, used to store the islands and all the player data
 
 SETUP INSTRUCTIONS:
 - Load the plugin into an empty server
 - Add FastAsyncWorldEdit
-- Set the MySQL database info into the config.yml file
+- Set the SQL database info into the config.yml file
 - Restart
 - Configure to your liking
 
 
 Technical Aspects:
 
-Each player currently occupies 8mb of disk space on the MySQL update.
-I am currently developing an update that will shrink the size to 4mb per island + 32kb per player.
-This is done to shrink disk space usage, as 1M unique players would previously consume 8TB, but now it is anywhere from 500gb - 4TB
+Each player currently occupies ~32.5KB, with each island occupying ~4MB max on the SQL database.
+This means that group islands are heavily optimized, as each player stores an Island UUID, which is then referenced to get the Island itself.
 
 All storage operations are done async (Island saving, pasting and regenerating) when possible.
 
