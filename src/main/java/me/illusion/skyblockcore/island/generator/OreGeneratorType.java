@@ -3,8 +3,6 @@ package me.illusion.skyblockcore.island.generator;
 import lombok.Getter;
 import org.bukkit.Material;
 
-import java.util.stream.Stream;
-
 @Getter
 public enum OreGeneratorType {
     COBBLESTONE(1, Material.COBBLESTONE, 0, 10),
@@ -14,6 +12,16 @@ public enum OreGeneratorType {
     GOLD(5, Material.GOLD_ORE, 1, 10000),
     DIAMOND(6, Material.DIAMOND_ORE, 9, 20000),
     QUARTZ(7, Material.QUARTZ_ORE, 14, 5000);
+
+    private static final OreGeneratorType[] VALUES = {
+            COBBLESTONE,
+            COAL,
+            IRON,
+            LAPIZ,
+            GOLD,
+            DIAMOND,
+            QUARTZ
+    };
 
     private final int id;
     private final Material endMaterial;
@@ -35,6 +43,14 @@ public enum OreGeneratorType {
      * @return an OreGeneratorType if it matches, NULL otherwise
      */
     public static OreGeneratorType fromId(int id) {
-        return Stream.of(values()).filter(type -> type.id == id).findFirst().orElse(null);
+        for (OreGeneratorType type : VALUES)
+            if (type.getId() == id)
+                return type;
+
+        return null;
+    }
+
+    public static OreGeneratorType[] getValues() {
+        return VALUES;
     }
 }

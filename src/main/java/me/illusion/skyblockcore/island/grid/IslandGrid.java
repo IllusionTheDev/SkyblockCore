@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.island.grid;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,8 +9,8 @@ public class IslandGrid {
     private final Map<Integer, GridCell> grid = new HashMap<>();
 
     public IslandGrid(int width, int height) {
-        int centerX = width / 2;
-        int centerY = height / 2;
+        int centerX = width >> 1;
+        int centerY = height >> 1;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int index = y * width + x;
@@ -28,10 +29,31 @@ public class IslandGrid {
      * @return Available cell closest to middle, NULL if all cells are occupied
      */
     public GridCell getFirstCell() {
-        return grid.values()
-                .stream()
-                .filter(cell -> !cell.isOccupied())
-                .min((cell1, cell2) -> (int) (Math.hypot(cell1.getXPos(), cell1.getYPos()) - Math.hypot(cell2.getXPos(), cell2.getYPos())))
-                .orElse(null);
+        Collection<GridCell> cells = grid.values();
+        GridCell lowest = null;
+        double lowestDistance = 0;
+
+        for (GridCell cell : cells) {
+            if (cell.isOccupied())
+                continue;
+
+            if (lowest == null) {
+                lowest = cell;
+                continue;
+            }
+
+            if (cell.equals(lowest))
+                continue;
+
+            double distance = Math.hypot(lowest.getXPos(), lowest.getYPos()) - Math.hypot(cell.getXPos(), cell.getYPos());
+
+            if (distance > lowestDistance)
+                continue;
+
+            lowest = cell;
+            lowestDistance = distance;
+        }
+
+        return lowest;
     }
 }

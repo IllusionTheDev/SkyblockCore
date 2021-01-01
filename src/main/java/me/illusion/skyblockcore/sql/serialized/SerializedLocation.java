@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.sql.serialized;
 
+import me.illusion.utilities.storage.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -18,7 +19,8 @@ public class SerializedLocation implements Serializable {
         if (format == null || format.equalsIgnoreCase(""))
             return null;
 
-        String[] split = format.split(" ");
+        String[] split = StringUtil.split(format, ' '); // Faster split method
+
         double x = Double.parseDouble(split[0]);
         double y = Double.parseDouble(split[1]);
         double z = Double.parseDouble(split[2]);
@@ -41,6 +43,6 @@ public class SerializedLocation implements Serializable {
         float pitch = location.getPitch();
         String world = location.getWorld().getName();
 
-        this.format = String.format("%s %s %s %s %s %s", x, y, z, yaw, pitch, world);
+        this.format = x + " " + y + " " + z + " " + yaw + " " + pitch + " " + world; // Not using String.format because it is awfully slow
     }
 }

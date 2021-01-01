@@ -73,6 +73,7 @@ public class SerializedItemStackArray implements Serializable {
      */
     public void updateArray(ItemStack[] items) {
         base64 = itemStackArrayToBase64(items);
+        System.out.println("Updated internal base64 to " + base64);
     }
 
     /**

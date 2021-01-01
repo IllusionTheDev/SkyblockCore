@@ -158,7 +158,7 @@ public class SkyblockPlayer {
             e.printStackTrace();
         }
 
-        Bukkit.broadcastMessage("post-paste");
+        System.out.println("Pasted Island.");
 
         return new Island(main, one, two, center, data, cell);
     }
@@ -205,9 +205,20 @@ public class SkyblockPlayer {
         data.getIslandLocation().update(getPlayer().getLocation());
         data.getInventory().updateArray(getPlayer().getInventory().getContents());
         island.save();
+
         CompletableFuture.runAsync(() -> saveObject(data, SAVE_PLAYER));
 
-        if (island.getData().getUsers().stream().noneMatch(uuid -> !this.uuid.equals(uuid) && Bukkit.getPlayer(uuid) == null))
+        boolean delete = true;
+
+        for (UUID uuid : island.getData().getUsers()) {
+            if (uuid.equals(this.uuid))
+                continue;
+            if (Bukkit.getPlayer(uuid) == null)
+                continue;
+            delete = false;
+        }
+
+        if (delete)
             island.cleanIsland();
 
         island.getData().getIslandSchematic().delete();

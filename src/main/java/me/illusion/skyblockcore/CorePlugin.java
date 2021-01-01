@@ -2,7 +2,6 @@ package me.illusion.skyblockcore;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.data.PlayerManager;
-import me.illusion.skyblockcore.data.SkyblockPlayer;
 import me.illusion.skyblockcore.file.IslandConfig;
 import me.illusion.skyblockcore.island.IslandManager;
 import me.illusion.skyblockcore.island.grid.IslandGrid;
@@ -12,6 +11,7 @@ import me.illusion.skyblockcore.listener.LeaveListener;
 import me.illusion.skyblockcore.sql.SQLUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -88,8 +88,7 @@ public class CorePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Bukkit.getOnlinePlayers().stream()
-                .map(playerManager::get)
-                .forEach(SkyblockPlayer::save);
+        for (Player player : Bukkit.getOnlinePlayers())
+            playerManager.get(player).save();
     }
 }

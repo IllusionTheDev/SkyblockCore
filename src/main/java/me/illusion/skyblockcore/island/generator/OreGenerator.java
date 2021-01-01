@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.island.generator;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import me.illusion.skyblockcore.sql.serialized.SerializedLocation;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,13 +11,22 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OreGenerator implements Serializable {
 
-    private final transient Location center;
     private final SerializedLocation relativeLocation;
     private final OreGeneratorType type;
     private long nextGenerationEpochSecond;
+
+    private transient Location center = null;
+    private transient Block block;
+    private transient Location location;
+
+    public void setCenter(Location center) {
+        this.center = center;
+        this.location = center.add(relativeLocation.getLocation().getX(), 0, relativeLocation.getLocation().getZ());
+        this.block = location.getBlock();
+    }
 
     /**
      * Check if the OreGenerator is at a specific location
@@ -26,7 +35,7 @@ public class OreGenerator implements Serializable {
      * @return TRUE if the locations match, FALSE otherwise
      */
     public boolean isAtLocation(Location loc) {
-        return center.add(relativeLocation.getLocation().getX(), 0, relativeLocation.getLocation().getZ()).equals(loc);
+        return location.equals(loc);
     }
 
     /**
@@ -39,12 +48,11 @@ public class OreGenerator implements Serializable {
             return;
 
         Material target = type.getEndMaterial();
-        Block b = center.add(relativeLocation.getLocation().getX(), 0, relativeLocation.getLocation().getZ()).getBlock();
 
-        if (b.getType() != target)
+        if (block.getType() != target)
             return;
 
-        b.setType(target);
+        block.setType(target);
         nextGenerationEpochSecond = -1;
     }
 
@@ -52,9 +60,7 @@ public class OreGenerator implements Serializable {
      * Handles block breaking
      */
     public void handleBreak() {
-        Block b = relativeLocation.getLocation().add(center.getX(), 0, center.getZ()).getBlock();
-
-        b.setType(type.getCooldownMaterial());
+        block.setType(type.getCooldownMaterial());
         nextGenerationEpochSecond = Instant.now().getEpochSecond() + type.getCooldownSeconds();
     }
 

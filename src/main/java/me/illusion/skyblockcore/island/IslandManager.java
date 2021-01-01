@@ -5,6 +5,7 @@ import me.illusion.skyblockcore.data.SkyblockPlayer;
 import me.illusion.utilities.storage.LocationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -18,12 +19,16 @@ public class IslandManager {
     }
 
     public Optional<Island> getIslandFromId(UUID islandId) {
-        return Bukkit.getOnlinePlayers()
-                .stream()
-                .map(main.getPlayerManager()::get)
-                .filter(p -> p.getData().getIslandId().equals(islandId) && p.getIsland() != null)
-                .map(SkyblockPlayer::getIsland)
-                .findFirst();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            SkyblockPlayer sb = main.getPlayerManager().get(player);
+            Island island = sb.getIsland();
+
+            if (island != null && sb.getData().getIslandId().equals(islandId))
+                return Optional.of(island);
+
+        }
+        return Optional.empty();
     }
 
     /**
@@ -33,13 +38,17 @@ public class IslandManager {
      * @return NULL if no match is found, Island object otherwise
      */
     public Island getIslandAt(Location location) {
-        return Bukkit.getOnlinePlayers()
-                .stream()
-                .map(main.getPlayerManager()::get)
-                .filter(p -> LocationUtil.locationBelongs(location, p.getIsland().getPointOne(), p.getIsland().getPointTwo()))
-                .map(SkyblockPlayer::getIsland)
-                .findFirst()
-                .orElse(null);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            SkyblockPlayer sb = main.getPlayerManager().get(player);
+            Island island = sb.getIsland();
+
+            if (island == null)
+                continue;
+
+            if (LocationUtil.locationBelongs(location, island.getPointOne(), island.getPointTwo()))
+                return island;
+        }
+        return null;
     }
 
 }
