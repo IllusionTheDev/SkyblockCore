@@ -8,6 +8,7 @@ import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import me.illusion.skyblockcore.CorePlugin;
 import me.illusion.skyblockcore.island.grid.GridCell;
 import me.illusion.skyblockcore.sql.SQLSerializer;
@@ -75,11 +76,13 @@ public class Island {
      *
      * @param object - The object to serialize
      */
+    @SneakyThrows
     private void saveObject(Object object) {
 
+        PreparedStatement statement = null;
         try {
             long id = SQLSerializer.serialize(main.getMySQLConnection(), object, "ISLAND");
-            PreparedStatement statement = main.getMySQLConnection().prepareStatement(SAVE_ISLAND);
+            statement = main.getMySQLConnection().prepareStatement(SAVE_ISLAND);
 
             statement.setString(1, data.getId().toString());
             statement.setLong(2, id);
@@ -87,6 +90,9 @@ public class Island {
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (statement != null)
+                statement.close();
         }
     }
 

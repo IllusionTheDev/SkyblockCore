@@ -19,7 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -185,7 +184,7 @@ public class SkyblockPlayer {
 
             long serialized = result.getLong("id");
             return SQLSerializer.deserialize(main.getMySQLConnection(), serialized, table);
-        } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             if (statement != null)
@@ -230,11 +229,13 @@ public class SkyblockPlayer {
      * @param object - The object to serialize
      * @param SQL    - The SQL query
      */
+    @SneakyThrows
     private void saveObject(Object object, String SQL) {
 
+        PreparedStatement statement = null;
         try {
             long id = SQLSerializer.serialize(main.getMySQLConnection(), object, "PLAYER");
-            PreparedStatement statement = main.getMySQLConnection().prepareStatement(SQL);
+            statement = main.getMySQLConnection().prepareStatement(SQL);
 
             statement.setString(1, uuid.toString());
             statement.setLong(2, id);
@@ -242,6 +243,9 @@ public class SkyblockPlayer {
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (statement != null)
+                statement.close();
         }
     }
 

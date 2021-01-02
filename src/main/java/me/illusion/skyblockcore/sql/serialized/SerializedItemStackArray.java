@@ -20,7 +20,7 @@ public class SerializedItemStackArray implements Serializable {
      * @param items - The ItemStack[] to serialize
      * @return the base64 encoded String
      */
-    private static String itemStackArrayToBase64(ItemStack[] items) {
+    private static String itemStackArrayToBase64(ItemStack... items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
@@ -71,7 +71,7 @@ public class SerializedItemStackArray implements Serializable {
      *
      * @param items - The new array
      */
-    public void updateArray(ItemStack[] items) {
+    public void updateArray(ItemStack... items) {
         base64 = itemStackArrayToBase64(items);
         System.out.println("Updated internal base64 to " + base64);
     }

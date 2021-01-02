@@ -11,16 +11,15 @@ import java.io.IOException;
 
 public class YMLBase {
 
-    private boolean existsOnSource;
-    private JavaPlugin plugin;
+    private final boolean existsOnSource;
+    private final JavaPlugin plugin;
 
     protected File file;
 
     @Getter
-    private FileConfiguration configuration;
+    private final FileConfiguration configuration;
 
-    public YMLBase(JavaPlugin plugin, String name)
-    {
+    public YMLBase(JavaPlugin plugin, String name) {
         this(plugin, new File(plugin.getDataFolder(), name), true);
     }
 
