@@ -1,9 +1,25 @@
+# General island settings
 island:
   overworld:
+    # The distance between islands on the grid
     distance: 2000
+    # The world where the grid will be located
     world: SkyblockWorld
+    # The max island size, used for storage
     max-size: 500
+    # The inicial size of the island, used for upgrades
     inicial-size: 100
   nether:
+    # The nether and end worlds can be disabled, set to true to enable
     enabled: false
+    # The world where the grid will be located
     world: SkyblockNetherWorld
+
+# If the player should respawn in their spawn point, otherwise defaults to the server's spawn point
+island-respawn-on-death: true
+
+# For a more Hypixel Skyblock experience, players won't appear in TAB or in the game, other islands won't be rendered if set to false
+show-other-players: false
+
+
+
