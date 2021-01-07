@@ -28,7 +28,7 @@ public class ExtendedYMLBase extends YMLBase {
             TargetPath target = field.getAnnotation(TargetPath.class);
             String path = target.path();
 
-            if(path.equalsIgnoreCase(""))
+            if ("".equalsIgnoreCase(path))
                 path = field.getName();
 
             Class<?> targetClass = field.getType();
@@ -46,7 +46,7 @@ public class ExtendedYMLBase extends YMLBase {
 
                 Class<?> primitive = PrimitiveUnboxer.unbox(cast.getClass());
 
-                if(primitive.isPrimitive() && primitive == targetClass) {
+                if (primitive.isPrimitive() && primitive.equals(targetClass)) {
                     cast = cast.getClass().getDeclaredMethod(primitive.getName() + "Value").invoke(cast);
                 }
 

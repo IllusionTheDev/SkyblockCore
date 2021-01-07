@@ -1,69 +1,103 @@
 package me.illusion.skyblockcore.sql;
 
-import org.bukkit.event.EventHandler;
+import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Statement;
 
-public class SQLSerializer {
+import static me.illusion.skyblockcore.sql.SQLOperation.SQL_DESERIALIZE_OBJECT;
+import static me.illusion.skyblockcore.sql.SQLOperation.SQL_SERIALIZE_OBJECT;
 
-    private static final String SQL_SERIALIZE_OBJECT = "INSERT INTO serialized_java_objects(object_name, serialized_object) VALUES (?, ?)";
-    private static final String SQL_DESERIALIZE_OBJECT = "SELECT serialized_object FROM serialized_java_objects WHERE serialized_id = ?";
+public final class SQLSerializer {
 
+    private SQLSerializer() {
+        // Empty constructor for utility class
+    }
+
+    /**
+     * Serializes an object into SQL
+     *
+     * @param connection        - The SQL connection
+     * @param objectToSerialize - The object to serialize
+     * @return the serialized ID
+     */
+    @SneakyThrows
     public static long serialize(Connection connection,
-                                 Object objectToSerialize) throws SQLException {
-
-        PreparedStatement pstmt = connection
-                .prepareStatement(SQL_SERIALIZE_OBJECT);
-
-        // just setting the class name
-        pstmt.setString(1, objectToSerialize.getClass().getName());
-        pstmt.setObject(2, objectToSerialize);
-        pstmt.executeUpdate();
-        ResultSet rs = pstmt.getGeneratedKeys();
+                                 Object objectToSerialize, String table) {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
         int serialized_id = -1;
-        if (rs.next()) {
-            serialized_id = rs.getInt(1);
+
+        try {
+            pstmt = connection
+                    .prepareStatement(SQL_SERIALIZE_OBJECT.replaceFirst("\\?", table), Statement.RETURN_GENERATED_KEYS);
+
+            // just setting the class name
+            pstmt.setString(1, objectToSerialize.getClass().getName());
+            pstmt.setObject(2, objectToSerialize);
+            pstmt.executeUpdate();
+            rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                serialized_id = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (pstmt != null)
+                pstmt.close();
         }
-        rs.close();
-        pstmt.close();
-        System.out.println("Java object serialized to database. Object: "
-                + objectToSerialize);
+
+
+        Bukkit.getLogger().info("Serialized object with id " + serialized_id);
         return serialized_id;
     }
 
     /**
-     * To de-serialize a java object from database
+     * Deserializes a SQL object
      *
-     * @throws SQLException
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @param connection    - The SQL connection
+     * @param serialized_id - The serialized ID
+     * @return deserialized object
      */
-    public static Object deserialize(Connection connection,
-                                     long serialized_id) throws SQLException, IOException,
-            ClassNotFoundException {
-        PreparedStatement pstmt = connection
-                .prepareStatement(SQL_DESERIALIZE_OBJECT);
-        pstmt.setLong(1, serialized_id);
-        ResultSet rs = pstmt.executeQuery();
-        rs.next();
-
-        // Object object = rs.getObject(1);
-
-        byte[] buf = rs.getBytes(1);
+    @SneakyThrows
+    public static Object deserialize(Connection connection, long serialized_id, String table) {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
         ObjectInputStream objectIn = null;
-        if (buf != null)
-            objectIn = new ObjectInputStream(new ByteArrayInputStream(buf));
+        Object deSerializedObject = null;
 
-        Object deSerializedObject = objectIn.readObject();
+        try {
+            pstmt = connection.prepareStatement(SQL_DESERIALIZE_OBJECT.replaceFirst("\\?", table));
+            pstmt.setLong(1, serialized_id);
+            rs = pstmt.executeQuery();
+            rs.next();
 
-        rs.close();
-        pstmt.close();
+            // Object object = rs.getObject(1);
+
+            Bukkit.getLogger().info("Deserializing object with id " + serialized_id);
+            byte[] buf = rs.getBytes(1);
+            if (buf != null)
+                objectIn = new ObjectInputStream(new ByteArrayInputStream(buf));
+
+            deSerializedObject = objectIn.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (objectIn != null)
+                objectIn.close();
+            if (rs != null)
+                rs.close();
+            if (pstmt != null)
+                pstmt.close();
+        }
 
         return deSerializedObject;
     }

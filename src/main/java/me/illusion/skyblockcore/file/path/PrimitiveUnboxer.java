@@ -3,7 +3,11 @@ package me.illusion.skyblockcore.file.path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PrimitiveUnboxer {
+public final class PrimitiveUnboxer {
+
+    private PrimitiveUnboxer() {
+        // Private empty constructor for utility class
+    }
 
     private static final Map<Class<?>, Class<?>> primitives = new HashMap<>();
 
@@ -15,8 +19,7 @@ public class PrimitiveUnboxer {
         primitives.put(Short.class, short.class);
     }
 
-    public static Class<?> unbox(Class<?> clazz)
-    {
+    public static Class<?> unbox(Class<?> clazz) {
         return primitives.getOrDefault(clazz, clazz);
     }
 }

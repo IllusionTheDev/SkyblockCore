@@ -6,16 +6,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import static me.illusion.skyblockcore.sql.SQLOperation.*;
 
 @Getter
 public class SQLUtil {
 
     private static final String[] TABLES = {
-            "CREATE TABLE IF NOT EXISTS uuid_data (uuid VARCHAR(36), id LONG);",
-            "CREATE TABLE IF NOT EXISTS island_data (uuid VARCHAR(36), id LONG);",
-            "CREATE TABLE IF NOT EXISTS serialized_java_objects (serialized_id int(11) NOT NULL auto_increment, object_name varchar(20) default NULL, serialized_object blob, PRIMARY KEY (serialized_id)) ENGINE=InnoDB DEFAULT CHARSET=latin1;"
+            CREATE_DATA_TABLE,
+            CREATE_ISLAND_TABLE,
+            CREATE_UUID_TABLE,
+            CREATE_ISLAND_DATA_TABLE
     };
 
     private final JavaPlugin main; //MAIN
@@ -45,6 +47,7 @@ public class SQLUtil {
             }
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
+            connection.setAutoCommit(true);
         } catch (Exception e) {
             return false;
         }

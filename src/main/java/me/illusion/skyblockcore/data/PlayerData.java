@@ -2,20 +2,20 @@ package me.illusion.skyblockcore.data;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
+import me.illusion.skyblockcore.sql.serialized.SerializedItemStackArray;
+import me.illusion.skyblockcore.sql.serialized.SerializedLocation;
 
-import java.io.File;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class PlayerData {
+public class PlayerData implements Serializable {
 
-    private File islandSchematic = null;
+    private UUID islandId;
     private double money = 0;
-    private ItemStack[] inventory = null;
-    private Location islandLocation;
-    private Location lastLocation;
+    private SerializedItemStackArray inventory = new SerializedItemStackArray();
+    private SerializedLocation islandLocation = new SerializedLocation();
+    private SerializedLocation lastLocation = new SerializedLocation();
 
 }

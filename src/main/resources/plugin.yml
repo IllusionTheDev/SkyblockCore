@@ -4,3 +4,4 @@ main: me.illusion.skyblockcore.CorePlugin
 
 depend:
   - FastAsyncWorldEdit
+  - WorldEdit
