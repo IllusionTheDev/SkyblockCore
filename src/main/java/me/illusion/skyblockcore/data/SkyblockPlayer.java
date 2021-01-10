@@ -13,6 +13,7 @@ import me.illusion.skyblockcore.island.Island;
 import me.illusion.skyblockcore.island.IslandData;
 import me.illusion.skyblockcore.island.grid.GridCell;
 import me.illusion.skyblockcore.sql.SQLSerializer;
+import me.illusion.skyblockcore.sql.serialized.SerializedLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -37,6 +38,7 @@ public class SkyblockPlayer {
     private final UUID uuid;
     private PlayerData data;
 
+    private Location islandCenter;
     private Island island;
 
     public SkyblockPlayer(CorePlugin main, UUID uuid) {
@@ -79,7 +81,7 @@ public class SkyblockPlayer {
         if (data == null) {
             data = new PlayerData();
             Files.copy(main.getStartSchematic(), schematic);
-            islandData = new IslandData(UUID.randomUUID(), schematic, uuid.toString(), uuid, new ArrayList<>(), null);
+            islandData = new IslandData(UUID.randomUUID(), schematic, uuid, new ArrayList<>());
             data.getInventory().updateArray(getPlayer().getInventory().getContents());
 
         } else {
@@ -93,14 +95,18 @@ public class SkyblockPlayer {
             island = loadIsland(islandData, main.getIslandConfig().getOverworldSettings().getBukkitWorld());
             islandData.setIsland(island);
 
-            if (data.getLastLocation().getLocation() == null) {
-                data.getLastLocation().update(getPlayer().getLocation());
+            SerializedLocation last = data.getLastLocation();
+
+            if (last.getLocation() == null) {
+                last.update(getPlayer().getLocation());
                 data.getIslandLocation().update(getPlayer().getLocation());
             }
 
             checkTeleport();
             updateInventory();
         });
+
+
     }
 
     /**
@@ -110,15 +116,18 @@ public class SkyblockPlayer {
     private void checkTeleport() {
         System.out.println("Teleporting");
 
+        Player p = getPlayer();
+        Location lastLoc = data.getLastLocation().getLocation();
+
         World world = main.getIslandConfig().getOverworldSettings().getBukkitWorld();
 
         String worldName = world.getName();
-        String schematicName = data.getLastLocation().getLocation().getWorld().getName();
+        String schematicName = lastLoc.getWorld().getName();
 
         if (worldName.equalsIgnoreCase(schematicName))
-            getPlayer().teleport(data.getLastLocation().getLocation().add(island.getCenter().getX(), 0, island.getCenter().getZ()));
+            p.teleport(data.getIslandLocation().getLocation().add(islandCenter.getX(), 0, islandCenter.getZ()));
         else
-            getPlayer().teleport(data.getLastLocation().getLocation());
+            p.teleport(lastLoc);
     }
 
     /**
@@ -157,6 +166,7 @@ public class SkyblockPlayer {
             e.printStackTrace();
         }
 
+        islandCenter = center;
         System.out.println("Pasted Island.");
 
         return new Island(main, one, two, center, data, cell);
@@ -200,9 +210,12 @@ public class SkyblockPlayer {
      * Saves all the player data, and cleans the island if possible
      */
     public void save() {
-        data.getLastLocation().update(getPlayer().getLocation());
-        data.getIslandLocation().update(getPlayer().getLocation());
-        data.getInventory().updateArray(getPlayer().getInventory().getContents());
+        Player p = getPlayer();
+        Location loc = p.getLocation();
+
+        data.getLastLocation().update(loc);
+        data.getIslandLocation().update(loc);
+        data.getInventory().updateArray(p.getInventory().getContents());
         island.save();
 
         CompletableFuture.runAsync(() -> saveObject(data, SAVE_PLAYER));

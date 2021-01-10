@@ -1,25 +1,24 @@
 package me.illusion.skyblockcore.file.path;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public final class PrimitiveUnboxer {
 
     private PrimitiveUnboxer() {
         // Private empty constructor for utility class
     }
 
-    private static final Map<Class<?>, Class<?>> primitives = new HashMap<>();
-
-    static {
-        primitives.put(Integer.class, int.class);
-        primitives.put(Byte.class, byte.class);
-        primitives.put(Boolean.class, boolean.class);
-        primitives.put(Double.class, double.class);
-        primitives.put(Short.class, short.class);
-    }
-
     public static Class<?> unbox(Class<?> clazz) {
-        return primitives.getOrDefault(clazz, clazz);
+        // Hardcoding the values for performance
+        if (clazz == Integer.class)
+            return int.class;
+        if (clazz == Byte.class)
+            return byte.class;
+        if (clazz == Boolean.class)
+            return boolean.class;
+        if (clazz == Double.class)
+            return double.class;
+        if (clazz == Short.class)
+            return short.class;
+
+        return clazz;
     }
 }
