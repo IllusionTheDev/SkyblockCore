@@ -9,6 +9,7 @@ import me.illusion.skyblockcore.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.listener.JoinListener;
 import me.illusion.skyblockcore.listener.LeaveListener;
 import me.illusion.skyblockcore.sql.SQLUtil;
+import me.illusion.utilities.storage.MessagesFile;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ public class CorePlugin extends JavaPlugin {
     private PlayerManager playerManager;
     private IslandGrid grid;
 
+    private MessagesFile messages;
     private File startSchematic;
 
     @Override
@@ -38,8 +40,9 @@ public class CorePlugin extends JavaPlugin {
 
         setupSQL();
 
-        islandConfig = new IslandConfig(this);
-        grid = new IslandGrid(5, 5);
+        messages      = new MessagesFile(this);
+        islandConfig  = new IslandConfig(this);
+        grid          = new IslandGrid(5, 5);
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
