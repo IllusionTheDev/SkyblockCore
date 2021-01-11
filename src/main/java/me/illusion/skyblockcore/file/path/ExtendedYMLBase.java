@@ -46,14 +46,15 @@ public class ExtendedYMLBase extends YMLBase {
 
                 Class<?> primitive = PrimitiveUnboxer.unbox(cast.getClass());
 
-                if (primitive.isPrimitive() && primitive.equals(targetClass)) {
+                if (primitive.isPrimitive() && primitive.equals(targetClass))
                     cast = cast.getClass().getDeclaredMethod(primitive.getName() + "Value").invoke(cast);
-                }
 
                 field.set(t, cast);
             } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
             }
+
+            field.setAccessible(!accessible);
         }
 
         return t;
