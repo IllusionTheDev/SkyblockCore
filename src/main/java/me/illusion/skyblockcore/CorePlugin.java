@@ -1,6 +1,8 @@
 package me.illusion.skyblockcore;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.command.CommandManager;
+import me.illusion.skyblockcore.command.island.IslandCommand;
 import me.illusion.skyblockcore.data.PlayerManager;
 import me.illusion.skyblockcore.file.IslandConfig;
 import me.illusion.skyblockcore.island.IslandManager;
@@ -26,6 +28,7 @@ public class CorePlugin extends JavaPlugin {
     private IslandConfig islandConfig;
     private IslandManager islandManager;
     private PlayerManager playerManager;
+    private CommandManager commandManager;
     private IslandGrid grid;
 
     private MessagesFile messages;
@@ -41,15 +44,18 @@ public class CorePlugin extends JavaPlugin {
         setupSQL();
 
         messages      = new MessagesFile(this);
-        islandConfig  = new IslandConfig(this);
-        grid          = new IslandGrid(5, 5);
+        islandConfig = new IslandConfig(this);
+        grid = new IslandGrid(5, 5);
         islandManager = new IslandManager(this);
+        commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, this::setupWorld, 1L);
 
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
+
+        registerDefaultCommands();
     }
 
     /**
@@ -87,6 +93,10 @@ public class CorePlugin extends JavaPlugin {
             sql.createTable();
             mySQLConnection = sql.getConnection();
         });
+    }
+
+    private void registerDefaultCommands() {
+        commandManager.register(new IslandCommand(this));
     }
 
     @Override

@@ -2,7 +2,7 @@ package me.illusion.skyblockcore.island;
 
 import me.illusion.skyblockcore.CorePlugin;
 import me.illusion.skyblockcore.data.SkyblockPlayer;
-import me.illusion.utilities.storage.LocationUtil;
+import me.illusion.utilities.LocationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

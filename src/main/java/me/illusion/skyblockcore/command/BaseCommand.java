@@ -2,8 +2,6 @@ package me.illusion.skyblockcore.command;
 
 import me.illusion.skyblockcore.CorePlugin;
 import me.illusion.skyblockcore.command.comparison.ComparisonResult;
-import me.illusion.utilities.storage.StringUtil;
-import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 

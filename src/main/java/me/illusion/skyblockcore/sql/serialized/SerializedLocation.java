@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.sql.serialized;
 
-import me.illusion.utilities.storage.StringUtil;
+import me.illusion.utilities.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

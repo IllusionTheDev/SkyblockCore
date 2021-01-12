@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.illusion.skyblockcore.island.generator.OreGenerator;
-import me.illusion.utilities.storage.StringUtil;
+import me.illusion.utilities.StringUtil;
 
 import java.io.File;
 import java.io.Serializable;

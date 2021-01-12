@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.command;
 
 import me.illusion.skyblockcore.CorePlugin;
-import me.illusion.utilities.storage.StringUtil;
+import me.illusion.utilities.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandMap;
@@ -50,7 +50,7 @@ public class CommandManager {
         return commands.get(identifier);
     }
 
-    public SkyblockCommand get(String name, String[] args) {
+    public SkyblockCommand get(String name, String... args) {
         String identifier = String.join(".", name, String.join(".", args));
 
         return get(identifier);

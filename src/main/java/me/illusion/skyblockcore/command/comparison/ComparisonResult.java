@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.command.comparison;
 
 import lombok.Getter;
-import me.illusion.utilities.storage.StringUtil;
+import me.illusion.utilities.StringUtil;
 
 @Getter
 public class ComparisonResult {
@@ -9,27 +9,27 @@ public class ComparisonResult {
     private boolean matches;
     private int[] wildcardPositions = null;
 
+    private final String[] currentSplit;
+
     public ComparisonResult(String current, String test, String[] aliases) {
-        test(current, test);
+        currentSplit = StringUtil.split(current, '.');
+        test(test);
 
-        if(!matches)
-            for(String str : aliases)
-            {
-                test(current, str);
+        if (!matches)
+            for (String str : aliases) {
+                test(str);
 
-                if(matches)
+                if (matches)
                     return;
             }
     }
 
-    private void test(String identifier, String test) {
-        String[] currentSplit = StringUtil.split(identifier, '.');
+    private void test(String test) {
         String[] testSplit = StringUtil.split(test, '.');
 
         int length = currentSplit.length;
 
-        if(length != testSplit.length)
-        {
+        if (length != testSplit.length) {
             matches = false;
             return;
         }
@@ -41,16 +41,15 @@ public class ComparisonResult {
             String c = currentSplit[i];
             String t = testSplit[i];
 
-            if(c.equals("*")) {
+            if ("*".equals(c)) {
                 wildcardPositions[wildcard++] = i;
                 continue;
             }
 
-            if(c.equalsIgnoreCase(t))
-                continue;
-
-            matches = false;
-            return;
+            if (!c.equalsIgnoreCase(t)) {
+                matches = false;
+                return;
+            }
         }
         matches = true;
         System.arraycopy(wildcardPositions, 0, wildcardPositions, 0, wildcard);
