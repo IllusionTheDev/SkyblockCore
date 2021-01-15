@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.island;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -15,6 +16,7 @@ import me.illusion.skyblockcore.sql.SQLSerializer;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -50,7 +52,8 @@ public class Island {
         board.setOrigin(new Vector(center.getBlockX(), center.getBlockY(), center.getBlockZ()));
 
         try {
-            schematic.save(data.getIslandSchematic(), ClipboardFormats.findByFile(data.getIslandSchematic()));
+            File schem = data.getIslandSchematic();
+            schematic.save(schem, ClipboardFormats.findByFile(schem));
 
             CompletableFuture.runAsync(() -> saveObject(data));
         } catch (IOException e) {
@@ -64,11 +67,12 @@ public class Island {
     public void cleanIsland() {
         World world = center.getWorld();
 
-        CuboidRegion region = new CuboidRegion(FaweAPI.getWorld(center.getWorld().getName()),
+        CuboidRegion region = new CuboidRegion(FaweAPI.getWorld(world.getName()),
                 new Vector(pointOne.getBlockX(), pointOne.getBlockY(), pointOne.getBlockZ()),
                 new Vector(pointTwo.getBlockX(), pointTwo.getBlockY(), pointTwo.getBlockZ()));
 
-        region.getChunks().forEach((c) -> world.regenerateChunk(c.getBlockX(), c.getBlockZ()));
+        for (Vector2D chunk : region.getChunks())
+            world.regenerateChunk(chunk.getBlockX(), chunk.getBlockZ());
     }
 
     /**

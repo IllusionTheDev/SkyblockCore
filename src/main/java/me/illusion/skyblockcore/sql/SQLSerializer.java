@@ -27,8 +27,7 @@ public final class SQLSerializer {
      * @return the serialized ID
      */
     @SneakyThrows
-    public static long serialize(Connection connection,
-                                 Object objectToSerialize, String table) {
+    public static long serialize(Connection connection, Object objectToSerialize, String table) {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         int serialized_id = -1;
@@ -42,9 +41,8 @@ public final class SQLSerializer {
             pstmt.setObject(2, objectToSerialize);
             pstmt.executeUpdate();
             rs = pstmt.getGeneratedKeys();
-            if (rs.next()) {
+            if (rs.next())
                 serialized_id = rs.getInt(1);
-            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,11 +70,13 @@ public final class SQLSerializer {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         ObjectInputStream objectIn = null;
+
         Object deSerializedObject = null;
 
         try {
             pstmt = connection.prepareStatement(SQL_DESERIALIZE_OBJECT.replaceFirst("\\?", table));
             pstmt.setLong(1, serialized_id);
+
             rs = pstmt.executeQuery();
             rs.next();
 

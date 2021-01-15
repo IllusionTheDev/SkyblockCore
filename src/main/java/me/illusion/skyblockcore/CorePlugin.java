@@ -5,6 +5,7 @@ import me.illusion.skyblockcore.command.CommandManager;
 import me.illusion.skyblockcore.command.island.IslandCommand;
 import me.illusion.skyblockcore.data.PlayerManager;
 import me.illusion.skyblockcore.file.IslandConfig;
+import me.illusion.skyblockcore.hook.VaultHook;
 import me.illusion.skyblockcore.island.IslandManager;
 import me.illusion.skyblockcore.island.grid.IslandGrid;
 import me.illusion.skyblockcore.island.world.EmptyWorldGenerator;
@@ -56,6 +57,9 @@ public class CorePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
 
         registerDefaultCommands();
+
+        if (Bukkit.getPluginManager().getPlugin("Vault") != null)
+            new VaultHook(this);
     }
 
     /**

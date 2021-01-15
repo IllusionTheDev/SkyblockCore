@@ -37,4 +37,19 @@ public final class StringUtil {
 
         return Arrays.copyOf(array, index + 1); // Returns a copy with all the NULL values removed
     }
+
+    public static String replaceFirst(String str, char key, String replacement) {
+        char[] chars = str.toCharArray();
+        int size = chars.length;
+
+        for (int i = 0; i < size; i++) {
+            char c = chars[i];
+
+            if (c == key)
+                return str.substring(0, i - 1) + replacement + str.substring(i);
+        }
+
+        return str;
+    }
+
 }
