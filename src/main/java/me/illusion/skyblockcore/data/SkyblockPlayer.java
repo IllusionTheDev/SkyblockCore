@@ -1,17 +1,11 @@
 package me.illusion.skyblockcore.data;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.schematic.Schematic;
-import com.google.common.io.Files;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.illusion.skyblockcore.CorePlugin;
 import me.illusion.skyblockcore.island.Island;
 import me.illusion.skyblockcore.island.IslandData;
-import me.illusion.skyblockcore.island.grid.GridCell;
 import me.illusion.skyblockcore.sql.SQLSerializer;
 import me.illusion.skyblockcore.sql.serialized.SerializedLocation;
 import org.bukkit.Bukkit;
@@ -68,31 +62,23 @@ public class SkyblockPlayer {
     private void load() {
 
         data = (PlayerData) load(GET_PLAYER, "PLAYER", uuid.toString());
-        File schematic = new File(main.getDataFolder() + File.separator + "cache", uuid.toString() + ".schematic");
         IslandData islandData;
-
-        try {
-            schematic.getParentFile().mkdirs();
-            schematic.createNewFile();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         if (data == null) {
             data = new PlayerData();
-            Files.copy(main.getStartSchematic(), schematic);
-            islandData = new IslandData(UUID.randomUUID(), schematic, uuid, new ArrayList<>());
+            islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
             data.getInventory().updateArray(getPlayer().getInventory().getContents());
 
         } else {
             islandData = (IslandData) load(GET_ISLAND, "ISLAND", data.getIslandId().toString());
-            Files.copy(islandData.getIslandSchematic(), schematic);
         }
 
         data.setIslandId(islandData.getId());
 
         Bukkit.getScheduler().runTask(main, () -> {
-            island = loadIsland(islandData, main.getIslandConfig().getOverworldSettings().getBukkitWorld());
+            String world = main.getWorldManager().assignWorld(islandData.getId());
+
+            island = loadIsland(islandData, Bukkit.getWorld(world));
             islandData.setIsland(island);
 
             SerializedLocation last = data.getLastLocation();
@@ -119,7 +105,7 @@ public class SkyblockPlayer {
         Player p = getPlayer();
         Location lastLoc = data.getLastLocation().getLocation();
 
-        World world = main.getIslandConfig().getOverworldSettings().getBukkitWorld();
+        World world = Bukkit.getWorld(island.getWorld());
 
         String worldName = world.getName();
         String schematicName = lastLoc.getWorld().getName();
@@ -138,38 +124,18 @@ public class SkyblockPlayer {
      * @return island object
      */
     private Island loadIsland(IslandData data, World world) {
-        Location one = null;
-        Location two = null;
-        Location center = null;
-        GridCell cell = main.getGrid().getFirstCell();
+        Location center = new Location(world, 0, 128, 0);
+        int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
-        cell.setOccupied(true);
+        Location one = center.add(-offset, 128, -offset);
+        Location two = center.add(offset, -128, offset);
 
-        try {
-            Schematic schematic = ClipboardFormat.SCHEMATIC.load(data.getIslandSchematic());
-            Clipboard clipboard = schematic.getClipboard();
-
-            one = new Location(world, clipboard.getMinimumPoint().getBlockX(), clipboard.getMinimumPoint().getBlockY(), clipboard.getMinimumPoint().getBlockZ());
-            two = new Location(world, clipboard.getMaximumPoint().getBlockX(), clipboard.getMaximumPoint().getBlockY(), clipboard.getMaximumPoint().getBlockZ());
-            center = new Location(world, clipboard.getOrigin().getBlockX(), clipboard.getOrigin().getBlockY(), clipboard.getOrigin().getBlockZ());
-
-            int distance = main.getIslandConfig().getOverworldSettings().getDistance();
-            center = center.add(cell.getXPos() * distance, 0, cell.getYPos() * distance);
-            one = one.add(cell.getXPos() * distance, 0, cell.getYPos() * distance);
-            two = two.add(cell.getXPos() * distance, 0, cell.getYPos() * distance);
-
-            Bukkit.getLogger().info(String.format("Pasting island at %s %s %s (%s)", center.getX(), center.getY(), center.getZ(), center.getWorld().getName()));
-            schematic.paste(FaweAPI.getWorld(world.getName()), clipboard.getOrigin(), false);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        main.getPastingHandler().paste(data.getIslandSchematic(), center);
 
         islandCenter = center;
         System.out.println("Pasted Island.");
 
-        return new Island(main, one, two, center, data, cell);
+        return new Island(main, one, two, center, data, world.getName());
     }
 
     /**
@@ -228,12 +194,14 @@ public class SkyblockPlayer {
             if (Bukkit.getPlayer(uuid) == null)
                 continue;
             delete = false;
+            break;
         }
 
         if (delete)
             island.cleanIsland();
 
-        island.getData().getIslandSchematic().delete();
+        for (File file : island.getData().getIslandSchematic())
+            file.delete();
     }
 
     /**
@@ -272,6 +240,11 @@ public class SkyblockPlayer {
             getPlayer().getInventory().clear();
 
         getPlayer().getInventory().setContents(data.getInventory().getArray());
+    }
+
+    @SafeVarargs
+    private final <T> T[] array(T... t) {
+        return t;
     }
 
 

@@ -17,7 +17,8 @@ import java.util.UUID;
 public class IslandData implements Serializable {
 
     private final UUID id;
-    private final File islandSchematic;
+    @Setter
+    private File[] islandSchematic;
     private transient final List<UUID> users = new ArrayList<>();
     private final UUID owner;
     private final List<OreGenerator> oreGenerators;

@@ -7,11 +7,12 @@ import me.illusion.skyblockcore.data.PlayerManager;
 import me.illusion.skyblockcore.file.IslandConfig;
 import me.illusion.skyblockcore.hook.VaultHook;
 import me.illusion.skyblockcore.island.IslandManager;
-import me.illusion.skyblockcore.island.grid.IslandGrid;
 import me.illusion.skyblockcore.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.listener.JoinListener;
 import me.illusion.skyblockcore.listener.LeaveListener;
+import me.illusion.skyblockcore.pasting.PastingHandler;
 import me.illusion.skyblockcore.sql.SQLUtil;
+import me.illusion.skyblockcore.world.WorldManager;
 import me.illusion.utilities.storage.MessagesFile;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
@@ -30,7 +31,8 @@ public class CorePlugin extends JavaPlugin {
     private IslandManager islandManager;
     private PlayerManager playerManager;
     private CommandManager commandManager;
-    private IslandGrid grid;
+    private WorldManager worldManager;
+    private PastingHandler pastingHandler;
 
     private MessagesFile messages;
     private File startSchematic;
@@ -44,14 +46,11 @@ public class CorePlugin extends JavaPlugin {
 
         setupSQL();
 
-        messages      = new MessagesFile(this);
+        messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
-        grid = new IslandGrid(5, 5);
         islandManager = new IslandManager(this);
         commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, this::setupWorld, 1L);
 
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
@@ -65,8 +64,8 @@ public class CorePlugin extends JavaPlugin {
     /**
      * Generates the empty island worlds
      */
-    private void setupWorld() {
-        new WorldCreator(islandConfig.getOverworldSettings().getWorld())
+    public void setupWorld(String name) {
+        new WorldCreator(name)
                 .generator(new EmptyWorldGenerator())
                 .generateStructures(false)
                 .createWorld();

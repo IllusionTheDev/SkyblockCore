@@ -1,10 +1,15 @@
 # General island settings
 island:
+  # Available choices:
+  # FAWE - Uses FastAsyncWorldEdit to paste in the island
+  # DEFAULT - Unloads the world, sets the region file and reloads
+  # If you're using SlimeWorldManager, I suggest you go with DEFAULT
+  pasting-type: FAWE
+  # Max number of loaded islands at once
+  # Worlds will be loaded and cleaned on demand
+  island-worlds: 25
+  # Overworld settings
   overworld:
-    # The distance between islands on the grid
-    distance: 2000
-    # The world where the grid will be located
-    world: SkyblockWorld
     # The max island size, used for storage
     max-size: 500
     # The inicial size of the island, used for upgrades
@@ -12,8 +17,6 @@ island:
   nether:
     # The nether and end worlds can be disabled, set to true to enable
     enabled: false
-    # The world where the grid will be located
-    world: SkyblockNetherWorld
 
 # If the player should respawn in their spawn point, otherwise defaults to the server's spawn point
 island-respawn-on-death: true

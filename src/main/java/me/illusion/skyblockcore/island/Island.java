@@ -1,23 +1,14 @@
 package me.illusion.skyblockcore.island;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.schematic.Schematic;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.illusion.skyblockcore.CorePlugin;
-import me.illusion.skyblockcore.island.grid.GridCell;
 import me.illusion.skyblockcore.sql.SQLSerializer;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
@@ -36,29 +27,17 @@ public class Island {
 
     private final IslandData data;
 
-    private final GridCell cell;
+    private final String world;
 
     /**
      * Saves the island
      */
     public void save() {
-        CuboidRegion region = new CuboidRegion(FaweAPI.getWorld(center.getWorld().getName()),
-                new Vector(pointOne.getBlockX(), pointOne.getBlockY(), pointOne.getBlockZ()),
-                new Vector(pointTwo.getBlockX(), pointTwo.getBlockY(), pointTwo.getBlockZ()));
+        File[] schem = main.getPastingHandler().save(this);
+        data.setIslandSchematic(schem);
 
-        Schematic schematic = new Schematic(region);
-        Clipboard board = schematic.getClipboard();
+        CompletableFuture.runAsync(() -> saveObject(data));
 
-        board.setOrigin(new Vector(center.getBlockX(), center.getBlockY(), center.getBlockZ()));
-
-        try {
-            File schem = data.getIslandSchematic();
-            schematic.save(schem, ClipboardFormats.findByFile(schem));
-
-            CompletableFuture.runAsync(() -> saveObject(data));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -67,12 +46,14 @@ public class Island {
     public void cleanIsland() {
         World world = center.getWorld();
 
-        CuboidRegion region = new CuboidRegion(FaweAPI.getWorld(world.getName()),
-                new Vector(pointOne.getBlockX(), pointOne.getBlockY(), pointOne.getBlockZ()),
-                new Vector(pointTwo.getBlockX(), pointTwo.getBlockY(), pointTwo.getBlockZ()));
+        int x1 = pointOne.getBlockX() >> 4;
+        int z1 = pointOne.getBlockZ() >> 4;
+        int x2 = pointTwo.getBlockX() >> 4;
+        int z2 = pointTwo.getBlockZ() >> 4;
 
-        for (Vector2D chunk : region.getChunks())
-            world.regenerateChunk(chunk.getBlockX(), chunk.getBlockZ());
+        for (int x = x1; x <= x2; x++)
+            for (int z = z1; z <= z2; z++)
+                world.regenerateChunk(x, z);
     }
 
     /**
