@@ -22,4 +22,5 @@ Now for RAM / DISK usage on the instance itself, I'd say around 2GB DISK and 2GB
 The islands are either saved in .mca (Mojang's format) or in .schematic (FAWE), format set in island-config.yml 
 
 Islands have their own worlds
+
 Worlds are loaded on-demand
