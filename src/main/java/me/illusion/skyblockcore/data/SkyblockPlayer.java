@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.data;
 
+import com.google.common.io.Files;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -8,12 +9,14 @@ import me.illusion.skyblockcore.island.Island;
 import me.illusion.skyblockcore.island.IslandData;
 import me.illusion.skyblockcore.sql.SQLSerializer;
 import me.illusion.skyblockcore.sql.serialized.SerializedLocation;
+import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,19 +67,31 @@ public class SkyblockPlayer {
         data = (PlayerData) load(GET_PLAYER, "PLAYER", uuid.toString());
         IslandData islandData;
 
+        File folder = new File(main.getDataFolder() + File.separator + "cache");
+
         if (data == null) {
             data = new PlayerData();
             islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
             data.getInventory().updateArray(getPlayer().getInventory().getContents());
-
         } else {
             islandData = (IslandData) load(GET_ISLAND, "ISLAND", data.getIslandId().toString());
         }
 
-        data.setIslandId(islandData.getId());
+        UUID uuid = islandData.getId();
+        File[] islandFiles = islandData.getIslandSchematic();
+
+        if (islandFiles == null)
+            islandFiles = main.getStartSchematic();
+
+        File[] files = createFiles(uuid, folder, islandFiles);
+
+        islandData.setIslandSchematic(files);
+
+        data.setIslandId(uuid);
+
 
         Bukkit.getScheduler().runTask(main, () -> {
-            String world = main.getWorldManager().assignWorld(islandData.getId());
+            String world = main.getWorldManager().assignWorld(uuid);
 
             island = loadIsland(islandData, Bukkit.getWorld(world));
             islandData.setIsland(island);
@@ -91,8 +106,31 @@ public class SkyblockPlayer {
             checkTeleport();
             updateInventory();
         });
+    }
 
+    private File[] createFiles(UUID id, File folder, File... files) {
+        File[] copyArray = new File[files.length];
 
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+
+            File copy = new File(folder, id + "_" + i + FilenameUtils.getExtension(file.getName()));
+
+            copyArray[i] = copy;
+
+            if (file.equals(copy))
+                continue;
+
+            try {
+                if (!copy.exists())
+                    copy.createNewFile();
+                Files.copy(file, copy);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return copyArray;
     }
 
     /**

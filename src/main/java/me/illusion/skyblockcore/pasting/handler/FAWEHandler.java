@@ -8,10 +8,13 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import me.illusion.skyblockcore.CorePlugin;
 import me.illusion.skyblockcore.island.Island;
 import me.illusion.skyblockcore.pasting.PastingHandler;
+import me.illusion.skyblockcore.pasting.PastingType;
 import org.bukkit.Location;
 
 import java.io.File;
 import java.io.IOException;
+
+import static me.illusion.skyblockcore.pasting.PastingType.FAWE;
 
 public class FAWEHandler implements PastingHandler {
 
@@ -68,5 +71,10 @@ public class FAWEHandler implements PastingHandler {
     @SafeVarargs
     private final <T> T[] array(T... types) {
         return types;
+    }
+
+    @Override
+    public PastingType getType() {
+        return FAWE;
     }
 }

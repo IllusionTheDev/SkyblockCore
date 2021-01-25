@@ -10,4 +10,6 @@ public interface PastingHandler {
     void paste(File[] file, Location loc);
 
     File[] save(Island island);
+
+    PastingType getType();
 }

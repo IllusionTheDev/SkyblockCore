@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.pasting.handler;
 import com.google.common.io.Files;
 import me.illusion.skyblockcore.island.Island;
 import me.illusion.skyblockcore.pasting.PastingHandler;
+import me.illusion.skyblockcore.pasting.PastingType;
 import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -83,5 +84,10 @@ public class DefaultHandler implements PastingHandler {
                 list.add(new File(regionFolder, "r." + x + "." + z + "." + extension));
 
         return list.toArray(new File[]{});
+    }
+
+    @Override
+    public PastingType getType() {
+        return PastingType.DEFAULT;
     }
 }

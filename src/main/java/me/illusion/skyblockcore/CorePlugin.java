@@ -36,15 +36,10 @@ public class CorePlugin extends JavaPlugin {
     private PastingHandler pastingHandler;
 
     private MessagesFile messages;
-    private File startSchematic;
+    private File[] startSchematic;
 
     @Override
     public void onEnable() {
-        startSchematic = new File(getDataFolder(), "skyblock-schematic.schematic");
-
-        if (!startSchematic.exists())
-            saveResource("skyblock-schematic.schematic", false);
-
         setupSQL();
 
         messages = new MessagesFile(this);
@@ -52,6 +47,8 @@ public class CorePlugin extends JavaPlugin {
         islandManager = new IslandManager(this);
         commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
+
+        startSchematic = startFiles();
 
         worldManager = new WorldManager(this);
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
@@ -110,5 +107,23 @@ public class CorePlugin extends JavaPlugin {
     public void onDisable() {
         for (Player player : Bukkit.getOnlinePlayers())
             playerManager.get(player).save();
+    }
+
+    private File[] startFiles() {
+        File startSchematicFolder = new File(getDataFolder() + File.separator + "start-schematic");
+
+        if (!startSchematicFolder.exists())
+            startSchematicFolder.mkdir();
+
+        File[] files = startSchematicFolder.listFiles();
+
+        if (files == null || files.length == 0) {
+            if (pastingHandler.getType() == PastingType.FAWE)
+                saveResource("skyblock-schematic.schematic", false);
+            else
+                saveResource("skyblock-mca.mca", false);
+        }
+
+        return startSchematicFolder.listFiles();
     }
 }
