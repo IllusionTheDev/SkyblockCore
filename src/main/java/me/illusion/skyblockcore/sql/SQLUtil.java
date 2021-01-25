@@ -1,12 +1,11 @@
 package me.illusion.skyblockcore.sql;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 import static me.illusion.skyblockcore.sql.SQLOperation.*;
 
@@ -20,8 +19,6 @@ public class SQLUtil {
             CREATE_ISLAND_DATA_TABLE
     };
 
-    private final JavaPlugin main; //MAIN
-
     private Connection connection;
 
     private final String host;
@@ -30,8 +27,7 @@ public class SQLUtil {
     private final String password;
     private final int port;
 
-    public SQLUtil(JavaPlugin main, String host, String database, String username, String password, int port) {
-        this.main = main;
+    public SQLUtil(String host, String database, String username, String password, int port) {
 
         this.host = host;
         this.database = database;
@@ -55,12 +51,13 @@ public class SQLUtil {
     }
 
     public void createTable() {
-        Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
-            try {
-                for(String query : TABLES)
+        CompletableFuture.runAsync(() -> {
+            for (String query : TABLES) {
+                try {
                     connection.createStatement().execute(query);
-            } catch (SQLException e) {
-                e.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
     }

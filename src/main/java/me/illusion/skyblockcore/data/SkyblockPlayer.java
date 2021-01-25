@@ -242,10 +242,4 @@ public class SkyblockPlayer {
         getPlayer().getInventory().setContents(data.getInventory().getArray());
     }
 
-    @SafeVarargs
-    private final <T> T[] array(T... t) {
-        return t;
-    }
-
-
 }

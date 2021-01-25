@@ -11,6 +11,7 @@ import me.illusion.skyblockcore.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.listener.JoinListener;
 import me.illusion.skyblockcore.listener.LeaveListener;
 import me.illusion.skyblockcore.pasting.PastingHandler;
+import me.illusion.skyblockcore.pasting.PastingType;
 import me.illusion.skyblockcore.sql.SQLUtil;
 import me.illusion.skyblockcore.world.WorldManager;
 import me.illusion.utilities.storage.MessagesFile;
@@ -52,12 +53,15 @@ public class CorePlugin extends JavaPlugin {
         commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
 
+        worldManager = new WorldManager(this);
+        pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
+
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
 
         registerDefaultCommands();
 
-        if (Bukkit.getPluginManager().getPlugin("Vault") != null)
+        if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
     }
 
@@ -84,12 +88,12 @@ public class CorePlugin extends JavaPlugin {
         int port = getConfig().getInt("database.port");
 
         CompletableFuture.runAsync(() -> {
-            SQLUtil sql = new SQLUtil(this, host, database, username, password, port);
+            SQLUtil sql = new SQLUtil(host, database, username, password, port);
 
             if (!sql.openConnection()) {
                 getLogger().warning("Could not load SQL Database.");
                 getLogger().warning("This plugin requires a valid SQL database to work.");
-                getPluginLoader().disablePlugin(this);
+                setEnabled(false);
                 return;
             }
 

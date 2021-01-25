@@ -44,7 +44,7 @@ public enum PastingType {
         if (this == DEFAULT)
             return new DefaultHandler();
         else
-            return new FAWEHandler();
+            return new FAWEHandler(main);
     }
 
     public String getPlugin() {

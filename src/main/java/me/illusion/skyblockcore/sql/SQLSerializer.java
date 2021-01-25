@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.sql;
 
 import lombok.SneakyThrows;
+import me.illusion.utilities.StringUtil;
 import org.bukkit.Bukkit;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +35,7 @@ public final class SQLSerializer {
 
         try {
             pstmt = connection
-                    .prepareStatement(SQL_SERIALIZE_OBJECT.replaceFirst("\\?", table), Statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement(StringUtil.replaceFirst(SQL_SERIALIZE_OBJECT, '?', table), Statement.RETURN_GENERATED_KEYS);
 
             // just setting the class name
             pstmt.setString(1, objectToSerialize.getClass().getName());
@@ -74,7 +75,7 @@ public final class SQLSerializer {
         Object deSerializedObject = null;
 
         try {
-            pstmt = connection.prepareStatement(SQL_DESERIALIZE_OBJECT.replaceFirst("\\?", table));
+            pstmt = connection.prepareStatement(StringUtil.replaceFirst(SQL_DESERIALIZE_OBJECT, '?', table));
             pstmt.setLong(1, serialized_id);
 
             rs = pstmt.executeQuery();
