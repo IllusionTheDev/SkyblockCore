@@ -1,6 +1,7 @@
 This project consists on an advanced Skyblock core made to scale massively.
 
 To start, the plugin requires a SQL connection, used to store the islands and all the player data
+If you do not have/need a SQL connection, change the storage type to SQLITE on the config.yml file
 
 SETUP INSTRUCTIONS:
 - Load the plugin into an empty server
