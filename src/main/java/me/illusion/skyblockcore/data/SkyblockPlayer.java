@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -109,10 +110,11 @@ public class SkyblockPlayer {
         boolean finalPaste = paste;
 
         Bukkit.getScheduler().runTask(main, () -> {
-            String world = main.getWorldManager().assignWorld();
+            if (finalPaste) {
+                String world = main.getWorldManager().assignWorld();
+                island = loadIsland(islandData, new WorldCreator(world).createWorld());
+            }
 
-            if (finalPaste)
-                island = loadIsland(islandData, Bukkit.getWorld(world));
             islandData.setIsland(island);
 
             SerializedLocation last = data.getLastLocation();
@@ -266,6 +268,7 @@ public class SkyblockPlayer {
         for (File file : island.getData().getIslandSchematic())
             if (file != null && file.exists())
                 file.delete();
+
     }
 
     /**

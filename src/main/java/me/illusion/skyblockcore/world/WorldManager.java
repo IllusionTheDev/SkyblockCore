@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.world;
 
 import me.illusion.skyblockcore.CorePlugin;
+import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ public class WorldManager {
         for (int i = 1; i <= main.getIslandConfig().getWorldCount(); i++) {
             loadedIslands.put("SkyblockWorld" + i, null);
             main.setupWorld("SkyblockWorld" + i);
+            Bukkit.unloadWorld("SkyblockWorld", false);
         }
 
     }
@@ -28,5 +30,6 @@ public class WorldManager {
 
     public void unregister(String world) {
         loadedIslands.put(world, null);
+        Bukkit.unloadWorld(world, false);
     }
 }
