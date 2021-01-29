@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 import me.illusion.skyblockcore.command.CommandManager;
 import me.illusion.skyblockcore.command.island.IslandCommand;
 import me.illusion.skyblockcore.data.PlayerManager;
@@ -13,6 +14,7 @@ import me.illusion.skyblockcore.listener.LeaveListener;
 import me.illusion.skyblockcore.pasting.PastingHandler;
 import me.illusion.skyblockcore.pasting.PastingType;
 import me.illusion.skyblockcore.sql.SQLUtil;
+import me.illusion.skyblockcore.sql.StorageType;
 import me.illusion.skyblockcore.world.WorldManager;
 import me.illusion.utilities.storage.MessagesFile;
 import org.bukkit.Bukkit;
@@ -22,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.sql.Connection;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -78,14 +81,21 @@ public class CorePlugin extends JavaPlugin {
     private void setupSQL() {
         saveDefaultConfig();
 
-        String host = getConfig().getString("database.host");
-        String database = getConfig().getString("database.database");
-        String username = getConfig().getString("database.username");
-        String password = getConfig().getString("database.password");
+        StorageType type = StorageType.valueOf(getConfig().getString("database.type").toUpperCase(Locale.ROOT));
+
+        String host = getConfig().getString("database.host", "");
+        String database = getConfig().getString("database.database", "");
+        String username = getConfig().getString("database.username", "");
+        String password = getConfig().getString("database.password", "");
         int port = getConfig().getInt("database.port");
 
         CompletableFuture.runAsync(() -> {
-            SQLUtil sql = new SQLUtil(host, database, username, password, port);
+            SQLUtil sql;
+
+            if (type == StorageType.MYSQL)
+                sql = new SQLUtil(host, database, username, password, port);
+            else
+                sql = new SQLUtil(createSQLiteFile());
 
             if (!sql.openConnection()) {
                 getLogger().warning("Could not load SQL Database.");
@@ -97,6 +107,16 @@ public class CorePlugin extends JavaPlugin {
             sql.createTable();
             mySQLConnection = sql.getConnection();
         });
+    }
+
+    @SneakyThrows
+    private File createSQLiteFile() {
+        File file = new File(getDataFolder(), "storage.db");
+
+        if (!file.exists())
+            file.createNewFile();
+
+        return file;
     }
 
     private void registerDefaultCommands() {

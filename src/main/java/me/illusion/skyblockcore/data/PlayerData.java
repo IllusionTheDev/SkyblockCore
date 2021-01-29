@@ -14,6 +14,8 @@ public class PlayerData implements Serializable {
 
     private UUID islandId;
     private double money = 0;
+    private float experience = 0;
+    private int experienceLevel = 0;
     private SerializedItemStackArray inventory = new SerializedItemStackArray();
     private SerializedLocation islandLocation = new SerializedLocation();
     private SerializedLocation lastLocation = new SerializedLocation();

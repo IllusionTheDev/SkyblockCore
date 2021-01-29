@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.sql;
 
 import lombok.Getter;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -21,11 +22,17 @@ public class SQLUtil {
 
     private Connection connection;
 
-    private final String host;
-    private final String database;
-    private final String username;
-    private final String password;
-    private final int port;
+    private String host;
+    private String database;
+    private String username;
+    private String password;
+    private int port;
+
+    private File file;
+
+    public SQLUtil(File file) {
+        this.file = file;
+    }
 
     public SQLUtil(String host, String database, String username, String password, int port) {
 
@@ -42,7 +49,11 @@ public class SQLUtil {
                 return true;
             }
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
+            if (file == null)
+                connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
+            else
+                connection = DriverManager.getConnection("jdbc:sqlite:" + file);
+
             connection.setAutoCommit(true);
         } catch (Exception e) {
             return false;

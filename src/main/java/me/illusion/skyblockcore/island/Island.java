@@ -37,7 +37,6 @@ public class Island {
         data.setIslandSchematic(schem);
 
         CompletableFuture.runAsync(() -> saveObject(data));
-
     }
 
     /**
@@ -54,6 +53,8 @@ public class Island {
         for (int x = x1; x <= x2; x++)
             for (int z = z1; z <= z2; z++)
                 world.regenerateChunk(x, z);
+
+        main.getWorldManager().unregister(this.world);
     }
 
     /**

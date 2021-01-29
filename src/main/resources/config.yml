@@ -1,4 +1,8 @@
 database:
+  # Available types: SQLite, MySQL
+  type: MySQL
+
+  # Specific to MySQL, leave blank with SQLite
   host: 172.18.0.1
   database: Skyblock
   username: u28_BkBAJgUhJp

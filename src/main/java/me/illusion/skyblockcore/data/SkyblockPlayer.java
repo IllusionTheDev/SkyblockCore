@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -64,44 +65,66 @@ public class SkyblockPlayer {
     @SneakyThrows
     private void load() {
 
+        Player p = getPlayer();
         data = (PlayerData) load(GET_PLAYER, "PLAYER", uuid.toString());
         IslandData islandData;
+
+        boolean paste = true;
 
         File folder = new File(main.getDataFolder() + File.separator + "cache");
 
         if (data == null) {
             data = new PlayerData();
             islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
-            data.getInventory().updateArray(getPlayer().getInventory().getContents());
+            data.getInventory().updateArray(p.getInventory().getContents());
         } else {
             islandData = (IslandData) load(GET_ISLAND, "ISLAND", data.getIslandId().toString());
+
+            List<UUID> members = islandData.getUsers();
+
+            for (UUID uuid : members)
+                if (!uuid.equals(this.uuid) && Bukkit.getPlayer(uuid) != null) {
+                    paste = false;
+                    break;
+                }
         }
 
         UUID uuid = islandData.getId();
-        File[] islandFiles = islandData.getIslandSchematic();
 
-        if (islandFiles == null)
-            islandFiles = main.getStartSchematic();
+        if (paste) {
+            File[] islandFiles = islandData.getIslandSchematic();
 
-        File[] files = createFiles(uuid, folder, islandFiles);
+            if (islandFiles == null)
+                islandFiles = main.getStartSchematic();
 
-        islandData.setIslandSchematic(files);
+            File[] files = createFiles(uuid, folder, islandFiles);
+
+            islandData.setIslandSchematic(files);
+        }
+
 
         data.setIslandId(uuid);
 
 
-        Bukkit.getScheduler().runTask(main, () -> {
-            String world = main.getWorldManager().assignWorld(uuid);
+        boolean finalPaste = paste;
 
-            island = loadIsland(islandData, Bukkit.getWorld(world));
+        Bukkit.getScheduler().runTask(main, () -> {
+            String world = main.getWorldManager().assignWorld();
+
+            if (finalPaste)
+                island = loadIsland(islandData, Bukkit.getWorld(world));
             islandData.setIsland(island);
 
             SerializedLocation last = data.getLastLocation();
 
             if (last.getLocation() == null) {
-                last.update(getPlayer().getLocation());
-                data.getIslandLocation().update(getPlayer().getLocation());
+                Location loc = p.getLocation();
+                last.update(loc);
+                data.getIslandLocation().update(loc);
             }
+
+            p.setExp(data.getExperience());
+            p.setLevel(data.getExperienceLevel());
 
             checkTeleport();
             updateInventory();
@@ -217,6 +240,8 @@ public class SkyblockPlayer {
         Player p = getPlayer();
         Location loc = p.getLocation();
 
+        data.setExperience(p.getExp());
+        data.setExperienceLevel(p.getLevel());
         data.getLastLocation().update(loc);
         data.getIslandLocation().update(loc);
         data.getInventory().updateArray(p.getInventory().getContents());
@@ -239,7 +264,8 @@ public class SkyblockPlayer {
             island.cleanIsland();
 
         for (File file : island.getData().getIslandSchematic())
-            file.delete();
+            if (file != null && file.exists())
+                file.delete();
     }
 
     /**
