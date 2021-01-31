@@ -25,3 +25,12 @@ The islands are either saved in .mca (Mojang's format) or in .schematic (FAWE), 
 Islands have their own worlds
 
 Worlds are loaded on-demand
+
+**Technologies Used**
+- SpigotAPI
+- MySQL
+- Gradle
+
+**Plugin Hooks**
+- Vault
+- FastAsyncWorldEdit
