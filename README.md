@@ -3,6 +3,7 @@ This project consists on an advanced Skyblock core made to scale massively.
 To start, the plugin requires a SQL connection, used to store the islands and all the player data
 If you do not have/need a SQL connection, change the storage type to SQLITE on the config.yml file
 
+
 **SETUP INSTRUCTIONS**:
 - Load the plugin into an empty server
 - Set the SQL database info into the config.yml file (if not SQLite)
@@ -19,6 +20,7 @@ If you do not have/need a SQL connection, change the storage type to SQLITE on t
 - Set them all to use the same MySQL database
 - On each proxy, also set the Redis database details
 - Restart all proxies (If you don't have jedis, you're going to have to restart twice)
+
 
 **Technical Aspects**:
 
