@@ -29,8 +29,8 @@ Islands have their own worlds, which are loaded on demand
 - MySQL
 - SQLite
 - Gradle
+- Bungeecord
 - ~~Redis (soon)~~ 
-- ~~Bungeecord (soon)~~
 
 **Plugin Hooks**
 - Vault
