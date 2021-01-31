@@ -30,7 +30,7 @@ Islands have their own worlds, which are loaded on demand
 - SQLite
 - Gradle
 - Bungeecord
-- ~~Redis (soon)~~ 
+- Redis
 
 **Plugin Hooks**
 - Vault
