@@ -18,15 +18,10 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import static me.illusion.skyblockcore.sql.SQLOperation.*;
 
 @Getter
 public class SkyblockPlayer {
@@ -66,23 +61,25 @@ public class SkyblockPlayer {
     @SneakyThrows
     private void load() {
 
-        Player p = getPlayer();
-        data = (PlayerData) load(GET_PLAYER, "PLAYER", uuid.toString());
-        IslandData islandData;
+        Player p = getPlayer(); // Obtain the Bukkit player
+        data = (PlayerData) load("PLAYER", uuid); // Load the player data
+        IslandData islandData; // Island data variable
 
-        boolean paste = true;
+        boolean paste = true; // Default pasting as true
 
-        File folder = new File(main.getDataFolder() + File.separator + "cache");
+        File folder = new File(main.getDataFolder() + File.separator + "cache"); // Create cache folder
 
-        if (data == null) {
-            data = new PlayerData();
-            islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
-            data.getInventory().updateArray(p.getInventory().getContents());
-        } else {
-            islandData = (IslandData) load(GET_ISLAND, "ISLAND", data.getIslandId().toString());
+        if (data == null) { // If the player data is null (player never joined before)
+            data = new PlayerData(); // Create new data
+            islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>()); // Assign new island data
+            data.getInventory().updateArray(p.getInventory().getContents()); // Update serialized contents
+        } else { // If the player joined before
+            islandData = (IslandData) load("ISLAND", data.getIslandId()); // Load island data
 
+            // Obtain island members
             List<UUID> members = islandData.getUsers();
 
+            // If any island member is online (island pasted)
             for (UUID uuid : members)
                 if (!uuid.equals(this.uuid) && Bukkit.getPlayer(uuid) != null) {
                     paste = false;
@@ -90,8 +87,10 @@ public class SkyblockPlayer {
                 }
         }
 
+        // Obtain island UUID
         UUID uuid = islandData.getId();
 
+        // Premake island cache files
         if (paste) {
             File[] islandFiles = islandData.getIslandSchematic();
 
@@ -103,32 +102,40 @@ public class SkyblockPlayer {
             islandData.setIslandSchematic(files);
         }
 
-
+        // Set the island UUID in the player data
         data.setIslandId(uuid);
 
-
+        // Final copy of paste
         boolean finalPaste = paste;
 
+        // Back to sync
         Bukkit.getScheduler().runTask(main, () -> {
+            // Paste the island
             if (finalPaste) {
                 String world = main.getWorldManager().assignWorld();
                 island = loadIsland(islandData, new WorldCreator(world).createWorld());
             }
 
+            // Update the island internally (island not serialized)
             islandData.setIsland(island);
 
+            // Obtain last player location
             SerializedLocation last = data.getLastLocation();
 
+            // Assign player location if not found
             if (last.getLocation() == null) {
-                Location loc = p.getLocation();
+                Location loc = islandCenter;
                 last.update(loc);
                 data.getIslandLocation().update(loc);
             }
 
+            // Update XP values (default 0)
             p.setExp(data.getExperience());
             p.setLevel(data.getExperienceLevel());
 
+            // Teleports
             checkTeleport();
+            // Updates inventory
             updateInventory();
         });
     }
@@ -204,34 +211,10 @@ public class SkyblockPlayer {
     /**
      * Obtains a serialized object
      *
-     * @param sql - The SQL query used to obtain the ID
      * @return deserialized object
      */
-    @SneakyThrows
-    private Object load(String sql, String table, String... values) {
-        PreparedStatement statement = null;
-        ResultSet result = null;
-        try {
-            statement = main.getMySQLConnection().prepareStatement(sql);
-            for (int i = 1; i <= values.length; i++)
-                statement.setString(i, values[i - 1]);
-
-            result = statement.executeQuery();
-
-            if (!result.first())
-                return null;
-
-            long serialized = result.getLong("id");
-            return SQLSerializer.deserialize(main.getMySQLConnection(), serialized, table);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null)
-                statement.close();
-            if (result != null)
-                result.close();
-        }
-        return null;
+    private Object load(String table, UUID uuid) {
+        return SQLSerializer.deserialize(main.getMySQLConnection(), uuid, table);
     }
     // ----- DATA SAVING -----
 
@@ -249,7 +232,7 @@ public class SkyblockPlayer {
         data.getInventory().updateArray(p.getInventory().getContents());
         island.save();
 
-        CompletableFuture.runAsync(() -> saveObject(data, SAVE_PLAYER));
+        CompletableFuture.runAsync(() -> saveObject(uuid, data, "PLAYER"));
 
         boolean delete = true;
 
@@ -275,26 +258,9 @@ public class SkyblockPlayer {
      * Serializes the object and sets the serialized ID into the SQL statement
      *
      * @param object - The object to serialize
-     * @param SQL    - The SQL query
      */
-    @SneakyThrows
-    private void saveObject(Object object, String SQL) {
-
-        PreparedStatement statement = null;
-        try {
-            long id = SQLSerializer.serialize(main.getMySQLConnection(), object, "PLAYER");
-            statement = main.getMySQLConnection().prepareStatement(SQL);
-
-            statement.setString(1, uuid.toString());
-            statement.setLong(2, id);
-
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null)
-                statement.close();
-        }
+    private void saveObject(UUID uuid, Object object, String table) {
+        SQLSerializer.serialize(main.getMySQLConnection(), uuid, object, table);
     }
 
     // ----- DATA POST-LOAD -----

@@ -66,6 +66,7 @@ public class DefaultHandler implements PastingHandler {
     @Override
     public File[] save(Island island) {
         World world = Bukkit.getWorld(island.getWorld());
+        world.save();
 
         File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
 

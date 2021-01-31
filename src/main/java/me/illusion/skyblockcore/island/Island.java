@@ -2,18 +2,13 @@ package me.illusion.skyblockcore.island;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.illusion.skyblockcore.CorePlugin;
 import me.illusion.skyblockcore.sql.SQLSerializer;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.io.File;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
-
-import static me.illusion.skyblockcore.sql.SQLOperation.SAVE_ISLAND;
 
 @Getter
 @AllArgsConstructor
@@ -36,7 +31,7 @@ public class Island {
         File[] schem = main.getPastingHandler().save(this);
         data.setIslandSchematic(schem);
 
-        CompletableFuture.runAsync(() -> saveObject(data));
+        CompletableFuture.runAsync(this::saveData);
     }
 
     /**
@@ -54,32 +49,16 @@ public class Island {
             for (int z = z1; z <= z2; z++)
                 world.regenerateChunk(x, z);
 
+        world.save();
+
         main.getWorldManager().unregister(this.world);
     }
 
     /**
-     * Serializes the object and sets the serialized ID into the SQL statement
-     *
-     * @param object - The object to serialize
+     * Saves Island data
      */
-    @SneakyThrows
-    private void saveObject(Object object) {
-
-        PreparedStatement statement = null;
-        try {
-            long id = SQLSerializer.serialize(main.getMySQLConnection(), object, "ISLAND");
-            statement = main.getMySQLConnection().prepareStatement(SAVE_ISLAND);
-
-            statement.setString(1, data.getId().toString());
-            statement.setLong(2, id);
-
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null)
-                statement.close();
-        }
+    private void saveData() {
+        SQLSerializer.serialize(main.getMySQLConnection(), data.getId(), data, "ISLAND");
     }
 
 }
