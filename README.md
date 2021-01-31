@@ -9,6 +9,17 @@ If you do not have/need a SQL connection, change the storage type to SQLITE on t
 - Restart
 - Configure to your liking
 
+**If on a proxy**:
+- Put the plugin on the plugins folder
+- Set the SQL database info into the bungee-config.yml file (note that instances should also be running on MySQL)
+- Restart
+
+**If you're running multiple proxies (Requires Redis)**:
+- Put the plugin on each proxy and instance
+- Set them all to use the same MySQL database
+- On each proxy, also set the Redis database details
+- Restart all proxies (If you don't have jedis, you're going to have to restart twice)
+
 **Technical Aspects**:
 
 Each player currently occupies ~32.5KB max, with each island occupying ~4MB max on the SQL database.
