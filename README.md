@@ -3,13 +3,13 @@ This project consists on an advanced Skyblock core made to scale massively.
 To start, the plugin requires a SQL connection, used to store the islands and all the player data
 If you do not have/need a SQL connection, change the storage type to SQLITE on the config.yml file
 
-SETUP INSTRUCTIONS:
+**SETUP INSTRUCTIONS**:
 - Load the plugin into an empty server
-- Set the SQL database info into the config.yml file
+- Set the SQL database info into the config.yml file (if not SQLite)
 - Restart
 - Configure to your liking
 
-Technical Aspects:
+**Technical Aspects**:
 
 Each player currently occupies ~32.5KB max, with each island occupying ~4MB max on the SQL database.
 This means that group islands are heavily optimized, as each player stores an Island UUID, which is then referenced to get the Island itself.
@@ -22,14 +22,15 @@ Now for RAM / DISK usage on the instance itself, I'd say around 2GB DISK and 2GB
 
 The islands are either saved in .mca (Mojang's format) or in .schematic (FAWE), format set in island-config.yml 
 
-Islands have their own worlds
-
-Worlds are loaded on-demand
+Islands have their own worlds, which are loaded on demand
 
 **Technologies Used**
 - SpigotAPI
 - MySQL
+- SQLite
 - Gradle
+~~- Redis (soon)~~ 
+~~- Bungeecord (soon)~~
 
 **Plugin Hooks**
 - Vault
