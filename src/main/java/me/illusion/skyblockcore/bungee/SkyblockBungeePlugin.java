@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.bungee;
 import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SkyblockCommand;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
+import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
 import me.illusion.skyblockcore.shared.sql.SQLUtil;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -15,8 +16,12 @@ public class SkyblockBungeePlugin extends Plugin {
 
     private boolean enabled;
 
+    private boolean multiProxy;
+
+    private PlayerFinder playerFinder;
     private Connection mySQLConnection;
     private Configuration config;
+    private JedisUtil jedisUtil;
 
     @Override
     public void onEnable() {
@@ -27,7 +32,13 @@ public class SkyblockBungeePlugin extends Plugin {
         if (!enabled)
             return;
 
+        setupJedis();
+
+        if (!enabled)
+            return;
+
         getProxy().getPluginManager().registerCommand(this, new SkyblockCommand(this));
+        playerFinder = new PlayerFinder(this);
     }
 
     @Override
@@ -58,6 +69,22 @@ public class SkyblockBungeePlugin extends Plugin {
             sql.createTable();
             mySQLConnection = sql.getConnection();
         });
+    }
+
+    private void setupJedis() {
+        multiProxy = config.getBoolean("jedis.enable");
+
+        if (!multiProxy)
+            return;
+
+        jedisUtil = new JedisUtil();
+
+        String ip = config.getString("jedis.host");
+        String port = config.getString("jedis.port", "");
+        String password = config.getString("jedis.password", "");
+
+        if (!jedisUtil.connect(this, ip, port, password))
+            disable();
     }
 
     private void disable() {

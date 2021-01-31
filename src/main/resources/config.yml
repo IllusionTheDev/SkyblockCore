@@ -3,8 +3,8 @@ database:
   type: MySQL
 
   # Specific to MySQL, leave blank with SQLite
-  host: 172.18.0.1
+  host: localhost
   database: Skyblock
-  username: u28_BkBAJgUhJp
-  password: u^8.^zRXV53eVLpW@Q+rNGe9
+  username: username
+  password: password
   port: 3306
