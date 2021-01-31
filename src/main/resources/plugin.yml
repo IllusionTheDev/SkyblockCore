@@ -1,6 +1,6 @@
 name: Skyblock
 version: 1
-main: me.illusion.skyblockcore.CorePlugin
+main: me.illusion.skyblockcore.spigot.SkyblockPlugin
 
 depend:
   - FastAsyncWorldEdit
