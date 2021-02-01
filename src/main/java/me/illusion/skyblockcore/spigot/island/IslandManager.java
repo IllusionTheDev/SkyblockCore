@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.spigot.island;
 
-import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
 import org.bukkit.Location;
 
@@ -11,13 +10,7 @@ import java.util.UUID;
 
 public class IslandManager {
 
-    private final SkyblockPlugin main;
-
     private final Map<UUID, Island> islands = new HashMap<>();
-
-    public IslandManager(SkyblockPlugin main) {
-        this.main = main;
-    }
 
     void register(Island island) {
         islands.put(island.getData().getId(), island);

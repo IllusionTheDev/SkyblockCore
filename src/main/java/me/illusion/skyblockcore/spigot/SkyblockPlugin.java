@@ -65,7 +65,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
-        islandManager = new IslandManager(this);
+        islandManager = new IslandManager();
         commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
         emptyWorldGenerator = new EmptyWorldGenerator();
