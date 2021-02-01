@@ -1,11 +1,8 @@
 package me.illusion.skyblockcore.spigot.island;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
-import me.illusion.skyblockcore.spigot.data.SkyblockPlayer;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,16 +38,9 @@ public class IslandManager {
      * @return NULL if no match is found, Island object otherwise
      */
     public Island getIslandAt(Location location) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            SkyblockPlayer sb = main.getPlayerManager().get(player);
-            Island island = sb.getIsland();
-
-            if (island == null)
-                continue;
-
+        for (Island island : islands.values())
             if (LocationUtil.locationBelongs(location, island.getPointOne(), island.getPointTwo()))
                 return island;
-        }
         return null;
     }
 
