@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.spigot.island;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.sql.SQLSerializer;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
-@AllArgsConstructor
 public class Island {
 
     private final SkyblockPlugin main;
@@ -24,6 +22,17 @@ public class Island {
     private final IslandData data;
 
     private final String world;
+
+    public Island(SkyblockPlugin main, Location pointOne, Location pointTwo, Location center, IslandData data, String world) {
+        this.main = main;
+        this.pointOne = pointOne;
+        this.pointTwo = pointTwo;
+        this.center = center;
+        this.data = data;
+        this.world = world;
+
+        main.getIslandManager().register(this);
+    }
 
     /**
      * Saves the island
@@ -52,6 +61,7 @@ public class Island {
 
         world.save();
 
+        main.getIslandManager().unregister(this);
         main.getWorldManager().unregister(this.world);
     }
 

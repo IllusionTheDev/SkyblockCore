@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,21 +16,22 @@ public class IslandManager {
 
     private final SkyblockPlugin main;
 
+    private final Map<UUID, Island> islands = new HashMap<>();
+
     public IslandManager(SkyblockPlugin main) {
         this.main = main;
     }
 
+    void register(Island island) {
+        islands.put(island.getData().getId(), island);
+    }
+
+    void unregister(Island island) {
+        islands.remove(island.getData().getId());
+    }
+
     public Optional<Island> getIslandFromId(UUID islandId) {
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            SkyblockPlayer sb = main.getPlayerManager().get(player);
-            Island island = sb.getIsland();
-
-            if (island != null && sb.getData().getIslandId().equals(islandId))
-                return Optional.of(island);
-
-        }
-        return Optional.empty();
+        return Optional.ofNullable(islands.get(islandId));
     }
 
     /**
