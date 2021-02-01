@@ -58,7 +58,9 @@ public final class SQLSerializer {
                 pstmt.setString(1, uuid.toString());
 
                 rs = pstmt.executeQuery();
-                rs.next();
+
+                if (!rs.next())
+                    return null;
 
                 // Object object = rs.getObject(1);
 
@@ -73,10 +75,10 @@ public final class SQLSerializer {
                 try {
                     if (objectIn != null)
                         objectIn.close();
-                    if (rs != null)
-                        rs.close();
-                    if (pstmt != null)
-                        pstmt.close();
+                    //if (rs != null && !rs.isClosed())
+                    //    rs.close();
+                    //if (pstmt != null && !pstmt.isClosed())
+                    //    pstmt.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

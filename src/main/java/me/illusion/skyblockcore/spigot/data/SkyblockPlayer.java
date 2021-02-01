@@ -185,6 +185,8 @@ public class SkyblockPlayer {
             islandData.setIslandSchematic(files);
 
             String world = main.getWorldManager().assignWorld();
+
+            System.out.println("Assigned world " + world + " for player " + p.getName());
             island = loadIsland(islandData, new WorldCreator(world).generator(main.getEmptyWorldGenerator()).createWorld());
         } else
             island = main.getIslandManager().getIslandFromId(islandData.getId()).orElse(null);
@@ -304,7 +306,7 @@ public class SkyblockPlayer {
         data.getInventory().updateArray(p.getInventory().getContents());
         island.save();
 
-        CompletableFuture.runAsync(() -> saveObject(uuid, data, "PLAYER"));
+        CompletableFuture.runAsync(() -> saveObject(uuid, data));
 
         boolean delete = true;
 
@@ -331,8 +333,8 @@ public class SkyblockPlayer {
      *
      * @param object - The object to serialize
      */
-    private void saveObject(UUID uuid, Object object, String table) {
-        SQLSerializer.serialize(main.getMySQLConnection(), uuid, object, table);
+    private void saveObject(UUID uuid, Object object) {
+        SQLSerializer.serialize(main.getMySQLConnection(), uuid, object, "PLAYER");
     }
 
     // ----- DATA POST-LOAD -----
