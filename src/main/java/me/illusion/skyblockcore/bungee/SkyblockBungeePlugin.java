@@ -2,6 +2,9 @@ package me.illusion.skyblockcore.bungee;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SkyblockCommand;
+import me.illusion.skyblockcore.bungee.listener.ConnectListener;
+import me.illusion.skyblockcore.bungee.listener.RedisListener;
+import me.illusion.skyblockcore.bungee.listener.SpigotListener;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
 import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
 import me.illusion.skyblockcore.shared.sql.SQLUtil;
@@ -38,6 +41,8 @@ public class SkyblockBungeePlugin extends Plugin {
             return;
 
         getProxy().getPluginManager().registerCommand(this, new SkyblockCommand(this));
+        getProxy().getPluginManager().registerListener(this, new SpigotListener(this));
+        getProxy().getPluginManager().registerListener(this, new ConnectListener());
         playerFinder = new PlayerFinder(this);
     }
 
@@ -83,8 +88,11 @@ public class SkyblockBungeePlugin extends Plugin {
         String port = config.getString("jedis.port", "");
         String password = config.getString("jedis.password", "");
 
+
         if (!jedisUtil.connect(this, ip, port, password))
             disable();
+        else
+            new RedisListener(this);
     }
 
     private void disable() {

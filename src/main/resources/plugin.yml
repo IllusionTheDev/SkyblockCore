@@ -2,6 +2,7 @@ name: Skyblock
 version: 1
 main: me.illusion.skyblockcore.spigot.SkyblockPlugin
 
-depend:
+softdepend:
   - FastAsyncWorldEdit
   - WorldEdit
+  - Vault

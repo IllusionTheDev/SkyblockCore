@@ -1,0 +1,6 @@
+name: SkyblockCoreBungee
+version: "1"
+main: me.illusion.skyblockcore.bungee.SkyblockBungeePlugin
+
+softdepends:
+  - JedisDependency

@@ -1,6 +1,6 @@
 database:
   # Available types: SQLite, MySQL
-  type: MySQL
+  type: SQLite
 
   # Specific to MySQL, leave blank with SQLite
   host: localhost

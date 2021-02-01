@@ -4,7 +4,7 @@ island:
   # FAWE - Uses FastAsyncWorldEdit to paste in the island
   # DEFAULT - Unloads the world, sets the region file and reloads
   # If you're using SlimeWorldManager, I suggest you go with DEFAULT
-  pasting-type: FAWE
+  pasting-type: DEFAULT
   # Max number of loaded islands at once
   # Worlds will be loaded and cleaned on demand
   island-worlds: 25
