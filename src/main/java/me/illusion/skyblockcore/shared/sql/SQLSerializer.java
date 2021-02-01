@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.shared.sql;
 
+import com.mysql.jdbc.MySQLConnection;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
 
 import java.io.ByteArrayInputStream;
@@ -10,8 +11,7 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static me.illusion.skyblockcore.shared.sql.SQLOperation.SQL_DESERIALIZE_OBJECT;
-import static me.illusion.skyblockcore.shared.sql.SQLOperation.SQL_SERIALIZE_OBJECT;
+import static me.illusion.skyblockcore.shared.sql.SQLOperation.*;
 
 public final class SQLSerializer {
 
@@ -26,8 +26,10 @@ public final class SQLSerializer {
      * @param objectToSerialize - The object to serialize
      */
     public static void serialize(Connection connection, UUID uuid, Object objectToSerialize, String table) {
+        String operation = connection instanceof MySQLConnection ? SQL_SERIALIZE_OBJECT : SQLITE_SERIALIZE_OBJECT;
+
         try (PreparedStatement pstmt = connection
-                .prepareStatement(StringUtil.replaceFirst(SQL_SERIALIZE_OBJECT, '?', table))) {
+                .prepareStatement(StringUtil.replaceFirst(operation, '?', table))) {
 
             pstmt.setString(1, uuid.toString());
             pstmt.setString(2, objectToSerialize.getClass().getName());
@@ -47,8 +49,8 @@ public final class SQLSerializer {
      */
     public static CompletableFuture<Object> deserialize(Connection connection, UUID uuid, String table) {
         return CompletableFuture.supplyAsync(() -> {
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
+            PreparedStatement pstmt;
+            ResultSet rs;
             ObjectInputStream objectIn = null;
 
             Object deSerializedObject = null;
