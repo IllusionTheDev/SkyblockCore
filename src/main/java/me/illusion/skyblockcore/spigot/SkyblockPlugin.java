@@ -12,6 +12,7 @@ import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.spigot.listener.JoinListener;
 import me.illusion.skyblockcore.spigot.listener.LeaveListener;
+import me.illusion.skyblockcore.spigot.messaging.BungeeMessaging;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.sql.StorageType;
@@ -39,6 +40,8 @@ public class SkyblockPlugin extends JavaPlugin {
     private PastingHandler pastingHandler;
     private EmptyWorldGenerator emptyWorldGenerator;
 
+    private BungeeMessaging bungeeMessaging;
+
     private MessagesFile messages;
     private File[] startSchematic;
 
@@ -65,7 +68,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
-        islandManager = new IslandManager();
+        islandManager = new IslandManager(this);
         commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
         emptyWorldGenerator = new EmptyWorldGenerator();
@@ -89,6 +92,13 @@ public class SkyblockPlugin extends JavaPlugin {
         System.out.println("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
+
+        System.out.println("Registering bungeecord messaging listener");
+        bungeeMessaging = new BungeeMessaging(this);
+
+        System.out.println("Loaded");
+
+
     }
     /**
      * Generates the empty island worlds

@@ -1,7 +1,10 @@
 package me.illusion.skyblockcore.bungee.command;
 
+import me.illusion.skyblockcore.bungee.PlayerFinder;
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 public class SkyblockCommand extends Command {
@@ -15,6 +18,24 @@ public class SkyblockCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
+        if (!(sender instanceof ProxiedPlayer)) {
+            //message
+            return;
+        }
 
+        ProxiedPlayer player = (ProxiedPlayer) sender;
+        PlayerFinder playerFinder = main.getPlayerFinder();
+
+        playerFinder.request(player.getUniqueId()).whenComplete((servername, thr) -> {
+            if (servername == null) // Assign available server if no members are online
+                servername = playerFinder.getAvailableServer();
+
+            if (servername == null) // If no space found
+                return;
+
+            ServerInfo targetServer = main.getProxy().getServerInfo(servername);
+
+            player.connect(targetServer);
+        });
     }
 }

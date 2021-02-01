@@ -1,5 +1,8 @@
 package me.illusion.skyblockcore.bungee;
 
+import lombok.Getter;
+import me.illusion.skyblockcore.bungee.data.Server;
+import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.shared.data.PlayerData;
 import me.illusion.skyblockcore.shared.sql.SQLSerializer;
 
@@ -10,23 +13,69 @@ public class PlayerFinder {
 
     private final SkyblockBungeePlugin main;
 
-    private final Map<UUID, String> islandsLoaded = new HashMap<>();
+    @Getter
+    private final Map<String, Server> servers = new HashMap<>();
 
     public PlayerFinder(SkyblockBungeePlugin main) {
         this.main = main;
     }
 
-    public void update(List<UUID> islandId, String server) {
-        for (Map.Entry<UUID, String> entries : new HashSet<>(islandsLoaded.entrySet())) {
-            UUID uuid = entries.getKey();
-            String location = entries.getValue();
+    public void update(List<UUID> islandId, String server, boolean available, boolean spigot) {
+        RedisListener redisListener = main.getRedisListener();
 
-            if (location.equals(server) && !islandId.contains(uuid))
-                islandsLoaded.remove(uuid);
+        if (!servers.containsKey(server))
+            servers.put(server, new Server(server, new ArrayList<>(), available));
+
+        servers.get(server).setAvailable(available);
+
+        for (Map.Entry<String, Server> entry : servers.entrySet()) {
+            String name = entry.getKey();
+            Server srv = entry.getValue();
+
+            if (!server.equals(name))
+                continue;
+
+            List<UUID> islands = srv.getIslands();
+
+            for (UUID uuid : new ArrayList<>(islands))
+                if (!islandId.contains(uuid)) {
+                    islands.remove(uuid);
+                    if (main.isMultiProxy())
+                        redisListener.remove(uuid, name);
+                }
         }
 
-        for (UUID uuid : islandId)
-            islandsLoaded.putIfAbsent(uuid, server);
+        Server srv = servers.get(server);
+        List<UUID> islands = srv.getIslands();
+
+        for (UUID uuid : islandId) {
+            islands.add(uuid);
+
+            if (main.isMultiProxy())
+                redisListener.register(uuid, server);
+        }
+
+        if (spigot)
+            if (redisListener != null)
+                redisListener.requestUpdate();
+    }
+
+    public void update(UUID islandId, String server) {
+        servers.get(server).getIslands().add(islandId);
+
+        RedisListener redisListener = main.getRedisListener();
+
+        if (redisListener != null) {
+            redisListener.register(islandId, server);
+        }
+    }
+
+    public String getAvailableServer() {
+        for (Map.Entry<String, Server> entry : servers.entrySet())
+            if (entry.getValue().isAvailable())
+                return entry.getKey();
+
+        return null;
     }
 
     public CompletableFuture<String> request(UUID member) {
@@ -39,8 +88,17 @@ public class PlayerFinder {
             if (data == null)
                 return null;
 
-            return islandsLoaded.get(data.getIslandId());
+            UUID uuid = data.getIslandId();
 
+            for (Map.Entry<String, Server> entry : servers.entrySet()) {
+                String servername = entry.getKey();
+                Server server = entry.getValue();
+
+                if (server.getIslands().contains(uuid))
+                    return servername;
+            }
+
+            return null;
         });
 
     }

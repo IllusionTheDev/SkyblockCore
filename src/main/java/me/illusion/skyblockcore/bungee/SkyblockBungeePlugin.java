@@ -25,6 +25,7 @@ public class SkyblockBungeePlugin extends Plugin {
     private Connection mySQLConnection;
     private Configuration config;
     private JedisUtil jedisUtil;
+    private RedisListener redisListener;
 
     @Override
     public void onEnable() {
@@ -92,7 +93,7 @@ public class SkyblockBungeePlugin extends Plugin {
         if (!jedisUtil.connect(this, ip, port, password))
             disable();
         else
-            new RedisListener(this);
+            redisListener = new RedisListener(this);
     }
 
     private void disable() {

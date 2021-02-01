@@ -31,12 +31,13 @@ public class SpigotListener implements Listener {
 
         int size = input.readInt();
         String server = input.readUTF();
+        boolean available = input.readBoolean();
 
         List<UUID> islandIds = new ArrayList<>();
 
         for (int i = 0; i < size; i++)
             islandIds.add(UUID.fromString(input.readUTF()));
 
-        main.getPlayerFinder().update(islandIds, server);
+        main.getPlayerFinder().update(islandIds, server, available, true);
     }
 }

@@ -2,6 +2,8 @@ package me.illusion.skyblockcore.spigot.listener;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.data.SkyblockPlayer;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -16,7 +18,14 @@ public class JoinListener implements Listener {
 
     @EventHandler
     private void onJoin(PlayerJoinEvent e) {
-        SkyblockPlayer player = new SkyblockPlayer(main, e.getPlayer().getUniqueId());
+        Player p = e.getPlayer();
+        SkyblockPlayer player = new SkyblockPlayer(main, p.getUniqueId());
 
+        new ScheduleBuilder(main)
+                .in(2)
+                .ticks()
+                .run(() -> main.getBungeeMessaging().sendData(p))
+                .sync()
+                .start();
     }
 }

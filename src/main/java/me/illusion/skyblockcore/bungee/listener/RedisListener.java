@@ -6,11 +6,12 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class RedisListener extends JedisPubSub {
 
-    private final Jedis jedis;
     private final SkyblockBungeePlugin main;
+    private final Jedis jedis;
 
     public RedisListener(SkyblockBungeePlugin main) {
         this.main = main;
@@ -18,23 +19,35 @@ public class RedisListener extends JedisPubSub {
         jedis.subscribe(this, "SkyblockCommunication");
     }
 
+    public void register(UUID islandId, String server) {
+        jedis.sadd("Islands", islandId + "-" + server);
+    }
+
+    public void remove(UUID islandId, String server) {
+        jedis.srem("Islands", islandId + "-" + server);
+    }
+
+    public void requestUpdate() {
+        CompletableFuture.runAsync(() -> jedis.publish("SkyblockCommunication", "UPDATE"));
+    }
+
+    public void update() {
+        CompletableFuture.runAsync(() -> {
+            for (String island : jedis.smembers("Islands")) {
+                String[] split = StringUtil.split(island, '-');
+
+                String islandId = split[0];
+                String server = split[1];
+
+                main.getPlayerFinder().update(UUID.fromString(islandId), server);
+            }
+        });
+
+    }
+
     @Override
     public void onMessage(String channel, String message) {
-        if (!channel.equals("SkyblockCommunication"))
-            return;
-
-        String[] split = StringUtil.split(message, ' ');
-
-        if (!split[0].equals("GET_ISLAND"))
-            return;
-
-        UUID uuid = UUID.fromString(split[1]);
-
-        main.getPlayerFinder().request(uuid).whenCompleteAsync((s, thr) -> {
-            jedis.publish("SkyblockCommunication", s);
-
-            if (thr != null)
-                thr.printStackTrace();
-        });
+        if (channel.equals("SkyblockCommunication") && message.equals("UPDATE"))
+            update();
     }
 }
