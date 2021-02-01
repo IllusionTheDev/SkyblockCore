@@ -36,12 +36,15 @@ public class CommandManager {
 
     private void makeCommand(SkyblockCommand command) {
         String identifier = command.getIdentifier();
-        String name = identifier.substring(0, identifier.indexOf("."));
+        int index = identifier.indexOf(".");
+        String name = index == -1 ? identifier : identifier.substring(0, index);
 
         commandMap.register(name, new BaseCommand(name, main, command));
     }
 
     public void register(SkyblockCommand command) {
+        System.out.println("Registered command " + command.getClass().getSimpleName());
+
         commands.put(command.getIdentifier(), command);
         makeCommand(command);
     }

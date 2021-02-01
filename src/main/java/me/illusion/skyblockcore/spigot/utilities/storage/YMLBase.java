@@ -8,7 +8,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 
 public class YMLBase {
 
@@ -32,8 +31,7 @@ public class YMLBase {
         this.configuration = loadConfiguration();
     }
 
-    protected void save()
-    {
+    protected void save() {
         try {
             configuration.save(file);
         } catch (IOException e) {
@@ -44,26 +42,24 @@ public class YMLBase {
     private FileConfiguration loadConfiguration() {
         FileConfiguration cfg = new YamlConfiguration();
 
-        CompletableFuture.runAsync(() -> {
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                if (existsOnSource)
-                    plugin.saveResource(file.getAbsolutePath().replace(plugin.getDataFolder().getAbsolutePath() + File.separator, ""), false);
-                else {
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            if (existsOnSource)
+                plugin.saveResource(file.getAbsolutePath().replace(plugin.getDataFolder().getAbsolutePath() + File.separator, ""), false);
+            else {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
+        }
 
-            try {
-                cfg.load(file);
-            } catch (IOException | InvalidConfigurationException e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            cfg.load(file);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
 
 
         return cfg;

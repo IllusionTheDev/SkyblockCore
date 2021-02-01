@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.shared.sql;
 
-import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
 
 import java.io.ByteArrayInputStream;
@@ -9,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static me.illusion.skyblockcore.shared.sql.SQLOperation.SQL_DESERIALIZE_OBJECT;
 import static me.illusion.skyblockcore.shared.sql.SQLOperation.SQL_SERIALIZE_OBJECT;
@@ -45,39 +45,44 @@ public final class SQLSerializer {
      * @param connection - The SQL connection
      * @return deserialized object
      */
-    @SneakyThrows
-    public static Object deserialize(Connection connection, UUID uuid, String table) {
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        ObjectInputStream objectIn = null;
+    public static CompletableFuture<Object> deserialize(Connection connection, UUID uuid, String table) {
+        return CompletableFuture.supplyAsync(() -> {
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+            ObjectInputStream objectIn = null;
 
-        Object deSerializedObject = null;
+            Object deSerializedObject = null;
 
-        try {
-            pstmt = connection.prepareStatement(StringUtil.replaceFirst(SQL_DESERIALIZE_OBJECT, '?', table));
-            pstmt.setString(1, uuid.toString());
+            try {
+                pstmt = connection.prepareStatement(StringUtil.replaceFirst(SQL_DESERIALIZE_OBJECT, '?', table));
+                pstmt.setString(1, uuid.toString());
 
-            rs = pstmt.executeQuery();
-            rs.next();
+                rs = pstmt.executeQuery();
+                rs.next();
 
-            // Object object = rs.getObject(1);
+                // Object object = rs.getObject(1);
 
-            byte[] buf = rs.getBytes(1);
-            if (buf != null)
-                objectIn = new ObjectInputStream(new ByteArrayInputStream(buf));
+                byte[] buf = rs.getBytes(1);
+                if (buf != null)
+                    objectIn = new ObjectInputStream(new ByteArrayInputStream(buf));
 
-            deSerializedObject = objectIn.readObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (objectIn != null)
-                objectIn.close();
-            if (rs != null)
-                rs.close();
-            if (pstmt != null)
-                pstmt.close();
-        }
+                deSerializedObject = objectIn.readObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (objectIn != null)
+                        objectIn.close();
+                    if (rs != null)
+                        rs.close();
+                    if (pstmt != null)
+                        pstmt.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-        return deSerializedObject;
+            }
+            return deSerializedObject;
+        });
     }
 }

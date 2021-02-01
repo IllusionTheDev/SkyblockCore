@@ -18,6 +18,7 @@ public class IslandConfig extends ExtendedYMLBase {
 
         pastingSelection = getConfiguration().getString("island.pasting-type");
         worldCount = getConfiguration().getInt("island.island-worlds", 25);
+
         overworldSettings = load(new WorldSettings(), getConfiguration().getConfigurationSection("island.overworld"));
         netherSettings = load(new WorldSettings(), getConfiguration().getConfigurationSection("island.nether"));
     }

@@ -47,14 +47,18 @@ public class SQLUtil {
             if (connection != null && !connection.isClosed()) {
                 return true;
             }
-            Class.forName("com.mysql.jdbc.Driver");
-            if (file == null)
+            if (file == null) {
+                Class.forName("com.mysql.jdbc.Driver");
                 connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
-            else
+            } else {
+                Class.forName("org.sqlite.JDBC");
                 connection = DriverManager.getConnection("jdbc:sqlite:" + file);
+
+            }
 
             connection.setAutoCommit(true);
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
         return true;

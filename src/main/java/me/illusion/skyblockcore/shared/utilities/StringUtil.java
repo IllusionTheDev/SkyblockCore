@@ -16,6 +16,9 @@ public final class StringUtil {
      * @return The string split by the delimiter
      */
     public static String[] split(String str, char delimiter) {
+        if (str == null)
+            return new String[0];
+
         String[] array = new String[str.length()]; // Initializes a new array with the string size as a default
 
         int index = 0; // This will be the array index counter
@@ -46,7 +49,7 @@ public final class StringUtil {
             char c = chars[i];
 
             if (c == key)
-                return str.substring(0, i - 1) + replacement + str.substring(i);
+                return str.substring(0, i) + replacement + str.substring(i + 1);
         }
 
         return str;

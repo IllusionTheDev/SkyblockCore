@@ -37,59 +37,85 @@ public class SkyblockPlugin extends JavaPlugin {
     private CommandManager commandManager;
     private WorldManager worldManager;
     private PastingHandler pastingHandler;
+    private EmptyWorldGenerator emptyWorldGenerator;
 
     private MessagesFile messages;
     private File[] startSchematic;
 
     @Override
     public void onEnable() {
-        setupSQL();
+        setupSQL().whenComplete((val, throwable) -> {
+
+            System.out.println("SQL has been set up");
+
+            if (!val)
+                return;
+
+            try {
+                sync(this::load);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    private void load() {
+        System.out.println("Registering configuration files");
 
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
         islandManager = new IslandManager(this);
         commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
+        emptyWorldGenerator = new EmptyWorldGenerator();
 
-        startSchematic = startFiles();
-
-        worldManager = new WorldManager(this);
+        System.out.println("Setting up pasting handler");
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
 
+        System.out.println("Registering start files");
+        startSchematic = startFiles();
+
+        System.out.println("Creating worlds");
+        worldManager = new WorldManager(this);
+
+        System.out.println("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
 
+        System.out.println("Registering default commands.");
         registerDefaultCommands();
 
+        System.out.println("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
     }
-
     /**
      * Generates the empty island worlds
      */
     public void setupWorld(String name) {
         new WorldCreator(name)
-                .generator(new EmptyWorldGenerator())
+                .generator(emptyWorldGenerator)
                 .generateStructures(false)
+                .seed(0)
                 .createWorld();
     }
 
     /**
      * Opens the SQL connection async
      */
-    private void setupSQL() {
-        saveDefaultConfig();
+    private CompletableFuture<Boolean> setupSQL() {
+        return CompletableFuture.supplyAsync(() -> {
+            saveDefaultConfig();
 
-        StorageType type = StorageType.valueOf(getConfig().getString("database.type").toUpperCase(Locale.ROOT));
+            StorageType type = StorageType.valueOf(getConfig().getString("database.type").toUpperCase(Locale.ROOT));
 
-        String host = getConfig().getString("database.host", "");
-        String database = getConfig().getString("database.database", "");
-        String username = getConfig().getString("database.username", "");
-        String password = getConfig().getString("database.password", "");
-        int port = getConfig().getInt("database.port");
+            String host = getConfig().getString("database.host", "");
+            String database = getConfig().getString("database.database", "");
+            String username = getConfig().getString("database.username", "");
+            String password = getConfig().getString("database.password", "");
+            int port = getConfig().getInt("database.port");
 
-        CompletableFuture.runAsync(() -> {
             SQLUtil sql;
 
             if (type == StorageType.MYSQL)
@@ -101,12 +127,14 @@ public class SkyblockPlugin extends JavaPlugin {
                 getLogger().warning("Could not load SQL Database.");
                 getLogger().warning("This plugin requires a valid SQL database to work.");
                 setEnabled(false);
-                return;
+                return false;
             }
 
             sql.createTable();
             mySQLConnection = sql.getConnection();
+            return true;
         });
+
     }
 
     @SneakyThrows
@@ -139,11 +167,15 @@ public class SkyblockPlugin extends JavaPlugin {
 
         if (files == null || files.length == 0) {
             if (pastingHandler.getType() == PastingType.FAWE)
-                saveResource("skyblock-schematic.schematic", false);
+                saveResource("start-schematic" + File.separator + "skyblock-schematic.schematic", false);
             else
-                saveResource("skyblock-mca.mca", false);
+                saveResource("start-schematic" + File.separator + "skyblock-mca.mca", false);
         }
 
         return startSchematicFolder.listFiles();
+    }
+
+    private void sync(Runnable runnable) {
+        Bukkit.getScheduler().runTask(this, runnable);
     }
 }

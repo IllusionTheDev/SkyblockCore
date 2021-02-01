@@ -30,15 +30,18 @@ public class PlayerFinder {
     }
 
     public CompletableFuture<String> request(UUID member) {
-        return CompletableFuture.supplyAsync(() -> {
-            PlayerData playerData = (PlayerData) SQLSerializer.deserialize(main.getMySQLConnection(), member, "PLAYER");
+        return SQLSerializer.deserialize(main.getMySQLConnection(), member, "PLAYER").handle((dataObject, thr) -> {
+            if (thr != null)
+                thr.printStackTrace();
 
-            if (playerData == null)
+            PlayerData data = (PlayerData) dataObject;
+
+            if (data == null)
                 return null;
 
-            UUID islandId = playerData.getIslandId();
+            return islandsLoaded.get(data.getIslandId());
 
-            return islandsLoaded.get(islandId);
         });
+
     }
 }

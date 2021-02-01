@@ -22,19 +22,24 @@ public class DefaultHandler implements PastingHandler {
     private void paste(File file, Location loc) {
 
         if (extension == null)
-            extension = FilenameUtils.getExtension(file.getName());
+            extension = FilenameUtils.getExtension(file.getAbsolutePath());
+
+        System.out.println(extension);
 
         World world = loc.getWorld();
 
         String name = world.getName();
 
         // Divide blockX by 512, also known as chunkX/16
-        double x = loc.getBlockX() >> 9;
+        int x = loc.getBlockX() >> 9;
         // Divide blockZ by 512, also known as chunkZ/16
-        double z = loc.getBlockZ() >> 9;
+        int z = loc.getBlockZ() >> 9;
 
         // Obtain the region folder for the world
         File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
+
+        regionFolder.delete();
+        regionFolder.mkdir();
 
         // Unload the world, to not cause issues
         Bukkit.unloadWorld(world, false);
@@ -44,8 +49,7 @@ public class DefaultHandler implements PastingHandler {
 
         try {
             // Create the region file, if not exists
-            if (!newFile.exists())
-                newFile.createNewFile();
+            newFile.createNewFile();
 
             // Copy the file
             Files.copy(file, newFile);
