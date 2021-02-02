@@ -241,24 +241,14 @@ public class SkyblockPlayer {
     }
 
     /**
-     * Teleports the player to its island relative position
-     * If the location isn't on the island world, the location is no longer relative
+     * Teleports player to last position
      */
     private void checkTeleport() {
         System.out.println("Teleporting");
 
         Player p = getPlayer();
         Location lastLoc = data.getLastLocation().getLocation();
-
-        World world = Bukkit.getWorld(island.getWorld());
-
-        String worldName = world.getName();
-        String schematicName = lastLoc.getWorld().getName();
-
-        if (worldName.equalsIgnoreCase(schematicName))
-            p.teleport(data.getIslandLocation().getLocation().add(islandCenter.getX(), 0, islandCenter.getZ()));
-        else
-            p.teleport(lastLoc);
+        p.teleport(lastLoc);
     }
 
     /**
