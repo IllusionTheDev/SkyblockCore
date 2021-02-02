@@ -16,7 +16,7 @@ public class RedisListener extends JedisPubSub {
     public RedisListener(SkyblockBungeePlugin main) {
         this.main = main;
         this.jedis = main.getJedisUtil().getJedis();
-        jedis.subscribe(this, "SkyblockCommunication");
+        jedis.subscribe(this, "SkyblockChannel");
     }
 
     public void register(UUID islandId, String server) {
@@ -28,7 +28,7 @@ public class RedisListener extends JedisPubSub {
     }
 
     public void requestUpdate() {
-        CompletableFuture.runAsync(() -> jedis.publish("SkyblockCommunication", "UPDATE"));
+        CompletableFuture.runAsync(() -> jedis.publish("SkyblockChannel", "UPDATE"));
     }
 
     public void update() {
@@ -47,7 +47,7 @@ public class RedisListener extends JedisPubSub {
 
     @Override
     public void onMessage(String channel, String message) {
-        if (channel.equals("SkyblockCommunication") && message.equals("UPDATE"))
+        if (channel.equals("SkyblockChannel") && message.equals("UPDATE"))
             update();
     }
 }

@@ -42,7 +42,7 @@ public enum PastingType {
 
     private PastingHandler initialize(SkyblockPlugin main) {
         if (this == DEFAULT)
-            return new DefaultHandler();
+            return new DefaultHandler(main);
         else
             return new FAWEHandler(main);
     }

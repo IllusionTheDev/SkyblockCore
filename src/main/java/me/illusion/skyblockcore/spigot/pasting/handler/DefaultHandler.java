@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.pasting.handler;
 
 import com.google.common.io.Files;
+import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
@@ -14,8 +15,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class DefaultHandler implements PastingHandler {
+
+    private final SkyblockPlugin main;
+
+    public DefaultHandler(SkyblockPlugin main) {
+        this.main = main;
+    }
 
     private String extension;
 
@@ -68,27 +76,30 @@ public class DefaultHandler implements PastingHandler {
     }
 
     @Override
-    public File[] save(Island island) {
+    public void save(Island island, Consumer<File[]> action) {
         World world = Bukkit.getWorld(island.getWorld());
         world.save();
 
-        File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
+        main.getWorldManager().whenNextSave(($) -> {
+            File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
 
-        List<File> list = new ArrayList<>();
+            List<File> list = new ArrayList<>();
 
-        Location one = island.getPointOne();
-        Location two = island.getPointTwo();
+            Location one = island.getPointOne();
+            Location two = island.getPointTwo();
 
-        int xOne = one.getBlockX() >> 9;
-        int zOne = one.getBlockZ() >> 9;
-        int xTwo = two.getBlockX() >> 9;
-        int zTwo = two.getBlockZ() >> 9;
+            int xOne = one.getBlockX() >> 9;
+            int zOne = one.getBlockZ() >> 9;
+            int xTwo = two.getBlockX() >> 9;
+            int zTwo = two.getBlockZ() >> 9;
 
-        for (int x = xOne; x <= xTwo; x++)
-            for (int z = zOne; z <= zTwo; z++)
-                list.add(new File(regionFolder, "r." + x + "." + z + "." + extension));
+            for (int x = xOne; x <= xTwo; x++)
+                for (int z = zOne; z <= zTwo; z++)
+                    list.add(new File(regionFolder, "r." + x + "." + z + "." + extension));
 
-        return list.toArray(new File[]{});
+            action.accept(list.toArray(new File[]{}));
+        }, world.getName());
+
     }
 
     @Override

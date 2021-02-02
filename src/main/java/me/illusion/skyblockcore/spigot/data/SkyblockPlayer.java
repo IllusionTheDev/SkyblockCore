@@ -70,9 +70,10 @@ public class SkyblockPlayer {
                 data = new PlayerData();
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
                 data.getInventory().updateArray(p.getInventory().getContents());
-                loadIsland(islandData);
+                sync(() -> loadIsland(islandData));
             } else {
-                load("ISLAND", data.getIslandId()).whenComplete((islandObject, thr2) -> loadIsland((IslandData) islandObject));
+                load("ISLAND", data.getIslandId()).whenComplete((islandObject, thr2) ->
+                        sync(() -> loadIsland((IslandData) islandObject)));
             }
         });
         /*
@@ -304,27 +305,29 @@ public class SkyblockPlayer {
         data.getLastLocation().update(loc);
         data.getIslandLocation().update(loc);
         data.getInventory().updateArray(p.getInventory().getContents());
-        island.save();
+        island.save(() -> {
+            CompletableFuture.runAsync(() -> saveObject(uuid, data));
 
-        CompletableFuture.runAsync(() -> saveObject(uuid, data));
+            boolean delete = true;
 
-        boolean delete = true;
+            for (UUID uuid : island.getData().getUsers()) {
+                if (uuid.equals(this.uuid))
+                    continue;
+                if (Bukkit.getPlayer(uuid) == null)
+                    continue;
+                delete = false;
+                break;
+            }
 
-        for (UUID uuid : island.getData().getUsers()) {
-            if (uuid.equals(this.uuid))
-                continue;
-            if (Bukkit.getPlayer(uuid) == null)
-                continue;
-            delete = false;
-            break;
-        }
+            if (delete)
+                island.cleanIsland();
 
-        if (delete)
-            island.cleanIsland();
+            for (File file : island.getData().getIslandSchematic())
+                if (file != null && file.exists())
+                    file.delete();
 
-        for (File file : island.getData().getIslandSchematic())
-            if (file != null && file.exists())
-                file.delete();
+        });
+
 
     }
 
@@ -347,6 +350,10 @@ public class SkyblockPlayer {
             getPlayer().getInventory().clear();
 
         getPlayer().getInventory().setContents(data.getInventory().getArray());
+    }
+
+    private void sync(Runnable runnable) {
+        Bukkit.getScheduler().runTask(main, runnable);
     }
 
 }

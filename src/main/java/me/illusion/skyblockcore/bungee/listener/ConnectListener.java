@@ -14,13 +14,13 @@ public class ConnectListener implements Listener {
         Server server = e.getServer();
         String serverName = server.getInfo().getName();
 
-        server.sendData("SkyblockCommunication", formMessage(serverName));
+        server.sendData("SkyblockChannel", formMessage(serverName));
     }
 
     private byte[] formMessage(String serverName) {
         ByteArrayDataOutput output = ByteStreams.newDataOutput();
 
-        output.writeUTF("SkyblockCommunicationIdentifier");
+        output.writeUTF("SkyblockChannelIdentifier");
         output.writeUTF(serverName);
 
         return output.toByteArray();

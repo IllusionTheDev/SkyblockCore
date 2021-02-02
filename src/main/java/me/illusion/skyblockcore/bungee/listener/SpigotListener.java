@@ -21,12 +21,12 @@ public class SpigotListener implements Listener {
 
     @EventHandler
     public void onPluginMessage(PluginMessageEvent e) {
-        if (!e.getTag().equals("SkyblockCommunication"))
+        if (!e.getTag().equals("SkyblockChannel"))
             return;
 
         ByteArrayDataInput input = ByteStreams.newDataInput(e.getData());
 
-        if (!input.readUTF().equals("SkyblockCommunication"))
+        if (!input.readUTF().equals("SkyblockChannel"))
             return;
 
         int size = input.readInt();

@@ -19,18 +19,18 @@ public class BungeeMessaging implements PluginMessageListener {
     public BungeeMessaging(SkyblockPlugin main) {
         this.main = main;
 
-        Bukkit.getMessenger().registerIncomingPluginChannel(main, "SkyblockCommunication", this);
-        Bukkit.getMessenger().registerOutgoingPluginChannel(main, "SkyblockCommunication");
+        Bukkit.getMessenger().registerIncomingPluginChannel(main, "SkyblockChannel", this);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(main, "SkyblockChannel");
     }
 
     @Override
     public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
-        if (!s.equalsIgnoreCase("SkyblockCommunication"))
+        if (!s.equalsIgnoreCase("SkyblockChannel"))
             return;
 
         ByteArrayDataInput input = ByteStreams.newDataInput(bytes);
 
-        if (input.readUTF().equals("SkyblockCommunicationIdentifier"))
+        if (input.readUTF().equals("SkyblockChannelIdentifier"))
             serverIdentifier = input.readUTF();
 
     }
@@ -39,14 +39,14 @@ public class BungeeMessaging implements PluginMessageListener {
         if (serverIdentifier == null)
             return;
 
-        player.sendPluginMessage(main, "SkyblockCommunication", prepareMessage());
+        player.sendPluginMessage(main, "SkyblockChannel", prepareMessage());
     }
 
     private byte[] prepareMessage() {
         ByteArrayDataOutput output = ByteStreams.newDataOutput();
 
         Collection<UUID> islandIds = main.getIslandManager().getLoadedIslandIds();
-        output.writeUTF("SkyblockCommunication");
+        output.writeUTF("SkyblockChannel");
 
         output.writeInt(islandIds.size());
         output.writeUTF(serverIdentifier);

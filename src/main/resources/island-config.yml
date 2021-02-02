@@ -14,8 +14,23 @@ island:
     max-size: 500
     # The inicial size of the island, used for upgrades
     inicial-size: 100
+
+    # The settings that will be applicable to each island
+    settings:
+      allow-fire: true
+      creeper-explosion-block-damage: true
+      creeper-explosion-damage: true
+      tnt-explosion-block-damage: true
+      tnt-explosion-damage: true
+      wither-explosion-block-damage: true
+      wither-explosion-damage: true
+      natural-mobs: true
+      enderman-grief: true
+      enderman-drop-block: true
+
+
   nether:
-    # The nether and end worlds can be disabled, set to true to enable
+    # The nether worlds can be disabled, not yet implemented, beware
     enabled: false
 
 # If the player should respawn in their spawn point, otherwise defaults to the server's spawn point

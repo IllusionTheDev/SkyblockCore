@@ -13,6 +13,7 @@ import org.bukkit.Location;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import static me.illusion.skyblockcore.spigot.pasting.PastingType.FAWE;
 
@@ -40,7 +41,7 @@ public class FAWEHandler implements PastingHandler {
     }
 
     @Override
-    public File[] save(Island island) {
+    public void save(Island island, Consumer<File[]> action) {
         File file = new File(main.getDataFolder() + File.separator + "cache", island.getData().getId() + ".schematic");
 
         if (!file.exists()) {
@@ -65,7 +66,7 @@ public class FAWEHandler implements PastingHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return array(file);
+        action.accept(array(file));
     }
 
     @SafeVarargs

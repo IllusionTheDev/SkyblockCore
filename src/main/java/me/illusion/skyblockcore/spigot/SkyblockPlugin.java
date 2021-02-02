@@ -31,27 +31,66 @@ import java.util.concurrent.CompletableFuture;
 @Getter
 public class SkyblockPlugin extends JavaPlugin {
 
+    /*
+        The MySQL or SQLite connection, used for storage
+     */
     private Connection mySQLConnection;
+
+    /*
+        The island configuration
+     */
     private IslandConfig islandConfig;
+
+    /*
+        The island manager, used to obtain islands
+     */
     private IslandManager islandManager;
+
+    /*
+        The player manager, used to obtain SkyblockPlayers
+     */
     private PlayerManager playerManager;
+
+    /*
+        The command manager, used to register and handle commands
+     */
     private CommandManager commandManager;
+
+    /*
+        The world manager, used to assign worlds to islands
+     */
     private WorldManager worldManager;
+
+    /*
+        The pasting handler, used to save / load islands from files
+     */
     private PastingHandler pastingHandler;
+
+    /*
+        The empty world generator, seems obvious
+     */
     private EmptyWorldGenerator emptyWorldGenerator;
 
+    /*
+        Bungee messaging handler, responsible for communication to proxy(ies)
+     */
     private BungeeMessaging bungeeMessaging;
 
+    /*
+        Message file, used to send and obtain messages
+     */
     private MessagesFile messages;
+
+    /*
+        Start schematics, default island on selected format
+     */
     private File[] startSchematic;
 
     @Override
     public void onEnable() {
+        // Loads the SQL, when that's complete with a response (true|false), loads if false
         setupSQL().whenComplete((val, throwable) -> {
-
-            System.out.println("SQL has been set up");
-
-            if (!val)
+            if (!val) // if the setup is incorrect, don't load
                 return;
 
             try {

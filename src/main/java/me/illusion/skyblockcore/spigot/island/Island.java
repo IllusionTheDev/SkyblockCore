@@ -7,7 +7,6 @@ import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -37,11 +36,13 @@ public class Island {
     /**
      * Saves the island
      */
-    public void save() {
-        File[] schem = main.getPastingHandler().save(this);
-        data.setIslandSchematic(schem);
+    public void save(Runnable afterSave) {
+        main.getPastingHandler().save(this, schem -> {
+            data.setIslandSchematic(schem);
 
-        CompletableFuture.runAsync(this::saveData);
+            CompletableFuture.runAsync(this::saveData);
+            afterSave.run();
+        });
     }
 
     /**
