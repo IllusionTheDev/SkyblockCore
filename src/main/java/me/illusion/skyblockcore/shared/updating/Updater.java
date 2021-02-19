@@ -2,7 +2,6 @@ package me.illusion.skyblockcore.shared.updating;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.*;
@@ -30,52 +29,24 @@ public class Updater {
     private final File file;
     // ID of a project
     private final int id;
-    // Set the update type
-    private final UpdateType updateType;
-    // Updater thread
-    private final Thread thread;
     // Direct download link
     private String downloadLink;
     // return a page
     private int page = 1;
     // Get the outcome result
-    private Result result = Result.SUCCESS;
     // If next page is empty set it to true, and get info from previous page.
     private boolean emptyPage;
-    // Version returned from spigot
-    private String version;
 
     public Updater(File pluginsFolder, int id, File file) {
         this.updateFolder = pluginsFolder;
         this.id = id;
         this.file = file;
-        this.updateType = UpdateType.DOWNLOAD;
 
         downloadLink = API_RESOURCE + id;
 
-        thread = new Thread(new UpdaterRunnable());
+        // Updater thread
+        Thread thread = new Thread(new UpdaterRunnable());
         thread.start();
-    }
-
-    /**
-     * Get the result of the update.
-     *
-     * @return result of the update.
-     * @see Result
-     */
-    public Result getResult() {
-        waitThread();
-        return result;
-    }
-
-    /**
-     * Get the latest version from spigot.
-     *
-     * @return latest version.
-     */
-    public String getVersion() {
-        waitThread();
-        return version;
     }
 
     /**
@@ -94,7 +65,6 @@ public class Updater {
 
             if (code != 200) {
                 connection.disconnect();
-                result = Result.BAD_ID;
                 return false;
             }
             connection.disconnect();
@@ -132,28 +102,11 @@ public class Updater {
                 this.page--;
                 checkUpdate();
             } else if (jsonArray.size() < 10) {
-                element = jsonArray.get(jsonArray.size() - 1);
-
-                JsonObject object = element.getAsJsonObject();
-                element = object.get("name");
-                version = element.toString().replaceAll("\"", "").replace("v", "");
-                if (updateType == UpdateType.DOWNLOAD) {
-                    download();
-                }
+                download();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Checks if plugin should be updated
-     *
-     * @param newVersion remote version
-     * @param oldVersion current version
-     */
-    private boolean shouldUpdate(String newVersion, String oldVersion) {
-        return !newVersion.equalsIgnoreCase(oldVersion);
     }
 
     /**
@@ -173,8 +126,7 @@ public class Updater {
             while ((count = in.read(data, 0, 4096)) != -1) {
                 fout.write(data, 0, count);
             }
-        } catch (Exception e) {
-            result = Result.FAILED;
+        } catch (Exception ignored) {
         } finally {
             try {
                 if (in != null) {
@@ -191,37 +143,6 @@ public class Updater {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Updater depends on thread's completion, so it is necessary to wait for thread to finish.
-     */
-    private void waitThread() {
-        if (thread != null && thread.isAlive()) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public enum UpdateType {
-        // Downloads without checking the version
-        DOWNLOAD,
-    }
-
-    public enum Result {
-
-        UPDATE_FOUND,
-
-        NO_UPDATE,
-
-        SUCCESS,
-
-        FAILED,
-
-        BAD_ID
     }
 
     public class UpdaterRunnable implements Runnable {

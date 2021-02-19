@@ -225,6 +225,7 @@ public class SkyblockPlugin extends JavaPlugin {
     }
 
     private void sync(Runnable runnable) {
+
         Bukkit.getScheduler().runTask(this, runnable);
     }
 }

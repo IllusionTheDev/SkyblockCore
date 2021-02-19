@@ -3,14 +3,12 @@ package me.illusion.skyblockcore.spigot.data;
 import com.google.common.io.Files;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
 import me.illusion.skyblockcore.shared.sql.SQLSerializer;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
-import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -59,11 +57,10 @@ public class SkyblockPlayer {
     /**
      * Loads the player and island data
      */
-    @SneakyThrows
     private void load() {
         Player p = getPlayer();
 
-        load("PLAYER", uuid).whenComplete((object, thr) -> {
+        load("PLAYER", uuid).whenComplete((object, $) -> {
             data = (PlayerData) object;
 
             if (data == null) {
@@ -71,11 +68,13 @@ public class SkyblockPlayer {
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
                 data.getInventory().updateArray(p.getInventory().getContents());
                 sync(() -> loadIsland(islandData));
-            } else {
-                load("ISLAND", data.getIslandId()).whenComplete((islandObject, thr2) ->
-                        sync(() -> loadIsland((IslandData) islandObject)));
+                return;
             }
+
+            load("ISLAND", data.getIslandId()).whenComplete((islandObject, $$) -> sync(() -> loadIsland((IslandData) islandObject)));
+
         });
+
         /*
         Player p = getPlayer(); // Obtain the Bukkit player
         data = (PlayerData) load("PLAYER", uuid); // Load the player data
@@ -157,12 +156,17 @@ public class SkyblockPlayer {
          */
     }
 
+    /**
+     * Loads island and finalizes player data
+     *
+     * @param islandData - The island data to load from
+     */
     private void loadIsland(IslandData islandData) {
-        Player p = getPlayer();
+        Player p = getPlayer(); // Obtains player
 
-        data.setIslandId(islandData.getId());
+        data.setIslandId(islandData.getId()); // Updates Island ID in playerdata
 
-        boolean paste = true;
+        boolean paste = true; // variable to store pasting
 
         List<UUID> members = islandData.getUsers();
 
@@ -175,26 +179,27 @@ public class SkyblockPlayer {
 
         File folder = new File(main.getDataFolder() + File.separator + "cache"); // Create cache folder
 
+        // Pastes island if required
         if (paste) {
-            File[] islandFiles = islandData.getIslandSchematic();
+            File[] islandFiles = islandData.getIslandSchematic(); // Obtains original files
 
-            if (islandFiles == null)
+            if (islandFiles == null) // Assigns default if not found
                 islandFiles = main.getStartSchematic();
 
-            File[] files = createFiles(uuid, folder, islandFiles);
+            File[] files = createFiles(islandData.getId(), folder, islandFiles); // Creates cache files
 
-            islandData.setIslandSchematic(files);
+            islandData.setIslandSchematic(files); // Updates schematic with cache files
 
-            String world = main.getWorldManager().assignWorld();
+            String world = main.getWorldManager().assignWorld(); // Assigns world
 
             System.out.println("Assigned world " + world + " for player " + p.getName());
-            island = loadIsland(islandData, new WorldCreator(world).generator(main.getEmptyWorldGenerator()).createWorld());
-        } else
-            island = main.getIslandManager().getIslandFromId(islandData.getId()).orElse(null);
+            island = loadIsland(islandData, new WorldCreator(world).generator(main.getEmptyWorldGenerator()).createWorld()); // Loads island
+        } else // If it doesn't need pasting
+            island = main.getIslandManager().getIslandFromId(islandData.getId()).orElse(null); // Obtains island from ID (loaded by a teammate)
 
-        islandData.setIsland(island);
+        islandData.setIsland(island); // Updates island in the island data
 
-        SerializedLocation last = data.getLastLocation();
+        SerializedLocation last = data.getLastLocation(); // Obtains last location
 
         // Assign player location if not found
         if (last.getLocation() == null) {
@@ -213,25 +218,33 @@ public class SkyblockPlayer {
         updateInventory();
     }
 
+    /**
+     * Creates cache island files
+     *
+     * @param id     - The UUID (used for file name)
+     * @param folder - The folder where to write the files do (default - cache)
+     * @param files  - The files to put
+     * @return The new renamed files
+     */
     private File[] createFiles(UUID id, File folder, File... files) {
-        File[] copyArray = new File[files.length];
+        File[] copyArray = new File[files.length]; // Makes an array of the copied files (rewritten files)
 
-        folder.mkdir();
+        folder.mkdir(); // Creates the folder (if doesn't exist)
 
-        for (int i = 0; i < files.length; i++) {
+        for (int i = 0; i < files.length; i++) { // Loops through files
             File file = files[i];
 
-            File copy = new File(folder, id + "_" + i + "." + FilenameUtils.getExtension(file.getName()));
+            File copy = new File(folder, id + "_" + file.getName()); // Creates new file with renamed name
 
-            copyArray[i] = copy;
+            copyArray[i] = copy; // Marks copy internally
 
-            if (file.equals(copy))
+            if (file.equals(copy) && file.exists())  // Checks for name equality
                 continue;
 
             try {
-                if (!copy.exists())
+                if (!copy.exists()) // Creates empty file if it doesn't exist
                     copy.createNewFile();
-                Files.copy(file, copy);
+                Files.copy(file, copy); // Copies bytes
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -262,8 +275,8 @@ public class SkyblockPlayer {
         Location center = new Location(world, 0, 128, 0);
         int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
-        Location one = center.add(-offset, 128, -offset);
-        Location two = center.add(offset, -128, offset);
+        Location one = center.add(-offset, -128, -offset);
+        Location two = center.add(offset, 128, offset);
 
         main.getPastingHandler().paste(data.getIslandSchematic(), center);
 
@@ -281,6 +294,7 @@ public class SkyblockPlayer {
     private CompletableFuture<Object> load(String table, UUID uuid) {
         return SQLSerializer.deserialize(main.getMySQLConnection(), uuid, table);
     }
+
     // ----- DATA SAVING -----
 
     /**
@@ -296,6 +310,7 @@ public class SkyblockPlayer {
         data.getIslandLocation().update(loc);
         data.getInventory().updateArray(p.getInventory().getContents());
         island.save(() -> {
+            System.out.println("Saving data");
             CompletableFuture.runAsync(() -> saveObject(uuid, data));
 
             boolean delete = true;
@@ -311,6 +326,8 @@ public class SkyblockPlayer {
 
             if (delete)
                 island.cleanIsland();
+
+            System.out.println("Attempting to delete island files");
 
             for (File file : island.getData().getIslandSchematic())
                 if (file != null && file.exists())

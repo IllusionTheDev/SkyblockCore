@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.concurrent.CompletableFuture;
 
 @Getter
 public class YMLBase {
@@ -25,28 +24,26 @@ public class YMLBase {
     public YMLBase(Plugin plugin, File file, boolean existsOnSource) {
         this.file = file;
 
-        CompletableFuture.runAsync(() -> {
-            if (!file.exists()) {
-                try {
-                    file.getParentFile().mkdirs();
-                    if (existsOnSource) {
-                        InputStream stream = plugin.getResourceAsStream(file.getName());
-                        Files.copy(stream, file.toPath());
-                    } else
-                        file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-
+        if (!file.exists()) {
             try {
-                this.configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+                file.getParentFile().mkdirs();
+                if (existsOnSource) {
+                    InputStream stream = plugin.getResourceAsStream(file.getName());
+                    Files.copy(stream, file.toPath());
+                } else
+                    file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+
+
+        }
+
+        try {
+            this.configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void save() {
