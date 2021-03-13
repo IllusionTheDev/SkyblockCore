@@ -2,7 +2,8 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import me.illusion.skyblockcore.shared.sql.SQLUtil;
+import me.illusion.skyblockcore.shared.storage.StorageHandler;
+import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.spigot.command.CommandManager;
 import me.illusion.skyblockcore.spigot.command.island.IslandCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
@@ -15,7 +16,6 @@ import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.BungeeMessaging;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
-import me.illusion.skyblockcore.spigot.sql.StorageType;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
 import org.bukkit.Bukkit;
@@ -24,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.sql.Connection;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,7 +33,7 @@ public class SkyblockPlugin extends JavaPlugin {
     /*
         The MySQL or SQLite connection, used for storage
      */
-    private Connection mySQLConnection;
+    private StorageHandler storageHandler;
 
     /*
         The island configuration
@@ -89,7 +88,7 @@ public class SkyblockPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Loads the SQL, when that's complete with a response (true|false), loads if false
-        setupSQL().whenComplete((val, throwable) -> {
+        setupStorage().whenComplete((val, throwable) -> {
             if (!val) // if the setup is incorrect, don't load
                 return;
 
@@ -139,6 +138,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
 
     }
+
     /**
      * Generates the empty island worlds
      */
@@ -153,36 +153,31 @@ public class SkyblockPlugin extends JavaPlugin {
     /**
      * Opens the SQL connection async
      */
-    private CompletableFuture<Boolean> setupSQL() {
-        return CompletableFuture.supplyAsync(() -> {
-            saveDefaultConfig();
+    private CompletableFuture<Boolean> setupStorage() {
+        saveDefaultConfig();
 
-            StorageType type = StorageType.valueOf(getConfig().getString("database.type").toUpperCase(Locale.ROOT));
+        StorageType type = StorageType.valueOf(getConfig().getString("database.type").toUpperCase(Locale.ROOT));
 
-            String host = getConfig().getString("database.host", "");
-            String database = getConfig().getString("database.database", "");
-            String username = getConfig().getString("database.username", "");
-            String password = getConfig().getString("database.password", "");
-            int port = getConfig().getInt("database.port");
+        Class<? extends StorageHandler> clazz = type.getHandlerClass();
+        try {
+            storageHandler = clazz.newInstance();
 
-            SQLUtil sql;
+            if (storageHandler.isFileBased())
+                return storageHandler.setup(getDataFolder());
+            else {
+                String host = getConfig().getString("database.host", "");
+                String database = getConfig().getString("database.database", "");
+                String username = getConfig().getString("database.username", "");
+                String password = getConfig().getString("database.password", "");
+                int port = getConfig().getInt("database.port");
 
-            if (type == StorageType.MYSQL)
-                sql = new SQLUtil(host, database, username, password, port);
-            else
-                sql = new SQLUtil(createSQLiteFile());
-
-            if (!sql.openConnection()) {
-                getLogger().warning("Could not load SQL Database.");
-                getLogger().warning("This plugin requires a valid SQL database to work.");
-                setEnabled(false);
-                return false;
+                return storageHandler.setup(host, port, database, username, password);
             }
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
-            sql.createTable();
-            mySQLConnection = sql.getConnection();
-            return true;
-        });
+        return CompletableFuture.supplyAsync(() -> false);
 
     }
 
@@ -225,7 +220,6 @@ public class SkyblockPlugin extends JavaPlugin {
     }
 
     private void sync(Runnable runnable) {
-
         Bukkit.getScheduler().runTask(this, runnable);
     }
 }

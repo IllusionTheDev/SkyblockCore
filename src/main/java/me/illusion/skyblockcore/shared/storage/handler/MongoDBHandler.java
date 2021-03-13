@@ -54,4 +54,10 @@ public class MongoDBHandler implements StorageHandler {
             islandStorage.insertOne(document);
         });
     }
+
+
+    @Override
+    public boolean isFileBased() {
+        return false;
+    }
 }

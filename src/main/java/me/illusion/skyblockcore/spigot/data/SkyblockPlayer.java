@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
-import me.illusion.skyblockcore.shared.sql.SQLSerializer;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
@@ -292,7 +291,7 @@ public class SkyblockPlayer {
      * @return deserialized object
      */
     private CompletableFuture<Object> load(String table, UUID uuid) {
-        return SQLSerializer.deserialize(main.getMySQLConnection(), uuid, table);
+        return main.getStorageHandler().get(uuid, table);
     }
 
     // ----- DATA SAVING -----
@@ -344,7 +343,7 @@ public class SkyblockPlayer {
      * @param object - The object to serialize
      */
     private void saveObject(UUID uuid, Object object) {
-        SQLSerializer.serialize(main.getMySQLConnection(), uuid, object, "PLAYER");
+        main.getStorageHandler().save(uuid, object, "PLAYER");
     }
 
     // ----- DATA POST-LOAD -----

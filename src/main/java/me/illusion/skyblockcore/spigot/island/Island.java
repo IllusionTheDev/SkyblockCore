@@ -2,7 +2,6 @@ package me.illusion.skyblockcore.spigot.island;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
-import me.illusion.skyblockcore.shared.sql.SQLSerializer;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -70,7 +69,7 @@ public class Island {
      * Saves Island data
      */
     private void saveData() {
-        SQLSerializer.serialize(main.getMySQLConnection(), data.getId(), data, "ISLAND");
+        main.getStorageHandler().save(data.getId(), data, "ISLAND");
     }
 
 }
