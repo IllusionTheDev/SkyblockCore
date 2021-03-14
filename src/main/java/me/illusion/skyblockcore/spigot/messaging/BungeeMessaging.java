@@ -11,6 +11,16 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.util.Collection;
 import java.util.UUID;
 
+/*
+    Class responsible for Bungeecord <-> Server messaging
+
+    When the first player joins the instance, the proxy sends the instance an identifier,
+    which is used to identify what server is sending a message.
+
+    Every time a player joins the instance, all loaded islands are sent to the proxy,
+    as a list of island uuid's
+
+ */
 public class BungeeMessaging implements PluginMessageListener {
 
     private final SkyblockPlugin main;

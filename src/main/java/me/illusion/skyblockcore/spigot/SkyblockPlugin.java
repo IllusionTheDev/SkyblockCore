@@ -1,7 +1,6 @@
 package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.spigot.command.CommandManager;
@@ -31,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 public class SkyblockPlugin extends JavaPlugin {
 
     /*
-        The MySQL or SQLite connection, used for storage
+        The handler used for player and island data storage
      */
     private StorageHandler storageHandler;
 
@@ -164,31 +163,21 @@ public class SkyblockPlugin extends JavaPlugin {
 
             if (storageHandler.isFileBased())
                 return storageHandler.setup(getDataFolder());
-            else {
-                String host = getConfig().getString("database.host", "");
-                String database = getConfig().getString("database.database", "");
-                String username = getConfig().getString("database.username", "");
-                String password = getConfig().getString("database.password", "");
-                int port = getConfig().getInt("database.port");
 
-                return storageHandler.setup(host, port, database, username, password);
-            }
+            String host = getConfig().getString("database.host", "");
+            String database = getConfig().getString("database.database", "");
+            String username = getConfig().getString("database.username", "");
+            String password = getConfig().getString("database.password", "");
+            int port = getConfig().getInt("database.port");
+
+            return storageHandler.setup(host, port, database, username, password);
+
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
         return CompletableFuture.supplyAsync(() -> false);
 
-    }
-
-    @SneakyThrows
-    private File createSQLiteFile() {
-        File file = new File(getDataFolder(), "storage.db");
-
-        if (!file.exists())
-            file.createNewFile();
-
-        return file;
     }
 
     private void registerDefaultCommands() {
@@ -213,7 +202,7 @@ public class SkyblockPlugin extends JavaPlugin {
             if (pastingHandler.getType() == PastingType.FAWE)
                 saveResource("start-schematic" + File.separator + "skyblock-schematic.schematic", false);
             else
-                saveResource("start-schematic" + File.separator + "skyblock-mca.mca", false);
+                saveResource("start-schematic" + File.separator + "r0.0.mca", false);
         }
 
         return startSchematicFolder.listFiles();
