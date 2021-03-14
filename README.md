@@ -6,25 +6,25 @@ If you do not have/need a SQL connection, change the storage type to SQLITE on t
 
 **SETUP INSTRUCTIONS**:
 - Load the plugin into an empty server
-- Set the SQL database info into the config.yml file (if not SQLite)
+- Set the SQL / MongoDB database info into the config.yml file (if not SQLite)
 - Restart
 - Configure to your liking
 
 **If on a proxy**:
 - Put the plugin on the plugins folder
-- Set the SQL database info into the bungee-config.yml file (note that instances should also be running on MySQL)
+- Set the SQL / MongoDB database info into the bungee-config.yml file (note that instances should also be running on the same database)
 - Restart
 
 **If you're running multiple proxies (Requires Redis)**:
 - Put the plugin on each proxy and instance
-- Set them all to use the same MySQL database
+- Set them all to use the same database
 - On each proxy, also set the Redis database details
 - Restart all proxies (If you don't have jedis, you're going to have to restart twice)
 
 
 **Technical Aspects**:
 
-Each player currently occupies ~32.5KB max, with each island occupying ~4MB max on the SQL database.
+Each player currently occupies ~32.5KB max, with each island occupying ~4MB max on the SQL / MongoDB database.
 This means that group islands are heavily optimized, as each player stores an Island UUID, which is then referenced to get the Island itself.
 
 All storage operations are done async (Island saving, pasting and regenerating) when possible.
@@ -44,6 +44,7 @@ Islands have their own worlds, which are loaded on demand
 - Gradle
 - Bungeecord
 - Redis
+- MongoDB
 
 **Plugin Hooks**
 - Vault
