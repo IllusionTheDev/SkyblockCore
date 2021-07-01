@@ -57,7 +57,6 @@ public class SkyblockPlayer {
      * Loads the player and island data
      */
     private void load() {
-        Player p = getPlayer();
 
         load("PLAYER", uuid).whenComplete((object, $) -> {
             data = (PlayerData) object;
@@ -65,7 +64,6 @@ public class SkyblockPlayer {
             if (data == null) {
                 data = new PlayerData();
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
-                data.getInventory().updateArray(p.getInventory().getContents());
                 sync(() -> loadIsland(islandData));
                 return;
             }
@@ -213,8 +211,6 @@ public class SkyblockPlayer {
 
         // Teleports
         checkTeleport();
-        // Updates inventory
-        updateInventory();
     }
 
     /**
@@ -307,7 +303,7 @@ public class SkyblockPlayer {
         data.setExperienceLevel(p.getLevel());
         data.getLastLocation().update(loc);
         data.getIslandLocation().update(loc);
-        data.getInventory().updateArray(p.getInventory().getContents());
+
         island.save(() -> {
             System.out.println("Saving data");
             CompletableFuture.runAsync(() -> saveObject(uuid, data));
@@ -347,16 +343,6 @@ public class SkyblockPlayer {
     }
 
     // ----- DATA POST-LOAD -----
-
-    /**
-     * Loads the inventory from serialized data
-     */
-    private void updateInventory() {
-        if (data == null)
-            getPlayer().getInventory().clear();
-
-        getPlayer().getInventory().setContents(data.getInventory().getArray());
-    }
 
     private void sync(Runnable runnable) {
         Bukkit.getScheduler().runTask(main, runnable);
