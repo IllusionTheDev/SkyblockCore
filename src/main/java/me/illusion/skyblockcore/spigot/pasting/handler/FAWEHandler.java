@@ -1,15 +1,14 @@
 package me.illusion.skyblockcore.spigot.pasting.handler;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.schematic.Schematic;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
-import com.sk89q.worldedit.regions.CuboidRegion;
+import lombok.SneakyThrows;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.data.SerializedFile;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
+import me.illusion.skyblockcore.spigot.pasting.provider.FAWEProvider;
+import me.illusion.skyblockcore.spigot.pasting.provider.NewFAWEProvider;
+import me.illusion.skyblockcore.spigot.pasting.provider.OldFAWEProvider;
 import org.bukkit.Location;
 
 import java.io.File;
@@ -23,10 +22,20 @@ public class FAWEHandler implements PastingHandler {
 
     private final SkyblockPlugin main;
 
+    private FAWEProvider provider;
+
     public FAWEHandler(SkyblockPlugin main) {
         this.main = main;
+
+        try {
+            Class.forName("com.sk89q.worldedit.math.BlockVector3");
+            provider = new NewFAWEProvider();
+        } catch (ClassNotFoundException e) {
+            provider = new OldFAWEProvider();
+        }
     }
 
+    @SneakyThrows
     private void paste(SerializedFile serializedFile, Location loc) {
         File file = null;
         try {
@@ -35,13 +44,9 @@ public class FAWEHandler implements PastingHandler {
             e.printStackTrace();
         }
 
-        try {
-            Schematic schem = ClipboardFormats.findByFile(file).load(file);
-            schem.paste(FaweAPI.getWorld(loc.getWorld().getName()), new Vector(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        provider.paste(file, loc);
     }
+
 
     @Override
     public void paste(SerializedFile[] file, Location loc) {
@@ -64,17 +69,7 @@ public class FAWEHandler implements PastingHandler {
         Location p1 = island.getPointOne();
         Location p2 = island.getPointTwo();
 
-        CuboidRegion region = new CuboidRegion(
-                new Vector(p1.getX(), p1.getY(), p1.getZ()),
-                new Vector(p2.getX(), p2.getY(), p2.getZ()));
-
-        Schematic schem = new Schematic(region);
-
-        try {
-            schem.save(file, ClipboardFormats.findByFile(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        provider.save(file, p1, p2);
         action.accept(array(new SerializedFile(file)));
     }
 
