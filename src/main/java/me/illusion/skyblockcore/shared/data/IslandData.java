@@ -4,10 +4,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
+import me.illusion.skyblockcore.spigot.data.SerializedFile;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.island.generator.OreGenerator;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class IslandData implements Serializable {
 
     private final UUID id;
     @Setter
-    private File[] islandSchematic;
+    private SerializedFile[] islandSchematic;
     private transient final List<UUID> users = new ArrayList<>();
     private final UUID owner;
     private final List<OreGenerator> oreGenerators;

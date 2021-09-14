@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Getter
 public class SkyblockPlayer {
@@ -178,12 +179,12 @@ public class SkyblockPlayer {
 
         // Pastes island if required
         if (paste) {
-            File[] islandFiles = islandData.getIslandSchematic(); // Obtains original files
+            SerializedFile[] islandFiles = islandData.getIslandSchematic(); // Obtains original files
 
             if (islandFiles == null) // Assigns default if not found
-                islandFiles = main.getStartSchematic();
+                islandFiles = SerializedFile.loadArray(main.getStartSchematic());
 
-            File[] files = createFiles(islandData.getId(), folder, islandFiles); // Creates cache files
+            SerializedFile[] files = createFiles(islandData.getId(), folder, islandFiles); // Creates cache files
 
             islandData.setIslandSchematic(files); // Updates schematic with cache files
 
@@ -221,13 +222,19 @@ public class SkyblockPlayer {
      * @param files  - The files to put
      * @return The new renamed files
      */
-    private File[] createFiles(UUID id, File folder, File... files) {
+    private SerializedFile[] createFiles(UUID id, File folder, SerializedFile... files) {
         File[] copyArray = new File[files.length]; // Makes an array of the copied files (rewritten files)
 
         folder.mkdir(); // Creates the folder (if doesn't exist)
 
         for (int i = 0; i < files.length; i++) { // Loops through files
-            File file = files[i];
+            SerializedFile serializedFile = files[i];
+            File file = null;
+            try {
+                file = serializedFile.getFile().get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
 
             File copy = new File(folder, id + "_" + file.getName()); // Creates new file with renamed name
 
@@ -245,7 +252,7 @@ public class SkyblockPlayer {
             }
         }
 
-        return copyArray;
+        return SerializedFile.loadArray(copyArray);
     }
 
     /**
@@ -324,9 +331,17 @@ public class SkyblockPlayer {
 
             System.out.println("Attempting to delete island files");
 
-            for (File file : island.getData().getIslandSchematic())
+            for (SerializedFile serializedFile : island.getData().getIslandSchematic()) {
+                File file = null;
+                try {
+                    file = serializedFile.getFile().get();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+
                 if (file != null && file.exists())
                     file.delete();
+            }
 
         });
 

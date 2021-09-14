@@ -25,6 +25,7 @@ public class IslandCommand implements SkyblockCommand {
         return new String[]{"island.go"};
     }
 
+
     @Override
     public boolean canExecute(CommandSender sender) {
         return sender instanceof Player;

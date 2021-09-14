@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot.pasting.handler;
 
 import com.google.common.io.Files;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.spigot.data.SerializedFile;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
@@ -15,19 +16,25 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class DefaultHandler implements PastingHandler {
 
     private final SkyblockPlugin main;
+    private String extension;
 
     public DefaultHandler(SkyblockPlugin main) {
         this.main = main;
     }
 
-    private String extension;
-
-    private void paste(File file, Location loc) {
+    private void paste(SerializedFile serializedFile, Location loc) {
+        File file = null;
+        try {
+            file = serializedFile.getFile().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
 
         if (extension == null)
             extension = FilenameUtils.getExtension(file.getAbsolutePath());
@@ -63,20 +70,20 @@ public class DefaultHandler implements PastingHandler {
     }
 
     @Override
-    public void paste(File[] file, Location loc) {
-        for (File f : file)
+    public void paste(SerializedFile[] file, Location loc) {
+        for (SerializedFile f : file)
             paste(f, loc);
     }
 
     @Override
-    public void save(Island island, Consumer<File[]> action) {
+    public void save(Island island, Consumer<SerializedFile[]> action) {
         World world = Bukkit.getWorld(island.getWorld());
         world.save();
 
         main.getWorldManager().whenNextSave(($) -> {
             File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
 
-            List<File> list = new ArrayList<>();
+            List<SerializedFile> list = new ArrayList<>();
 
             Location one = island.getPointOne();
             Location two = island.getPointTwo();
@@ -88,9 +95,9 @@ public class DefaultHandler implements PastingHandler {
 
             for (int x = xOne; x <= xTwo; x++)
                 for (int z = zOne; z <= zTwo; z++)
-                    list.add(new File(regionFolder, "r." + x + "." + z + "." + extension));
+                    list.add(new SerializedFile(new File(regionFolder, "r." + x + "." + z + "." + extension)));
 
-            action.accept(list.toArray(new File[]{}));
+            action.accept(list.toArray(new SerializedFile[]{}));
         }, world.getName());
 
     }

@@ -3,9 +3,10 @@ package me.illusion.skyblockcore.spigot.pasting.handler;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.spigot.data.SerializedFile;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
@@ -13,6 +14,7 @@ import org.bukkit.Location;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import static me.illusion.skyblockcore.spigot.pasting.PastingType.FAWE;
@@ -25,9 +27,16 @@ public class FAWEHandler implements PastingHandler {
         this.main = main;
     }
 
-    private void paste(File file, Location loc) {
+    private void paste(SerializedFile serializedFile, Location loc) {
+        File file = null;
         try {
-            Schematic schem = ClipboardFormat.SCHEMATIC.load(file);
+            file = serializedFile.getFile().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Schematic schem = ClipboardFormats.findByFile(file).load(file);
             schem.paste(FaweAPI.getWorld(loc.getWorld().getName()), new Vector(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,13 +44,13 @@ public class FAWEHandler implements PastingHandler {
     }
 
     @Override
-    public void paste(File[] file, Location loc) {
-        for (File f : file)
+    public void paste(SerializedFile[] file, Location loc) {
+        for (SerializedFile f : file)
             paste(f, loc);
     }
 
     @Override
-    public void save(Island island, Consumer<File[]> action) {
+    public void save(Island island, Consumer<SerializedFile[]> action) {
         File file = new File(main.getDataFolder() + File.separator + "cache", island.getData().getId() + ".schematic");
 
         if (!file.exists()) {
@@ -62,11 +71,11 @@ public class FAWEHandler implements PastingHandler {
         Schematic schem = new Schematic(region);
 
         try {
-            schem.save(file, ClipboardFormat.SCHEMATIC);
+            schem.save(file, ClipboardFormats.findByFile(file));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        action.accept(array(file));
+        action.accept(array(new SerializedFile(file)));
     }
 
     @SafeVarargs
