@@ -1,9 +1,11 @@
 package me.illusion.skyblockcore.spigot.pasting.provider;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.schematic.Schematic;
+import com.fastasyncworldedit.core.FaweAPI;
+import com.sk89q.worldedit.EditSessionFactory;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Location;
@@ -29,10 +31,10 @@ public class NewFAWEProvider implements FAWEProvider {
                 BlockVector3.at(one.getX(), one.getY(), one.getZ()),
                 BlockVector3.at(two.getX(), two.getY(), two.getZ()));
 
-        Schematic schem = new Schematic(region);
+        BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
 
         try {
-            schem.save(file, ClipboardFormats.findByFile(file));
+            clipboard.save(file, ClipboardFormats.findByFile(file));
         } catch (IOException e) {
             e.printStackTrace();
         }
