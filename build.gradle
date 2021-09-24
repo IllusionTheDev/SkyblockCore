@@ -15,7 +15,7 @@ repositories {
     maven { url = "http://repo.dmulloy2.net/nexus/repository/public/" }
     maven { url = 'http://repo.extendedclip.com/content/repositories/placeholderapi'}
     maven { url = 'https://mvn.intellectualsites.com/content/repositories/releases/'}
-    maven { url "https://repo.glaremaster s.me/repository/concuncan/" }
+    maven { url "https://repo.glaremasters.me/repository/concuncan/" }
 
     mavenLocal()
 
@@ -23,18 +23,18 @@ repositories {
 
 dependencies {
 
-    compile group: 'net.md-5', name: 'bungeecord-api', version: '1.16-R0.5-SNAPSHOT'
-    compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
+    implementation group: 'net.md-5', name: 'bungeecord-api', version: '1.16-R0.5-SNAPSHOT'
+    implementation 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
 
-    compile 'org.projectlombok:lombok:1.18.20'
+    implementation 'org.projectlombok:lombok:1.18.20'
     annotationProcessor('org.projectlombok:lombok:1.18.20')
 
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'de.tr7zw:item-nbt-api-plugin:2.1.0'
-    compile group: 'net.milkbowl.vault', name: 'Vault', version: '1.7.3'
-    compileOnly group: "com.grinderwolf", name: "slimeworldmanager-api", version: "2.2.1"
-    compile group: 'redis.clients', name: 'jedis', version: '2.4.2'
-    compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.7'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'de.tr7zw:item-nbt-api-plugin:2.1.0'
+    implementation group: 'net.milkbowl.vault', name: 'Vault', version: '1.7.3'
+    implementation group: "com.grinderwolf", name: "slimeworldmanager-api", version: "2.2.1"
+    implementation group: 'redis.clients', name: 'jedis', version: '2.4.2'
+    implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.7'
 
 
 }
