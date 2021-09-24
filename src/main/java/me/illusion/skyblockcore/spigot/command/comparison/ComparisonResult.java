@@ -22,6 +22,7 @@ public class ComparisonResult {
                 if (matches)
                     return;
             }
+
     }
 
     private void test(String test) {

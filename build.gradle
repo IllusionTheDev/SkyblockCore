@@ -15,7 +15,7 @@ repositories {
     maven { url = "http://repo.dmulloy2.net/nexus/repository/public/" }
     maven { url = 'http://repo.extendedclip.com/content/repositories/placeholderapi'}
     maven { url = 'https://mvn.intellectualsites.com/content/repositories/releases/'}
-    maven { url "https://repo.glaremasters.me/repository/concuncan/" }
+    maven { url "https://repo.glaremaster s.me/repository/concuncan/" }
 
     mavenLocal()
 
@@ -38,3 +38,5 @@ dependencies {
 
 
 }
+
+
