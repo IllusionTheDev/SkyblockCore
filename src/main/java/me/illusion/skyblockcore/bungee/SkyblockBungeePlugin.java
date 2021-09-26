@@ -7,6 +7,8 @@ import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.listener.SpigotListener;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
 import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
+import me.illusion.skyblockcore.shared.packet.PacketManager;
+import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.sql.SQLUtil;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -21,7 +23,7 @@ public class SkyblockBungeePlugin extends Plugin {
 
     private boolean multiProxy;
 
-    private PlayerFinder playerFinder;
+    private PacketManager packetManager;
     private Connection mySQLConnection;
     private Configuration config;
     private JedisUtil jedisUtil;
@@ -42,9 +44,11 @@ public class SkyblockBungeePlugin extends Plugin {
             return;
 
         getProxy().getPluginManager().registerCommand(this, new SkyblockCommand(this));
-        getProxy().getPluginManager().registerListener(this, new SpigotListener(this));
         getProxy().getPluginManager().registerListener(this, new ConnectListener());
-        playerFinder = new PlayerFinder(this);
+        packetManager = new PacketManager();
+
+        packetManager.registerProcessor(PacketDirection.PROXY_TO_PROXY, new RedisListener(this));
+        packetManager.registerProcessor(PacketDirection.PROXY_TO_INSTANCE, new SpigotListener(this));
     }
 
     @Override

@@ -35,11 +35,11 @@ public abstract class Packet {
         writeByte(direction.getIndex());
     }
 
-    public byte getIdentifier() {
+    protected byte getIdentifier() {
         return identifier;
     }
 
-    public PacketDirection getDirection() {
+    protected PacketDirection getDirection() {
         return direction;
     }
 
@@ -48,60 +48,60 @@ public abstract class Packet {
             stream = ByteStreams.newDataOutput();
     }
 
-    public void writeByte(byte value) {
+    protected void writeByte(byte value) {
         validateStream();
         stream.writeByte(value);
     }
 
-    public void writeByteArray(byte[] bytes) {
+    protected void writeByteArray(byte[] bytes) {
         validateStream();
         writeInt(bytes.length);
         stream.write(bytes);
     }
 
-    public void writeShort(short value) {
+    protected void writeShort(short value) {
         validateStream();
         stream.writeShort(value);
     }
 
-    public void writeInt(int value) {
+    protected void writeInt(int value) {
         validateStream();
         stream.writeInt(value);
     }
 
-    public void writeLong(long value) {
+    protected void writeLong(long value) {
         validateStream();
         stream.writeLong(value);
     }
 
-    public void writeFloat(float value) {
+    protected void writeFloat(float value) {
         validateStream();
         stream.writeFloat(value);
     }
 
-    public void writeDouble(double value) {
+    protected void writeDouble(double value) {
         validateStream();
         stream.writeDouble(value);
     }
 
-    public void writeChar(char value) {
+    protected void writeChar(char value) {
         validateStream();
         stream.writeChar(value);
     }
 
-    public void writeString(String string) {
+    protected void writeString(String string) {
         validateStream();
         stream.writeUTF(string);
     }
 
-    public void writeUUID(UUID uuid) {
+    protected void writeUUID(UUID uuid) {
         writeLong(uuid.getMostSignificantBits());
         writeLong(uuid.getLeastSignificantBits());
     }
 
 
     @SneakyThrows
-    public void writeObject(Object object) {
+    protected void writeObject(Object object) {
         validateStream();
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             ObjectOutputStream out = new ObjectOutputStream(bos);
@@ -115,11 +115,11 @@ public abstract class Packet {
     }
 
 
-    public byte readByte() {
+    protected byte readByte() {
         return input.readByte();
     }
 
-    public byte[] readByteArray() {
+    protected byte[] readByteArray() {
         int arraySize = readInt();
         byte[] array = new byte[arraySize];
 
@@ -129,28 +129,28 @@ public abstract class Packet {
         return array;
     }
 
-    public short readShort() {
+    protected short readShort() {
         return input.readShort();
     }
 
-    public int readInt() {
+    protected int readInt() {
         return input.readInt();
     }
 
-    public long readLong() {
+    protected long readLong() {
         return input.readLong();
     }
 
-    public String readString() {
+    protected String readString() {
         return input.readUTF();
     }
 
-    public UUID readUUID() {
+    protected UUID readUUID() {
         return new UUID(readLong(), readLong());
     }
 
     @SneakyThrows
-    public Object readObject() {
+    protected Object readObject() {
         byte[] bytes = readByteArray();
 
         try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes); ObjectInput in = new ObjectInputStream(bis)) {
@@ -158,5 +158,9 @@ public abstract class Packet {
         }
 
         // ignore close exception
+    }
+
+    public byte[] getAllBytes() {
+        return stream.toByteArray();
     }
 }

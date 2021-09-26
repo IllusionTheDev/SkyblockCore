@@ -1,14 +1,16 @@
 package me.illusion.skyblockcore.bungee.listener;
 
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
-import me.illusion.skyblockcore.shared.utilities.StringUtil;
+import me.illusion.skyblockcore.shared.packet.Packet;
+import me.illusion.skyblockcore.shared.packet.PacketProcessor;
+import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPubSub;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.nio.charset.StandardCharsets;
 
-public class RedisListener extends JedisPubSub {
+public class RedisListener extends BinaryJedisPubSub implements PacketProcessor {
+
+    private static final byte[] KEY = "SkyblockChannel".getBytes(StandardCharsets.UTF_8);
 
     private final SkyblockBungeePlugin main;
     private final Jedis jedis;
@@ -16,38 +18,19 @@ public class RedisListener extends JedisPubSub {
     public RedisListener(SkyblockBungeePlugin main) {
         this.main = main;
         this.jedis = main.getJedisUtil().getJedis();
-        jedis.subscribe(this, "SkyblockChannel");
-    }
-
-    public void register(UUID islandId, String server) {
-        jedis.sadd("Islands", islandId + "-" + server);
-    }
-
-    public void remove(UUID islandId, String server) {
-        jedis.srem("Islands", islandId + "-" + server);
-    }
-
-    public void requestUpdate() {
-        CompletableFuture.runAsync(() -> jedis.publish("SkyblockChannel", "UPDATE"));
-    }
-
-    public void update() {
-        CompletableFuture.runAsync(() -> {
-            for (String island : jedis.smembers("Islands")) {
-                String[] split = StringUtil.split(island, '-');
-
-                String islandId = split[0];
-                String server = split[1];
-
-                main.getPlayerFinder().update(UUID.fromString(islandId), server);
-            }
-        });
-
+        jedis.subscribe(this, KEY);
     }
 
     @Override
-    public void onMessage(String channel, String message) {
-        if (channel.equals("SkyblockChannel") && message.equals("UPDATE"))
-            update();
+    public void onMessage(byte[] channel, byte[] message) {
+        if (channel != KEY)
+            return;
+
+        main.getPacketManager().read(message);
+    }
+
+    @Override
+    public void send(Packet packet) {
+        jedis.publish(KEY, packet.getAllBytes());
     }
 }
