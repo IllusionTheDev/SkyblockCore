@@ -39,15 +39,15 @@ public class ComparisonResult {
         int wildcard = 0;
 
         for(int i = 0; i < length; i++) {
-            String c = currentSplit[i];
-            String t = testSplit[i];
+            String word = currentSplit[i];
+            String testWord = testSplit[i];
 
-            if ("*".equals(c)) {
+            if ("*".equals(word)) { // If word is wildcard
                 wildcardPositions[wildcard++] = i;
                 continue;
             }
 
-            if (!c.equalsIgnoreCase(t)) {
+            if (!word.equalsIgnoreCase(testWord)) { // Check for match
                 matches = false;
                 return;
             }

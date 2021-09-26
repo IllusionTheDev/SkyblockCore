@@ -19,8 +19,8 @@ public class PacketRequestServer extends Packet {
         this.proxyId = readString();
     }
 
-    public PacketRequestServer(byte identifier, UUID uuid, String proxyId) {
-        super(identifier, PacketDirection.PROXY_TO_PROXY);
+    public PacketRequestServer(UUID uuid, String proxyId) {
+        super(PacketDirection.PROXY_TO_PROXY);
 
         this.uuid = uuid;
         this.proxyId = proxyId;

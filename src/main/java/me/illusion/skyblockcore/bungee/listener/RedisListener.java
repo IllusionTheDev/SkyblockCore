@@ -7,6 +7,7 @@ import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class RedisListener extends BinaryJedisPubSub implements PacketProcessor {
 
@@ -19,6 +20,15 @@ public class RedisListener extends BinaryJedisPubSub implements PacketProcessor 
         this.main = main;
         this.jedis = main.getJedisUtil().getJedis();
         jedis.subscribe(this, KEY);
+    }
+
+    public void updatePlayer(UUID uuid, String proxy) {
+        jedis.set(uuid.toString().getBytes(StandardCharsets.UTF_8), proxy.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String getProxy(UUID uuid) {
+        byte[] bytes = jedis.get(uuid.toString().getBytes(StandardCharsets.UTF_8));
+        return new String(bytes);
     }
 
     @Override

@@ -26,8 +26,9 @@ public abstract class Packet {
         new PacketReceiveEvent(this);
     }
 
-    public Packet(byte identifier, PacketDirection direction) {
-        this.identifier = identifier;
+    public Packet(PacketDirection direction) {
+
+        this.identifier = PacketManager.getIdentifier(getClass());
         this.direction = direction;
 
         validateStream();

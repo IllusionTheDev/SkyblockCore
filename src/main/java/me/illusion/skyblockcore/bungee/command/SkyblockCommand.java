@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.bungee.command;
 
-import me.illusion.skyblockcore.bungee.PlayerFinder;
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
+import me.illusion.skyblockcore.bungee.data.PlayerFinder;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

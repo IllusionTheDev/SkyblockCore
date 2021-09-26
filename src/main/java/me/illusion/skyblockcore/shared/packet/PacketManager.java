@@ -12,12 +12,21 @@ import java.util.Map;
 
 public class PacketManager {
 
-    private final Map<Byte, Class<? extends Packet>> identifiers = new HashMap<>();
+    private static final Map<Byte, Class<? extends Packet>> identifiers = new HashMap<>();
     private final Map<PacketDirection, List<PacketProcessor>> processors = new HashMap<>();
 
     private void registerIds() {
         identifiers.put((byte) 0x01, PacketRequestServer.class);
         identifiers.put((byte) 0x02, PacketRespondServer.class);
+    }
+
+    public static byte getIdentifier(Class<? extends Packet> clazz) {
+        for (Map.Entry<Byte, Class<? extends Packet>> entry : identifiers.entrySet()) {
+            if (clazz.equals(entry.getValue()))
+                return entry.getKey();
+        }
+
+        return 0;
     }
 
     public Class<? extends Packet> getPacketClass(byte identifier) {

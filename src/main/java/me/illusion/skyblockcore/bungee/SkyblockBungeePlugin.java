@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.bungee;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SkyblockCommand;
+import me.illusion.skyblockcore.bungee.data.PlayerFinder;
 import me.illusion.skyblockcore.bungee.listener.ConnectListener;
 import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.listener.SpigotListener;
@@ -23,6 +24,7 @@ public class SkyblockBungeePlugin extends Plugin {
 
     private boolean multiProxy;
 
+    private PlayerFinder playerFinder;
     private PacketManager packetManager;
     private Connection mySQLConnection;
     private Configuration config;
@@ -46,6 +48,7 @@ public class SkyblockBungeePlugin extends Plugin {
         getProxy().getPluginManager().registerCommand(this, new SkyblockCommand(this));
         getProxy().getPluginManager().registerListener(this, new ConnectListener());
         packetManager = new PacketManager();
+        playerFinder = new PlayerFinder(this);
 
         packetManager.registerProcessor(PacketDirection.PROXY_TO_PROXY, new RedisListener(this));
         packetManager.registerProcessor(PacketDirection.PROXY_TO_INSTANCE, new SpigotListener(this));
