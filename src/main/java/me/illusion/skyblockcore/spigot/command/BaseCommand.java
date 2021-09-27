@@ -5,54 +5,74 @@ import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResult;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 
+import java.util.*;
+
 public class BaseCommand extends BukkitCommand {
 
-    private final SkyblockCommand command;
     private final SkyblockPlugin main;
+    private final Map<String, SkyblockCommand> commands = new HashMap<>();
 
-    private final boolean hasPermission;
-    private final String permission;
-
-    protected BaseCommand(String name, SkyblockPlugin main, SkyblockCommand command) {
+    protected BaseCommand(String name, SkyblockPlugin main) {
         super(name);
-        this.command = command;
         this.main = main;
-
-        this.permission = command.getPermission();
-        hasPermission = !permission.equals("");
     }
 
     @Override
-    public boolean execute(CommandSender sender, String s, String[] args) {
-        String identifier = String.join(".", s, String.join(".", args));
+    public List<String> tabComplete(CommandSender sender, String name, String[] args) throws IllegalArgumentException {
+        List<String> list = new ArrayList<>();
 
-        ComparisonResult result = compare(identifier);
+        if (args.length == 0)
+            return Collections.emptyList();
 
-        if(!result.isMatches())
-            return true;
+        String identifier = String.join(".", name, String.join(".", args));
 
-        if(!command.canExecute(sender)) {
-            main.getMessages().sendMessage(sender, "command.cannot-use", (str) -> str.replace("%permission%", permission).replace("%command%", s));
+        for (Map.Entry<String, SkyblockCommand> entry : commands.entrySet()) {
+            ComparisonResult result = new ComparisonResult(identifier, entry.getKey(), entry.getValue().getAliases());
+
+            if (result.isPartiallyMatches())
+                list.add(args[args.length - 1]);
+        }
+
+        return list;
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, String name, String[] args) {
+        String identifier = String.join(".", name, String.join(".", args));
+
+        SkyblockCommand command = main.getCommandManager().get(identifier);
+
+        if (command == null) {
+            main.getMessages().sendMessage(sender, "invalid-args");
             return true;
         }
 
-        if(hasPermission && !sender.hasPermission(permission)) {
-            main.getMessages().sendMessage(sender, "command.no-permission", (str) -> str.replace("%permission%", permission).replace("%command%", s));
+        String permission = command.getPermission();
+
+        if (!command.canExecute(sender)) {
+            main.getMessages().sendMessage(sender, "command.cannot-use", (str) -> str.replace("%permission%", permission).replace("%command%", name));
             return true;
         }
 
+        if (command.hasPermission() && !sender.hasPermission(command.getPermission())) {
+            main.getMessages().sendMessage(sender, "command.no-permission", (str) -> str.replace("%permission%", permission).replace("%command%", name));
+            return true;
+        }
+
+        ComparisonResult result = new ComparisonResult(identifier, command.getIdentifier(), command.getAliases());
         int[] wildcards = result.getWildcardPositions();
         int length = wildcards.length;
         String[] cmdArgs = new String[length];
 
-        for(int i = 0; i < length; i++)
+        for (int i = 0; i < length; i++)
             cmdArgs[i] = args[wildcards[i]];
 
         command.execute(sender, cmdArgs);
         return true;
     }
 
-    private ComparisonResult compare(String test) {
-        return new ComparisonResult(command.getIdentifier(), test, command.getAliases());
+
+    public void registerCommand(SkyblockCommand command) {
+        commands.put(command.getIdentifier(), command);
     }
 }

@@ -40,6 +40,10 @@ public interface SkyblockCommand {
         return true;
     }
 
+    default boolean hasPermission() {
+        return getPermission().isEmpty();
+    }
+
     /**
      * Executes the command
      *

@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.command;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResult;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandMap;
@@ -27,6 +28,7 @@ public class CommandManager {
         }
     }
 
+    private final Map<String, BaseCommand> baseCommands = new HashMap<>();
     private final Map<String, SkyblockCommand> commands = new HashMap<>();
     private final SkyblockPlugin main;
 
@@ -36,10 +38,17 @@ public class CommandManager {
 
     private void makeCommand(SkyblockCommand command) {
         String identifier = command.getIdentifier();
-        int index = identifier.indexOf(".");
-        String name = index == -1 ? identifier : identifier.substring(0, index);
+        String name = getBaseCommand(identifier);
 
-        commandMap.register(name, new BaseCommand(name, main, command));
+        BaseCommand baseCommand = baseCommands.getOrDefault(name, null);
+
+        if (baseCommand == null) {
+            baseCommand = new BaseCommand(name, main);
+            baseCommands.put(name, baseCommand);
+            commandMap.register(name, baseCommand);
+        }
+
+        baseCommand.registerCommand(command);
     }
 
     public void register(SkyblockCommand command) {
@@ -50,12 +59,24 @@ public class CommandManager {
     }
 
     public SkyblockCommand get(String identifier) {
-        return commands.get(identifier);
+        for (Map.Entry<String, SkyblockCommand> entry : commands.entrySet()) {
+            ComparisonResult result = new ComparisonResult(identifier, entry.getKey(), entry.getValue().getAliases());
+
+            if (result.isFullyMatches())
+                return entry.getValue();
+        }
+
+        return null;
     }
 
     public SkyblockCommand get(String name, String... args) {
         String identifier = String.join(".", name, String.join(".", args));
 
         return get(identifier);
+    }
+
+    private String getBaseCommand(String identifier) {
+        int index = identifier.indexOf(".");
+        return index == -1 ? identifier : identifier.substring(0, index);
     }
 }

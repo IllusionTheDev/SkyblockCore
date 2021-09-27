@@ -6,7 +6,8 @@ import me.illusion.skyblockcore.shared.utilities.StringUtil;
 @Getter
 public class ComparisonResult {
 
-    private boolean matches;
+    private boolean partiallyMatches;
+    private boolean fullyMatches;
     private int[] wildcardPositions = null;
 
     private final String[] currentSplit;
@@ -15,13 +16,15 @@ public class ComparisonResult {
         currentSplit = StringUtil.split(current, '.');
         test(test);
 
-        if (!matches)
+        if (!fullyMatches)
             for (String str : aliases) {
                 test(str);
 
-                if (matches)
-                    return;
+                if (fullyMatches)
+                    break;
             }
+
+        partiallyMatches = fullyMatches || partiallyMatches;
 
     }
 
@@ -29,11 +32,6 @@ public class ComparisonResult {
         String[] testSplit = StringUtil.split(test, '.');
 
         int length = currentSplit.length;
-
-        if (length != testSplit.length) {
-            matches = false;
-            return;
-        }
 
         wildcardPositions = new int[length];
         int wildcard = 0;
@@ -48,11 +46,13 @@ public class ComparisonResult {
             }
 
             if (!word.equalsIgnoreCase(testWord)) { // Check for match
-                matches = false;
+                if (testWord.startsWith(word))
+                    partiallyMatches = true;
+                fullyMatches = false;
                 return;
             }
         }
-        matches = true;
+        fullyMatches = true;
         System.arraycopy(wildcardPositions, 0, wildcardPositions, 0, wildcard);
     }
 }
