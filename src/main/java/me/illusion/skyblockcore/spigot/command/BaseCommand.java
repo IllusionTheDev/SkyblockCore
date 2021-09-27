@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.command;
 
+import me.illusion.skyblockcore.shared.utilities.StringUtil;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResult;
 import org.bukkit.command.CommandSender;
@@ -28,9 +29,9 @@ public class BaseCommand extends BukkitCommand {
 
         for (Map.Entry<String, SkyblockCommand> entry : commands.entrySet()) {
             ComparisonResult result = new ComparisonResult(identifier, entry.getKey(), entry.getValue().getAliases());
-
+            
             if (result.isPartiallyMatches())
-                list.add(args[args.length - 1]);
+                list.add(getWordToMatch(entry.getKey(), args[args.length - 1]));
         }
 
         return list;
@@ -69,6 +70,13 @@ public class BaseCommand extends BukkitCommand {
 
         command.execute(sender, cmdArgs);
         return true;
+    }
+
+    private String getWordToMatch(String input, String commandIdentifier) {
+        String[] identifierSplit = StringUtil.split(commandIdentifier, '.');
+        String[] inputSplit = StringUtil.split(input, '.');
+
+        return identifierSplit[inputSplit.length - 1];
     }
 
 
