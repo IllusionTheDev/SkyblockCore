@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.shared.packet;
 
-import me.illusion.skyblockcore.shared.impl.proxy.proxy.request.PacketRequestServer;
 import me.illusion.skyblockcore.shared.impl.proxy.proxy.response.PacketRespondServer;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 
@@ -14,11 +13,28 @@ public class PacketManager {
 
     private static final Map<Byte, Class<? extends Packet>> identifiers = new HashMap<>();
     private final Map<PacketDirection, List<PacketProcessor>> processors = new HashMap<>();
-    private final Map<String, List<PacketHandler<?>>> handlers = new HashMap<>();
+    private final Map<Byte, List<PacketHandler<Packet>>> handlers = new HashMap<>();
+
+
+    public PacketManager() {
+        registerIds();
+    }
+
+    public static void registerPacket(int packetId, Class<? extends Packet> packetClass) {
+        registerPacket((byte) packetId, packetClass);
+    }
+
+    public static void registerPacket(byte packetId, Class<? extends Packet> packetClass) {
+        if (identifiers.containsKey(packetId))
+            throw new UnsupportedOperationException("Packet identifier for packet " + packetClass.getSimpleName() + " is already registered. ");
+
+        identifiers.put(packetId, packetClass);
+    }
 
     private void registerIds() {
-        identifiers.put((byte) 0x01, PacketRequestServer.class);
-        identifiers.put((byte) 0x02, PacketRespondServer.class);
+        registerPacket(0x01, PacketRespondServer.class);
+        registerPacket(0x02, PacketRespondServer.class);
+
     }
 
     public static byte getIdentifier(Class<? extends Packet> clazz) {
@@ -51,6 +67,15 @@ public class PacketManager {
 
         for (PacketProcessor processor : processors)
             processor.send(packet);
+
+        byte id = packet.getIdentifier();
+        List<PacketHandler<Packet>> handler = handlers.get(id);
+
+        if (handler == null)
+            return;
+
+        for (PacketHandler<Packet> packetHandler : handler)
+            packetHandler.onSend(packet);
     }
 
     public List<PacketProcessor> getProcessors(PacketDirection direction) {
@@ -62,6 +87,11 @@ public class PacketManager {
 
         try {
             Packet packet = type.getConstructor(byte[].class).newInstance(bytes);
+            List<PacketHandler<Packet>> handler = handlers.get(bytes[0]);
+
+            if (handler != null)
+                for (PacketHandler<Packet> packetHandler : handler)
+                    packetHandler.onReceive(packet);
 
             return packet;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -72,9 +102,9 @@ public class PacketManager {
     }
 
     public <T extends Packet> void subscribe(Class<T> packetClass, PacketHandler<T> handler) {
-        String className = packetClass.getName();
+        byte identifier = getIdentifier(packetClass);
 
-        handlers.putIfAbsent(className, new ArrayList<>());
-        handlers.get(className).add(handler);
+        handlers.putIfAbsent(identifier, new ArrayList<>());
+        handlers.get(identifier).add((PacketHandler<Packet>) handler);
     }
 }

@@ -1,15 +1,15 @@
 package me.illusion.skyblockcore.spigot.messaging;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
+import me.illusion.skyblockcore.shared.impl.proxy.instance.response.PacketDetermineServerInfo;
+import me.illusion.skyblockcore.shared.packet.Packet;
+import me.illusion.skyblockcore.shared.packet.PacketHandler;
+import me.illusion.skyblockcore.shared.packet.PacketProcessor;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.util.Collection;
-import java.util.UUID;
 
 /*
     Class responsible for Bungeecord <-> Server messaging
@@ -21,7 +21,7 @@ import java.util.UUID;
     as a list of island uuid's
 
  */
-public class BungeeMessaging implements PluginMessageListener {
+public class BungeeMessaging implements PluginMessageListener, PacketProcessor {
 
     private final SkyblockPlugin main;
     private String serverIdentifier;
@@ -31,6 +31,13 @@ public class BungeeMessaging implements PluginMessageListener {
 
         Bukkit.getMessenger().registerIncomingPluginChannel(main, "SkyblockChannel", this);
         Bukkit.getMessenger().registerOutgoingPluginChannel(main, "SkyblockChannel");
+
+        main.getPacketManager().subscribe(PacketDetermineServerInfo.class, new PacketHandler<PacketDetermineServerInfo>() {
+            @Override
+            public void onReceive(PacketDetermineServerInfo packet) {
+                serverIdentifier = packet.getTargetServer();
+            }
+        });
     }
 
     @Override
@@ -38,35 +45,20 @@ public class BungeeMessaging implements PluginMessageListener {
         if (!s.equalsIgnoreCase("SkyblockChannel"))
             return;
 
-        ByteArrayDataInput input = ByteStreams.newDataInput(bytes);
-
-        if (input.readUTF().equals("SkyblockChannelIdentifier"))
-            serverIdentifier = input.readUTF();
+        main.getPacketManager().read(bytes);
 
     }
 
-    public void sendData(Player player) {
-        if (serverIdentifier == null)
+
+    @Override
+    public void send(Packet packet) {
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+
+        if (players.isEmpty())
             return;
 
-        player.sendPluginMessage(main, "SkyblockChannel", prepareMessage());
+        Player player = players.iterator().next();
+
+        player.sendPluginMessage(main, "SkyblockChannel", packet.getAllBytes());
     }
-
-    private byte[] prepareMessage() {
-        ByteArrayDataOutput output = ByteStreams.newDataOutput();
-
-        Collection<UUID> islandIds = main.getIslandManager().getLoadedIslandIds();
-        output.writeUTF("SkyblockChannel");
-
-        output.writeInt(islandIds.size());
-        output.writeUTF(serverIdentifier);
-        output.writeBoolean(main.getIslandManager().isMaxCapacity());
-
-        for (UUID uuid : islandIds)
-            output.writeUTF(uuid.toString());
-
-        return output.toByteArray();
-
-    }
-
 }

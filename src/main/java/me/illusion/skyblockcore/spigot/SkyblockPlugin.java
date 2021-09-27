@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.spigot.command.CommandManager;
@@ -84,6 +85,8 @@ public class SkyblockPlugin extends JavaPlugin {
      */
     private File[] startSchematic;
 
+    private PacketManager packetManager;
+
     @Override
     public void onEnable() {
         // Loads the SQL, when that's complete with a response (true|false), loads if false
@@ -131,6 +134,7 @@ public class SkyblockPlugin extends JavaPlugin {
             new VaultHook(this);
 
         System.out.println("Registering bungeecord messaging listener");
+        packetManager = new PacketManager();
         bungeeMessaging = new BungeeMessaging(this);
 
         System.out.println("Loaded");

@@ -1,14 +1,16 @@
 package me.illusion.skyblockcore.spigot.sql.serialized;
 
-import me.illusion.skyblockcore.shared.utilities.StringUtil;
-import org.bukkit.Bukkit;
+import lombok.Getter;
+import me.illusion.skyblockcore.spigot.utilities.BukkitConverter;
 import org.bukkit.Location;
 
 import java.io.Serializable;
 
+@Getter
 public class SerializedLocation implements Serializable {
 
     private String format;
+
 
     /**
      * Obtains the Bukkit location
@@ -16,18 +18,7 @@ public class SerializedLocation implements Serializable {
      * @return the bukkit location
      */
     public Location getLocation() {
-        if (format == null || format.isEmpty())
-            return null;
-
-        String[] split = StringUtil.split(format, ' '); // Faster split method
-
-        double x = Double.parseDouble(split[0]);
-        double y = Double.parseDouble(split[1]);
-        double z = Double.parseDouble(split[2]);
-        float yaw = Float.parseFloat(split[3]);
-        float pitch = Float.parseFloat(split[4]);
-        String world = split[5];
-        return new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
+        return BukkitConverter.convertLocation(this);
     }
 
     /**
