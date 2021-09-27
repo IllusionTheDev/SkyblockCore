@@ -60,4 +60,8 @@ public class JedisUtil {
 
         return file;
     }
+
+    public JedisPool getPool() {
+        return jedisPool;
+    }
 }

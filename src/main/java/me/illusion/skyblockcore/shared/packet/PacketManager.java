@@ -14,6 +14,7 @@ public class PacketManager {
 
     private static final Map<Byte, Class<? extends Packet>> identifiers = new HashMap<>();
     private final Map<PacketDirection, List<PacketProcessor>> processors = new HashMap<>();
+    private final Map<String, List<PacketHandler<?>>> handlers = new HashMap<>();
 
     private void registerIds() {
         identifiers.put((byte) 0x01, PacketRequestServer.class);
@@ -60,11 +61,20 @@ public class PacketManager {
         Class<? extends Packet> type = getPacketClass(bytes[0]);
 
         try {
-            return type.getConstructor(byte[].class).newInstance(bytes);
+            Packet packet = type.getConstructor(byte[].class).newInstance(bytes);
+
+            return packet;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    public <T extends Packet> void subscribe(Class<T> packetClass, PacketHandler<T> handler) {
+        String className = packetClass.getName();
+
+        handlers.putIfAbsent(className, new ArrayList<>());
+        handlers.get(className).add(handler);
     }
 }

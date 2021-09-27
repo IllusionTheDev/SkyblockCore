@@ -40,6 +40,31 @@ public class RedisListener extends BinaryJedisPubSub implements PacketProcessor 
     }
 
     @Override
+    public void onPMessage(byte[] pattern, byte[] channel, byte[] message) {
+
+    }
+
+    @Override
+    public void onSubscribe(byte[] channel, int subscribedChannels) {
+
+    }
+
+    @Override
+    public void onUnsubscribe(byte[] channel, int subscribedChannels) {
+
+    }
+
+    @Override
+    public void onPUnsubscribe(byte[] pattern, int subscribedChannels) {
+
+    }
+
+    @Override
+    public void onPSubscribe(byte[] pattern, int subscribedChannels) {
+
+    }
+
+    @Override
     public void send(Packet packet) {
         jedis.publish(KEY, packet.getAllBytes());
     }

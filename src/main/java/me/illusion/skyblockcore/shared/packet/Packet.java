@@ -5,7 +5,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
-import me.illusion.skyblockcore.shared.packet.event.PacketReceiveEvent;
 
 import java.io.*;
 import java.util.UUID;
@@ -23,7 +22,6 @@ public abstract class Packet {
         identifier = readByte();
         direction = PacketDirection.fromIndex(readByte());
 
-        new PacketReceiveEvent(this);
     }
 
     public Packet(PacketDirection direction) {
