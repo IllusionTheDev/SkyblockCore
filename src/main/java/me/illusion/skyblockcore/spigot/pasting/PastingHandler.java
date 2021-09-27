@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.spigot.pasting;
 
-import me.illusion.skyblockcore.spigot.data.SerializedFile;
+import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.island.Island;
 import org.bukkit.Location;
 

@@ -3,8 +3,8 @@ package me.illusion.skyblockcore.shared.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
-import me.illusion.skyblockcore.spigot.data.SerializedFile;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.island.generator.OreGenerator;
 

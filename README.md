@@ -37,6 +37,9 @@ The islands are either saved in .mca (Mojang's format) or in .schematic (FAWE), 
 
 Islands have their own worlds, which are loaded on demand
 
+Servers communicate using the Plugin Messaging API, when doing any proxy <-> instance communication, or Redis when doing any proxy <-> proxy communication.
+The communication is done via a Packet system, that is implemented in the `shared` package
+
 **Technologies Used**
 - SpigotAPI
 - MySQL
