@@ -115,7 +115,7 @@ public class PlayerFinder {
         byte[] bytes = jedis.get(uuid.toString().getBytes(StandardCharsets.UTF_8));
 
         jedis.close();
-        main.getJedisUtil().getPool().returnBrokenResource(jedis);
+        main.getJedisUtil().getPool().returnResource(jedis);
 
         return new String(bytes);
     }

@@ -5,6 +5,8 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.io.*;
 import java.util.UUID;
@@ -98,6 +100,10 @@ public abstract class Packet {
         writeLong(uuid.getLeastSignificantBits());
     }
 
+    protected void writeBungeeText(BaseComponent[] text) {
+        writeString(ComponentSerializer.toString(text));
+    }
+
 
     @SneakyThrows
     protected void writeObject(Object object) {
@@ -146,6 +152,10 @@ public abstract class Packet {
 
     protected UUID readUUID() {
         return new UUID(readLong(), readLong());
+    }
+
+    protected BaseComponent[] readBungeeText() {
+        return ComponentSerializer.parse(readString());
     }
 
     @SneakyThrows

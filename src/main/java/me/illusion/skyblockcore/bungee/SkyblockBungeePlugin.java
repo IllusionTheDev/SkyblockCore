@@ -3,11 +3,13 @@ package me.illusion.skyblockcore.bungee;
 import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SkyblockCommand;
 import me.illusion.skyblockcore.bungee.data.PlayerFinder;
+import me.illusion.skyblockcore.bungee.handler.MessagePacketHandler;
 import me.illusion.skyblockcore.bungee.listener.ConnectListener;
 import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.listener.SpigotListener;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
 import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
+import me.illusion.skyblockcore.shared.impl.proxy.proxy.request.PacketRequestMessageSend;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.sql.SQLUtil;
@@ -50,8 +52,14 @@ public class SkyblockBungeePlugin extends Plugin {
         packetManager = new PacketManager();
         playerFinder = new PlayerFinder(this);
 
+        setupPackets();
+    }
+
+    private void setupPackets() {
         packetManager.registerProcessor(PacketDirection.PROXY_TO_PROXY, new RedisListener(this));
         packetManager.registerProcessor(PacketDirection.PROXY_TO_INSTANCE, new SpigotListener(this));
+
+        packetManager.subscribe(PacketRequestMessageSend.class, new MessagePacketHandler());
     }
 
     @Override

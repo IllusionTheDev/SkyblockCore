@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.shared.packet;
 
+import me.illusion.skyblockcore.shared.impl.proxy.proxy.request.PacketRequestMessageSend;
 import me.illusion.skyblockcore.shared.impl.proxy.proxy.response.PacketRespondServer;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 
@@ -34,6 +35,7 @@ public class PacketManager {
     private void registerIds() {
         registerPacket(0x01, PacketRespondServer.class);
         registerPacket(0x02, PacketRespondServer.class);
+        registerPacket(0x03, PacketRequestMessageSend.class);
 
     }
 

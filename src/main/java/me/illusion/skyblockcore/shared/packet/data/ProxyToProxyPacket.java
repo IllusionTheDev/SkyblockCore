@@ -9,7 +9,6 @@ public class ProxyToProxyPacket extends Packet {
     private final String originProxy;
     private final String targetProxy;
 
-
     public ProxyToProxyPacket(byte[] bytes) {
         super(bytes);
 

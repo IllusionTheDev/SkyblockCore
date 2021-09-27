@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.messaging;
 
+import lombok.Getter;
 import me.illusion.skyblockcore.shared.impl.proxy.instance.response.PacketDetermineServerInfo;
 import me.illusion.skyblockcore.shared.packet.Packet;
 import me.illusion.skyblockcore.shared.packet.PacketHandler;
@@ -24,6 +25,8 @@ import java.util.Collection;
 public class BungeeMessaging implements PluginMessageListener, PacketProcessor {
 
     private final SkyblockPlugin main;
+
+    @Getter
     private String serverIdentifier;
 
     public BungeeMessaging(SkyblockPlugin main) {
