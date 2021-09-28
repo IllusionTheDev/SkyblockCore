@@ -11,30 +11,18 @@ import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 public class PlayerFinder {
 
     private static final String PROXY_ID = ProxyServer.getInstance().getName();
-
-    private final Map<UUID, CountDownLatch> latches = new HashMap<>();
-    private final Map<UUID, PacketRespondServer> responses = new HashMap<>();
 
     private final SkyblockBungeePlugin main;
 
     public PlayerFinder(SkyblockBungeePlugin main) {
         this.main = main;
 
-        main.getPacketManager().subscribe(PacketRespondServer.class, new PacketHandler<PacketRespondServer>() {
-            @Override
-            public void onReceive(PacketRespondServer packet) {
-                processResponse(packet);
-            }
-        });
 
         main.getPacketManager().subscribe(PacketRequestServer.class, new PacketHandler<PacketRequestServer>() {
             @Override
@@ -77,17 +65,7 @@ public class PlayerFinder {
 
                 main.getPacketManager().send(packet);
 
-                CountDownLatch latch = new CountDownLatch(1);
-
-                latches.put(uuid, latch);
-
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                PacketRespondServer response = responses.getOrDefault(uuid, null);
+                PacketRespondServer response = main.getPacketManager().await(PacketRespondServer.class, (packetIn) -> packetIn.getUuid().equals(uuid));
 
                 if (response == null)
                     return null;
@@ -120,8 +98,4 @@ public class PlayerFinder {
         return new String(bytes);
     }
 
-    public void processResponse(PacketRespondServer packet) {
-        latches.remove(packet.getUuid()).countDown();
-        responses.put(packet.getUuid(), packet);
-    }
 }

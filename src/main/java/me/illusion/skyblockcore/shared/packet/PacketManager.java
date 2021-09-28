@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class PacketManager {
 
@@ -16,9 +17,11 @@ public class PacketManager {
     private final Map<PacketDirection, List<PacketProcessor>> processors = new HashMap<>();
     private final Map<Byte, List<PacketHandler<Packet>>> handlers = new HashMap<>();
 
+    private final PacketWaiter waiter;
 
     public PacketManager() {
         registerIds();
+        waiter = new PacketWaiter(this);
     }
 
     public static void registerPacket(int packetId, Class<? extends Packet> packetClass) {
@@ -103,10 +106,14 @@ public class PacketManager {
         return null;
     }
 
-    public <T extends Packet> void subscribe(Class<T> packetClass, PacketHandler<T> handler) {
+    public synchronized <T extends Packet> void subscribe(Class<T> packetClass, PacketHandler<T> handler) {
         byte identifier = getIdentifier(packetClass);
 
         handlers.putIfAbsent(identifier, new ArrayList<>());
         handlers.get(identifier).add((PacketHandler<Packet>) handler);
+    }
+
+    public <T extends Packet> T await(Class<T> clazz, Predicate<T> predicate) {
+        return waiter.await(clazz, predicate);
     }
 }
