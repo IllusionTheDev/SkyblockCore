@@ -72,6 +72,8 @@ Servers communicate using the Plugin Messaging API, when doing any proxy <-> ins
 ### Some thoughts:
 SkyblockCore is incredibly difficult to develop, unlike a regular core, there is a lot of thought put into every line of code, the plugin is supposed to expect players switching across servers, proxies, players leaving mid-loading, different proxies for the same team members, all of it while handling all of the commands on the spigot side, so players on a survival server can't run skyblock commands.
 
+It might not seem like it, but this project is absolutely massive on its current state, and I'd say it's about 15% done.
+
 If you'd like to help with the project, even as someone without any code experience, here are some things that would greatly help me out:
 
 - Testing
