@@ -9,6 +9,6 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class PacketWaitData<T> {
 
-    private final Class<T> clazz;
-    private final Predicate<T> predicate;
+    private final Class<T> clazz; // Class that determines what packet should be waited for
+    private final Predicate<T> predicate; // Filter to determine wanted packets
 }

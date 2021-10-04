@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.shared.impl.proxy.proxy.response;
+package me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.response;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.packet.data.ProxyToProxyPacket;

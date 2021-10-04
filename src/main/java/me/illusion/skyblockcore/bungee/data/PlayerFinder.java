@@ -2,9 +2,9 @@ package me.illusion.skyblockcore.bungee.data;
 
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
 import me.illusion.skyblockcore.shared.exceptions.UnsafeSyncOperationException;
-import me.illusion.skyblockcore.shared.impl.proxy.proxy.request.PacketRequestServer;
-import me.illusion.skyblockcore.shared.impl.proxy.proxy.response.PacketRespondServer;
 import me.illusion.skyblockcore.shared.packet.PacketHandler;
+import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.request.PacketRequestServer;
+import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.response.PacketRespondServer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.Bukkit;
