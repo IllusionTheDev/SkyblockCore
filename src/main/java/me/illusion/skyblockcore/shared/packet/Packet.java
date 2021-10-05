@@ -54,7 +54,7 @@ public abstract class Packet {
         stream.writeByte(value);
     }
 
-    protected void writeByteArray(byte[] bytes) {
+    protected void writeByteArray(byte... bytes) {
         validateStream();
         writeInt(bytes.length);
         stream.write(bytes);
@@ -100,7 +100,7 @@ public abstract class Packet {
         writeLong(uuid.getLeastSignificantBits());
     }
 
-    protected void writeBungeeText(BaseComponent[] text) {
+    protected void writeBungeeText(BaseComponent... text) {
         writeString(ComponentSerializer.toString(text));
     }
 
@@ -108,13 +108,11 @@ public abstract class Packet {
     @SneakyThrows
     protected void writeObject(Object object) {
         validateStream();
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            ObjectOutputStream out = new ObjectOutputStream(bos);
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); ObjectOutputStream out = new ObjectOutputStream(bos)) {
             out.writeObject(object);
             out.flush();
             byte[] bytes = bos.toByteArray();
             writeByteArray(bytes);
-            out.close();
         }
         // ignore close exception
     }
