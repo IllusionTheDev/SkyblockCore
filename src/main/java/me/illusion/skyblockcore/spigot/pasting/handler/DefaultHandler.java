@@ -6,7 +6,6 @@ import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
-import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -37,7 +36,7 @@ public class DefaultHandler implements PastingHandler {
         }
 
         if (extension == null)
-            extension = FilenameUtils.getExtension(file.getAbsolutePath());
+            extension = getExtension(file.getName());
 
         World world = loc.getWorld();
 
@@ -105,5 +104,10 @@ public class DefaultHandler implements PastingHandler {
     @Override
     public PastingType getType() {
         return PastingType.DEFAULT;
+    }
+
+    private String getExtension(String filename) {
+        int index = filename.lastIndexOf(".");
+        return filename.substring(index + 1);
     }
 }

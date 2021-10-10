@@ -40,6 +40,6 @@ public class SQLiteHandler extends MySQLHandler {
 
     @Override
     public boolean isFileBased() {
-        return false;
+        return true;
     }
 }

@@ -60,16 +60,21 @@ public class SkyblockPlayer {
      */
     private void load() {
 
+        System.out.println("Loading data for " + getPlayer().getName());
+
         load("PLAYER", uuid).whenComplete((object, $) -> {
             data = (PlayerData) object;
 
             if (data == null) {
+                System.out.println("No PlayerData has been found, creating new data");
+
                 data = new PlayerData();
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
                 sync(() -> loadIsland(islandData));
                 return;
             }
 
+            System.out.println("Loaded player data, loading island data");
             load("ISLAND", data.getIslandId()).whenComplete((islandObject, $$) -> sync(() -> loadIsland((IslandData) islandObject)));
 
         });
@@ -163,11 +168,15 @@ public class SkyblockPlayer {
     private void loadIsland(IslandData islandData) {
         Player p = getPlayer(); // Obtains player
 
+        System.out.println("Loading island data for player " + p.getName());
+
         data.setIslandId(islandData.getId()); // Updates Island ID in playerdata
 
         boolean paste = true; // variable to store pasting
 
         List<UUID> members = islandData.getUsers();
+
+        System.out.println("Island users: " + members);
 
         // If any island member is online (island pasted)
         for (UUID uuid : members)
@@ -226,6 +235,7 @@ public class SkyblockPlayer {
     private SerializedFile[] createFiles(UUID id, File folder, SerializedFile... files) {
         File[] copyArray = new File[files.length]; // Makes an array of the copied files (rewritten files)
 
+        folder.getParentFile().mkdirs();
         folder.mkdir(); // Creates the folder (if doesn't exist)
 
         for (int i = 0; i < files.length; i++) { // Loops through files
@@ -281,6 +291,7 @@ public class SkyblockPlayer {
         Location one = center.add(-offset, -128, -offset);
         Location two = center.add(offset, 128, offset);
 
+        System.out.println("Pasting island");
         main.getPastingHandler().paste(data.getIslandSchematic(), center);
 
         islandCenter = center;
