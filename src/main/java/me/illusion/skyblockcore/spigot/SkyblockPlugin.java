@@ -11,6 +11,8 @@ import me.illusion.skyblockcore.spigot.file.IslandConfig;
 import me.illusion.skyblockcore.spigot.hook.VaultHook;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.island.world.EmptyWorldGenerator;
+import me.illusion.skyblockcore.spigot.listener.DeathListener;
+import me.illusion.skyblockcore.spigot.listener.DebugListener;
 import me.illusion.skyblockcore.spigot.listener.JoinListener;
 import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.BungeeMessaging;
@@ -21,6 +23,7 @@ import me.illusion.skyblockcore.spigot.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -89,6 +92,14 @@ public class SkyblockPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        emptyWorldGenerator = new EmptyWorldGenerator();
+
+        System.out.println("Registering configuration files");
+        messages = new MessagesFile(this);
+        islandConfig = new IslandConfig(this);
+
+        System.out.println("Creating worlds");
+        worldManager = new WorldManager(this);
         // Loads the SQL, when that's complete with a response (true|false), loads if false
         setupStorage().whenComplete((val, throwable) -> {
             if (!val) // if the setup is incorrect, don't load
@@ -104,14 +115,10 @@ public class SkyblockPlugin extends JavaPlugin {
     }
 
     private void load() {
-        System.out.println("Registering configuration files");
 
-        messages = new MessagesFile(this);
-        islandConfig = new IslandConfig(this);
         islandManager = new IslandManager(this);
         commandManager = new CommandManager(this);
         playerManager = new PlayerManager();
-        emptyWorldGenerator = new EmptyWorldGenerator();
 
         System.out.println("Setting up pasting handler");
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
@@ -119,12 +126,11 @@ public class SkyblockPlugin extends JavaPlugin {
         System.out.println("Registering start files");
         startSchematic = startFiles();
 
-        System.out.println("Creating worlds");
-        worldManager = new WorldManager(this);
-
         System.out.println("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
 
         System.out.println("Registering default commands.");
         registerDefaultCommands();
@@ -206,7 +212,7 @@ public class SkyblockPlugin extends JavaPlugin {
             if (pastingHandler.getType() == PastingType.FAWE)
                 saveResource("start-schematic" + File.separator + "skyblock-schematic.schematic", false);
             else
-                saveResource("start-schematic" + File.separator + "r0.0.mca", false);
+                saveResource("start-schematic" + File.separator + "r.0.0.mca", false);
         }
 
         return startSchematicFolder.listFiles();
@@ -216,4 +222,8 @@ public class SkyblockPlugin extends JavaPlugin {
         Bukkit.getScheduler().runTask(this, runnable);
     }
 
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        return emptyWorldGenerator;
+    }
 }

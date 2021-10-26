@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,6 +21,10 @@ public class WorldManager implements Listener {
     public WorldManager(SkyblockPlugin main) {
         for (int i = 1; i <= main.getIslandConfig().getWorldCount(); i++) {
             loadedIslands.put("SkyblockWorld" + i, null);
+
+            if (new File(Bukkit.getWorldContainer() + File.separator + "SkyblockWorld" + i).exists())
+                continue;
+
             main.setupWorld("SkyblockWorld" + i);
             Bukkit.unloadWorld("SkyblockWorld" + i, true);
         }
@@ -41,6 +46,10 @@ public class WorldManager implements Listener {
 
     public void whenNextSave(Consumer<World> worldConsumer, String worldname) {
         saveEvents.put(worldname, worldConsumer);
+    }
+
+    public boolean isSkyblockWorld(String name) {
+        return loadedIslands.containsKey(name);
     }
 
     @EventHandler

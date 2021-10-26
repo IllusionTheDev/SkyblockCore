@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.spigot.data;
 
-import com.google.common.io.Files;
 import lombok.AccessLevel;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
@@ -16,7 +15,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -60,16 +58,21 @@ public class SkyblockPlayer {
      */
     private void load() {
 
+        System.out.println("Loading data for " + getPlayer().getName());
+
         load("PLAYER", uuid).whenComplete((object, $) -> {
             data = (PlayerData) object;
 
             if (data == null) {
+                System.out.println("No PlayerData has been found, creating new data");
+
                 data = new PlayerData();
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
                 sync(() -> loadIsland(islandData));
                 return;
             }
 
+            System.out.println("Loaded player data, loading island data");
             load("ISLAND", data.getIslandId()).whenComplete((islandObject, $$) -> sync(() -> loadIsland((IslandData) islandObject)));
 
         });
@@ -163,11 +166,15 @@ public class SkyblockPlayer {
     private void loadIsland(IslandData islandData) {
         Player p = getPlayer(); // Obtains player
 
+        System.out.println("Loading island data for player " + p.getName());
+
         data.setIslandId(islandData.getId()); // Updates Island ID in playerdata
 
         boolean paste = true; // variable to store pasting
 
         List<UUID> members = islandData.getUsers();
+
+        System.out.println("Island users: " + members);
 
         // If any island member is online (island pasted)
         for (UUID uuid : members)
@@ -176,7 +183,7 @@ public class SkyblockPlayer {
                 break;
             }
 
-        File folder = new File(main.getDataFolder() + File.separator + "cache"); // Create cache folder
+        File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandData.getId()); // Create cache folder
 
         // Pastes island if required
         if (paste) {
@@ -224,36 +231,29 @@ public class SkyblockPlayer {
      * @return The new renamed files
      */
     private SerializedFile[] createFiles(UUID id, File folder, SerializedFile... files) {
-        File[] copyArray = new File[files.length]; // Makes an array of the copied files (rewritten files)
+        SerializedFile[] copyArray = new SerializedFile[files.length];
 
-        folder.mkdir(); // Creates the folder (if doesn't exist)
+        folder.getParentFile().mkdirs();
+        folder.mkdir();
 
-        for (int i = 0; i < files.length; i++) { // Loops through files
-            SerializedFile serializedFile = files[i];
-            File file = null;
+        for (int index = 0; index < files.length; index++) {
+            SerializedFile file = files[index].copy();
+            File realFile = null;
             try {
-                file = serializedFile.getFile().get();
+                realFile = file.getFile().get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
 
-            File copy = new File(folder, id + "_" + file.getName()); // Creates new file with renamed name
-
-            copyArray[i] = copy; // Marks copy internally
-
-            if (file.equals(copy) && file.exists())  // Checks for name equality
+            if (realFile == null)
                 continue;
 
-            try {
-                if (!copy.exists()) // Creates empty file if it doesn't exist
-                    copy.createNewFile();
-                Files.copy(file, copy); // Copies bytes
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            file.setFile(new File(folder, realFile.getName()));
+            file.save();
+            copyArray[index] = file;
         }
 
-        return SerializedFile.loadArray(copyArray);
+        return copyArray;
     }
 
     /**
@@ -275,12 +275,13 @@ public class SkyblockPlayer {
      * @return island object
      */
     private Island loadIsland(IslandData data, World world) {
-        Location center = new Location(world, 0, 128, 0);
+        Location center = new Location(world, 256, 128, 256);
         int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
         Location one = center.add(-offset, -128, -offset);
         Location two = center.add(offset, 128, offset);
 
+        System.out.println("Pasting island");
         main.getPastingHandler().paste(data.getIslandSchematic(), center);
 
         islandCenter = center;

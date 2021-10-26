@@ -10,34 +10,31 @@ public class ComparisonResult {
     private boolean fullyMatches;
     private int[] wildcardPositions = null;
 
-    private final String[] currentSplit;
-
-    public ComparisonResult(String current, String test, String[] aliases) {
-        currentSplit = StringUtil.split(current, '.');
-        test(test);
+    public ComparisonResult(String identifier, String test, String[] aliases) {
+        test(identifier, test);
 
         if (!fullyMatches)
             for (String str : aliases) {
-                test(str);
+                test(str, test);
 
                 if (fullyMatches)
                     break;
             }
 
         partiallyMatches = fullyMatches || partiallyMatches;
-
     }
 
-    private void test(String test) {
+    private void test(String identifier, String test) {
+        String[] identifierSplit = StringUtil.split(identifier, '.');
         String[] testSplit = StringUtil.split(test, '.');
 
-        int length = currentSplit.length;
+        int length = identifierSplit.length;
 
         wildcardPositions = new int[length];
         int wildcard = 0;
 
-        for(int i = 0; i < length; i++) {
-            String word = currentSplit[i];
+        for (int i = 0; i < length; i++) {
+            String word = identifierSplit[i];
             String testWord = testSplit[i];
 
             if ("*".equals(word)) { // If word is wildcard

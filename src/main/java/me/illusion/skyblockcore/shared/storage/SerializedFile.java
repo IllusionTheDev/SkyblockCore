@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @EqualsAndHashCode
 public class SerializedFile implements Serializable {
@@ -18,6 +19,15 @@ public class SerializedFile implements Serializable {
         setFile(file);
     }
 
+    private SerializedFile(File file, byte[] contents) {
+        this.file = file;
+        this.contents = contents;
+    }
+
+    public SerializedFile copy() {
+        return new SerializedFile(this.file, contents);
+    }
+
     public static SerializedFile[] loadArray(File[] array) {
         SerializedFile[] newArray = new SerializedFile[array.length];
 
@@ -25,6 +35,14 @@ public class SerializedFile implements Serializable {
             newArray[i] = new SerializedFile(array[i]);
 
         return newArray;
+    }
+
+    public void save() {
+        try {
+            getFile().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public CompletableFuture<File> getFile() {
@@ -48,7 +66,15 @@ public class SerializedFile implements Serializable {
     }
 
     public final void setFile(File file) {
+        setFile(file, true);
+    }
+
+    public final void setFile(File file, boolean readNewContents) {
         this.file = file;
+
+        if (!file.exists() || !readNewContents)
+            return;
+
         try {
             this.contents = Files.readAllBytes(file.toPath());
         } catch (IOException e) {

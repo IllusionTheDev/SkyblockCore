@@ -25,11 +25,11 @@ public class YMLBase {
         this.file = file;
 
         if (!file.exists()) {
-            try {
+            try (InputStream stream = plugin.getResourceAsStream(file.getName())) {
                 file.getParentFile().mkdirs();
                 if (existsOnSource) {
-                    InputStream stream = plugin.getResourceAsStream(file.getName());
                     Files.copy(stream, file.toPath());
+                    stream.close();
                 } else
                     file.createNewFile();
             } catch (IOException e) {

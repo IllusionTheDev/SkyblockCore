@@ -9,13 +9,13 @@ repositories {
     jcenter()
     mavenCentral()
 
-    maven { url = 'http://nexus.hc.to/content/repositories/pub_releases' }
+    maven { url = 'https://nexus.hc.to/content/repositories/pub_releases' }
     maven { url = 'https://hub.spigotmc.org/nexus/content/groups/public/' }
     maven { url = 'https://repo.codemc.org/repository/maven-public/' }
-    maven { url = "http://repo.dmulloy2.net/nexus/repository/public/" }
-    maven { url = 'http://repo.extendedclip.com/content/repositories/placeholderapi'}
+    maven { url = "https://repo.dmulloy2.net/nexus/repository/public/" }
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi'}
     maven { url = 'https://mvn.intellectualsites.com/content/repositories/releases/'}
-    maven { url "https://repo.glaremasters.me/repository/concuncan/" }
+    maven { url = "https://repo.glaremasters.me/repository/concuncan/" }
 
     mavenLocal()
 
@@ -26,8 +26,8 @@ dependencies {
     implementation group: 'net.md-5', name: 'bungeecord-api', version: '1.16-R0.5-SNAPSHOT'
     implementation 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
 
-    implementation 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor('org.projectlombok:lombok:1.18.20')
+    implementation 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor('org.projectlombok:lombok:1.18.22')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'de.tr7zw:item-nbt-api-plugin:2.1.0'

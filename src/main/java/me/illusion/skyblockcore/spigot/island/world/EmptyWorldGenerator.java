@@ -15,6 +15,6 @@ public class EmptyWorldGenerator extends ChunkGenerator {
 
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
-        return new Location(world, 0, 128, 0);
+        return new Location(world, 256, 128, 256);
     }
 }
