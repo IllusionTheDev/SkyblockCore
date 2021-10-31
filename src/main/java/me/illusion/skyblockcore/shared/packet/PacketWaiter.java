@@ -1,8 +1,6 @@
 package me.illusion.skyblockcore.shared.packet;
 
-import me.illusion.skyblockcore.shared.exceptions.UnsafeSyncOperationException;
 import me.illusion.skyblockcore.shared.packet.data.PacketWaitData;
-import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,8 +43,8 @@ public class PacketWaiter {
      * @return NULL if timeout, Packet otherwise
      */
     public <T extends Packet> T await(Class<T> packetClass, Predicate<T> returnIf, int timeoutSeconds) {
-        if (Bukkit.isPrimaryThread())
-            throw new UnsafeSyncOperationException();
+        //if (Bukkit.isPrimaryThread())
+        //    throw new UnsafeSyncOperationException();
 
         CountDownLatch latch = new CountDownLatch(1);
         PacketWaitData<?> waitData = new PacketWaitData<>(packetClass, returnIf);

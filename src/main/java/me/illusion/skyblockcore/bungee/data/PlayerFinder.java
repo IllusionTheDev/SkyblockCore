@@ -1,13 +1,11 @@
 package me.illusion.skyblockcore.bungee.data;
 
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
-import me.illusion.skyblockcore.shared.exceptions.UnsafeSyncOperationException;
 import me.illusion.skyblockcore.shared.packet.PacketHandler;
 import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.request.PacketRequestServer;
 import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.response.PacketRespondServer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
@@ -80,8 +78,10 @@ public class PlayerFinder {
     }
 
     private String getProxy(UUID uuid) {
-        if (Bukkit.isPrimaryThread())
-            throw new UnsafeSyncOperationException();
+        // TIL: Bungee doesn't have a main thread
+
+        //if (.isPrimaryThread())
+        //    throw new UnsafeSyncOperationException();
 
         if (!main.isMultiProxy()) {
             ProxyServer server = ProxyServer.getInstance();

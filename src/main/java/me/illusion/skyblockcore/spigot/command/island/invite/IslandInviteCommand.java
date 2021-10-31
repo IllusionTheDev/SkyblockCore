@@ -6,6 +6,7 @@ import me.illusion.skyblockcore.shared.packet.impl.proxy.instance.response.Packe
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -36,12 +37,16 @@ public class IslandInviteCommand implements SkyblockCommand {
         Player player = (Player) sender;
 
         // Check if the target is on the current instance
-        Player target = Bukkit.getPlayer(targetPlayer);
+        OfflinePlayer target = Bukkit.getOfflinePlayer(targetPlayer);
 
-        if (target == null) {
-            // Target might be on the proxy, but is not sure
-            return;
-        }
+        sendInvite(player, target.getName())
+                .thenAccept(response -> {
+                    player.sendMessage("Response: " + response);
+                })
+                .exceptionally((thr) -> {
+                    thr.printStackTrace();
+                    return null;
+                });
 
         return;
     }

@@ -28,51 +28,41 @@ public class CommandManager {
         }
     }
 
-    private final Map<String, BaseCommand> baseCommands = new HashMap<>();
     private final Map<String, SkyblockCommand> commands = new HashMap<>();
     private final SkyblockPlugin main;
 
     public CommandManager(SkyblockPlugin main) {
         this.main = main;
-    }
 
-    private void makeCommand(SkyblockCommand command) {
-        String identifier = command.getIdentifier();
-        String name = getBaseCommand(identifier);
-
-        BaseCommand baseCommand = baseCommands.getOrDefault(name, null);
-
-        if (baseCommand == null) {
-            baseCommand = new BaseCommand(name, main);
-            baseCommands.put(name, baseCommand);
-            commandMap.register(name, baseCommand);
-        }
-
-        baseCommand.registerCommand(command);
+        System.out.println("Running tests: ");
+        System.out.println("island.go -> " + get(true, "island.go"));
+        System.out.println("island -> " + get(true, "island"));
+        System.out.println("is (partial match) -> " + get(false, "is"));
+        System.out.println("island.invite -> " + get(false, "island.invite"));
+        System.out.println("island.invite.ImIllusion -> " + get(true, "island.invite.ImIllusion"));
     }
 
     public void register(SkyblockCommand command) {
         System.out.println("Registered command " + command.getClass().getSimpleName());
 
         commands.put(command.getIdentifier(), command);
-        makeCommand(command);
     }
 
-    public SkyblockCommand get(String identifier) {
+    public SkyblockCommand get(boolean fullMatch, String identifier) {
         for (Map.Entry<String, SkyblockCommand> entry : commands.entrySet()) {
             ComparisonResult result = new ComparisonResult(identifier, entry.getKey(), entry.getValue().getAliases());
 
-            if (result.isFullyMatches())
+            if ((fullMatch && result.isFullyMatches()) || (!fullMatch && result.isPartiallyMatches()))
                 return entry.getValue();
         }
 
         return null;
     }
 
-    public SkyblockCommand get(String name, String... args) {
+    public SkyblockCommand get(boolean fullMatch, String name, String... args) {
         String identifier = String.join(".", name, String.join(".", args));
 
-        return get(identifier);
+        return get(fullMatch, identifier);
     }
 
     private String getBaseCommand(String identifier) {
