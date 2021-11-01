@@ -145,7 +145,6 @@ public class SkyblockPlugin extends JavaPlugin {
 
         System.out.println("Loaded");
 
-
     }
 
     /**

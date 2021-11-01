@@ -24,9 +24,9 @@ public enum PastingType {
     }
 
     public static PastingHandler enable(SkyblockPlugin main, String selection) {
-        PastingType type = valueOf(selection);
+        PastingType type = matchSelection(selection);
 
-        if (!type.canEnable())
+        if (type == null || !type.canEnable())
             return DEFAULT.initialize(main);
 
         return type.initialize(main);
@@ -38,6 +38,13 @@ public enum PastingType {
 
     public boolean canEnable() {
         return plugin == null || Bukkit.getPluginManager().isPluginEnabled(plugin);
+    }
+
+    private static PastingType matchSelection(String selection) {
+        for (PastingType type : VALUES)
+            if (type.name().equalsIgnoreCase(selection))
+                return type;
+        return null;
     }
 
     private PastingHandler initialize(SkyblockPlugin main) {
