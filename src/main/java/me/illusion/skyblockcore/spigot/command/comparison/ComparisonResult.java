@@ -48,7 +48,7 @@ public class ComparisonResult {
         for (int i = 1; i < inputs.length; i++) {
             if (args[i].equals("*")) {
                 wildCards.add(i);
-                return true;
+                continue;
             }
             if (!args[i].startsWith(inputs[i]))
                 return false;
