@@ -2,57 +2,70 @@ package me.illusion.skyblockcore.spigot.command.comparison;
 
 import java.util.*;
 
-public class ComparisonResult
+public class ComparisonResultFull
 {
     private final Map<String,SkyblockCommand> commands;
     private final LinkedList<Integer> wildCards;
     private SkyblockCommand storedCommand;
 
-    public ComparisonResult(Map<String,SkyblockCommand> commands)
+    public ComparisonResultFull(Map<String,SkyblockCommand> commands)
     {
         this.commands = commands;
         this.wildCards = new LinkedList<>();
     }
 
-    String[] match(String input)
+    SkyblockCommand match(String input)
     {
-        SortedSet<String> result = new TreeSet<>(new SmallestStringComparator());
         String[] inputs = input.split("\\.");
 
         //in case input is empty
         if (inputs.length == 0)
-            return new String[0];
-
+            return null;
 
         //case alias.arg
         //first take out the alias
         for (SkyblockCommand command : commands.values())
         {
-            if(findAliasingCommand(inputs[0],command))
+            if (inputs.length == 1)
             {
-                if (searchArgs(inputs, command))
+                if (command.getIdentifier().equals(input)||searchAliases(input,command))
                 {
-                    result.add(command.getIdentifier());
-                    continue;
+                    return command;
                 }
             }
-
-            //look for identifiers
-            if (searchIds(inputs, command))
+            //case for alias.command
+            //if it's an alias of another command
+            else
             {
-                if (searchArgs(inputs, command))
+                if (findAliasingCommand(inputs[0], command))
                 {
-                    result.add(command.getIdentifier());
+                    if (searchArgs(inputs, command))
+                    {
+                        return command;
+                    }
+                }
+
+                //look for identifiers
+                if (searchIds(inputs, command))
+                {
+
+                    if (searchArgs(inputs, command))
+                    {
+                        return command;
+
+                    }
                 }
             }
         }
-        return result.toArray(new String[0]);
+        return null;
     }
 
     private boolean searchArgs(String[] inputs, SkyblockCommand command)
     {
         String[] args = command.getIdentifier().split("\\.");
 
+        //System.out.println("Args: " + Arrays.toString(args));
+        //System.out.println("Inputs: " + Arrays.toString(inputs));
         if (inputs.length > args.length) return false;
         //inputs has to be smaller than the command for autocomplete to work
         for (int i = 1; i < inputs.length; i++)
@@ -62,12 +75,11 @@ public class ComparisonResult
                 wildCards.add(i);
                 return true;
             }
-            if (!args[i].startsWith(inputs[i]))
+            if (!args[i].equals(inputs[i]))
             {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -76,7 +88,7 @@ public class ComparisonResult
         String[] aliases = command.getAliases();
         for (String alias : aliases)
         {
-            if (alias.startsWith(input))
+            if (alias.equals(input))
             {
                 return true;
             }
@@ -88,25 +100,13 @@ public class ComparisonResult
     {
         String[] ids = command.getIdentifier().split("\\.");
         String id=ids[0];
-        if (inputs.length == 1&&ids.length==1)
-            return id.startsWith(inputs[0]);
         return id.equals(inputs[0]);
-    }
-
-
-
-    public List<Integer> getWildCards()
-    {
-        return Collections.unmodifiableList(wildCards);
     }
 
     private boolean findAliasingCommand(String input, SkyblockCommand command)
     {
         String id = command.getIdentifier().split("\\.")[0];
 
-
-
-        String[] aliases = command.getAliases();
         SkyblockCommand it = commands.get(id);
         if(it.getIdentifier().equals(id))
             for (String alias : it.getAliases())
@@ -119,5 +119,20 @@ public class ComparisonResult
         return false;
 
     }
+
+    public List<Integer> getWildCards()
+    {
+        return Collections.unmodifiableList(wildCards);
+    }
+
 }
 
+/*
+island.go
+island.go
+island.go
+island.go
+island.go
+island.go
+island.invite.imillusion //island.go
+ */
