@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.spigot.command.island;
+package me.illusion.skyblockcore.spigot.command.island.movement;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
@@ -7,11 +7,11 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class IslandCommand implements SkyblockCommand {
+public class IslandGoCommand implements SkyblockCommand {
 
     private final SkyblockPlugin main;
 
-    public IslandCommand(SkyblockPlugin main) {
+    public IslandGoCommand(SkyblockPlugin main) {
         this.main = main;
     }
 
