@@ -15,6 +15,14 @@ To start, the plugin requires a SQL connection, used to store the islands and al
 
 ------------
 
+### Known issues:
+- Default .mca file is 1.17.1+
+- FAWE doesn't work (Has to do with versioning)
+
+I am aware of both issues, and aim to release fixes soon, please do not annoy me about them.
+
+------------
+
 ### Setup instructions:
 - Load the plugin into an empty server
 - Set the SQL / MongoDB database info into the config.yml file (if not SQLite)
