@@ -30,7 +30,7 @@ I am aware of both issues, and aim to release fixes soon, please do not annoy me
 - Configure to your liking
 
 #### If on a proxy:
-- Put the plugin on the plugins folder
+- Put the plugin on the proxy's plugins folder, as well as set-up each instance with the steps above.
 - Set the SQL / MongoDB database info into the bungee-config.yml file (note that instances should also be running on the same database)
 - Restart
 
