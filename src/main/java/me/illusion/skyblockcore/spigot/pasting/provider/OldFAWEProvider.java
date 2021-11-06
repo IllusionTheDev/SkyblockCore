@@ -60,7 +60,8 @@ public class OldFAWEProvider implements FAWEProvider {
     private Schematic loadSchematic(File file) {
 
         try {
-            return (Schematic) loadMethod.invoke(getFormat(file), file);
+            Object format = getFormat(file);
+            return (Schematic) loadMethod.invoke(format, file);
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

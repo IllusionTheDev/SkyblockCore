@@ -3,7 +3,7 @@ package me.illusion.skyblockcore.spigot.pasting.provider;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Location;
