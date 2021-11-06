@@ -17,7 +17,7 @@ public class IslandGoCommand implements SkyblockCommand {
 
     @Override
     public String getIdentifier() {
-        return "island";
+        return "island.go";
     }
 
     @Override

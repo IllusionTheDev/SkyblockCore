@@ -101,56 +101,69 @@ public class IslandManager {
                     }
 
                     return null;
+                }).exceptionally(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
                 });
     }
 
 
     public CompletableFuture<Island> loadIsland(IslandData data) {
         return CompletableFuture.supplyAsync(() -> {
-            // If any island member is online (island pasted), then we don't need to paste
-            boolean paste = !shouldRemoveIsland(data.getUsers()); // variable to store pasting
-
-            List<UUID> members = data.getUsers();
-
-            System.out.println("Island users: " + members);
-
-
-            File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + data); // Create cache folder
-
-            final Island[] island = {null};
-
-            CountDownLatch latch = new CountDownLatch(paste ? 1 : 0);
-
-
-            // Pastes island if required
-            if (paste) {
-                SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
-
-                if (islandFiles == null) // Assigns default if not found
-                    islandFiles = SerializedFile.loadArray(main.getStartSchematic());
-
-                CompletableFuture<SerializedFile[]> files = createFiles(folder, islandFiles); // Creates cache files
-
-                files.thenAccept(schematicFiles -> {
-                    data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
-
-                    String world = main.getWorldManager().assignWorld(); // Assigns world
-
-                    island[0] = loadIsland(data, new WorldCreator(world).generator(main.getEmptyWorldGenerator()).createWorld()); // Loads island
-                });
-
-            } else // If it doesn't need pasting
-                island[0] = getIslandFromId(data.getId()).orElse(null); // Obtains island from ID (loaded by a teammate)
-
-            data.setIsland(island[0]); // Updates island in the island data
-
             try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                // If any island member is online (island pasted), then we don't need to paste
+                boolean paste = shouldRemoveIsland(data.getUsers()); // variable to store pasting
 
-            return island[0];
+                File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + data); // Create cache folder
+
+                final Island[] island = {null};
+
+                CountDownLatch latch = new CountDownLatch(paste ? 1 : 0);
+
+                System.out.println("Pasting required? " + paste);
+                // Pastes island if required
+                if (paste) {
+                    SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
+
+                    if (islandFiles == null) {
+                        // Assigns default if not found
+                        islandFiles = SerializedFile.loadArray(main.getStartSchematic());
+                    }
+
+                    CompletableFuture<SerializedFile[]> files = createFiles(folder, islandFiles); // Creates cache files
+
+                    files.thenAccept(schematicFiles -> {
+                        data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
+
+                        String world = main.getWorldManager().assignWorld(); // Assigns world
+
+                        Bukkit.getScheduler().runTask(main, () -> {
+                            island[0] = loadIsland(data, new WorldCreator(world).generator(main.getEmptyWorldGenerator()).createWorld()); // Loads island
+                            latch.countDown();
+                        });
+
+
+                    });
+
+                } else // If it doesn't need pasting
+                    island[0] = getIslandFromId(data.getId()).orElse(null); // Obtains island from ID (loaded by a teammate)
+
+                data.setIsland(island[0]); // Updates island in the island data
+
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                return island[0];
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
         });
 
 
@@ -176,13 +189,10 @@ public class IslandManager {
         Location center = world.getSpawnLocation();
         int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
-        Location one = center.add(-offset, -128, -offset);
-        Location two = center.add(offset, 128, offset);
+        Location one = center.clone().add(-offset, -128, -offset);
+        Location two = center.clone().add(offset, 128, offset);
 
-        System.out.println("Pasting island");
         main.getPastingHandler().paste(data.getIslandSchematic(), center);
-
-        System.out.println("Pasted Island.");
 
         return new Island(main, one, two, center, data, world.getName());
     }
@@ -201,44 +211,74 @@ public class IslandManager {
         return CompletableFuture.supplyAsync(() -> {
             SerializedFile[] copyArray = new SerializedFile[files.length];
 
-            folder.getParentFile().mkdirs(); // Create parent folder if it doesn't exist
-            folder.mkdir(); // Create folder if it doesn't exist
-
-            CountDownLatch latch = new CountDownLatch(1); // Used to wait for the files to be written async
-
-            CompletableFuture[] futures = new CompletableFuture[files.length]; // Used to manage all the files being written
-
-            for (int index = 0; index < files.length; index++) { // Loops through all the serialized files
-                SerializedFile file = files[index].copy(); // Copies the file, so we don't modify the original
-
-                int finalI = index; // Java limitation REEEEEEEEEEE
-
-                futures[index] = file.getFile() // Obtain a future of the file
-                        .whenComplete((realFile, throwable) -> { // Which is then used to change internal data
-                            if (throwable != null)
-                                throwable.printStackTrace();
-
-
-                            file.setFile(new File(folder, realFile.getName())); // Change the file to the new location
-                            file.save(); // Save the file
-                            copyArray[finalI] = file; // Add the file to the copy array
-                        });
-            }
-
-            CompletableFuture.allOf(futures).whenComplete((v, throwable) -> { // Waits for all the files to be written
-                if (throwable != null) // If there was an error
-                    throwable.printStackTrace(); // Prints the error
-
-                latch.countDown(); // Allows the method to finish and return
-            });
-
             try {
-                latch.await(); // Waits for the files to be written
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                folder.getParentFile().mkdirs(); // Create parent folder if it doesn't exist
+                folder.mkdir(); // Create folder if it doesn't exist
+
+                System.out.println("Created folders");
+                CountDownLatch latch = new CountDownLatch(1); // Used to wait for the files to be written async
+
+                System.out.println("Created new latch");
+
+                CompletableFuture[] futures = new CompletableFuture[files.length]; // Used to manage all the files being written
+                System.out.println("Created an array of futures");
+
+                for (int index = 0; index < files.length; index++) { // Loops through all the serialized files
+                    SerializedFile file = files[index].copy(); // Copies the file, so we don't modify the original
+                    System.out.println("Copied file at index" + index);
+
+                    int finalI = index; // Java limitation REEEEEEEEEEE
+
+                    System.out.println("Creating future");
+                    futures[index] = file.getFile() // Obtain a future of the file
+                            .whenComplete((realFile, throwable) -> { // Which is then used to change internal data
+                                System.out.println("Obtained real file");
+                                try {
+                                    if (throwable != null)
+                                        throwable.printStackTrace();
+
+
+                                    System.out.println("Set new file");
+                                    file.setFile(new File(folder, realFile.getName())); // Change the file to the new location
+
+                                    System.out.println("Saved file");
+                                    file.save(); // Save the file
+
+                                    System.out.println("Updated array");
+                                    copyArray[finalI] = file; // Add the file to the copy array
+                                } catch (Exception exception) {
+                                    exception.printStackTrace();
+                                }
+
+                            });
+                }
+
+                System.out.println("Running all futures");
+                CompletableFuture.allOf(futures).whenComplete((v, throwable) -> { // Waits for all the files to be written
+                    if (throwable != null) // If there was an error
+                        throwable.printStackTrace(); // Prints the error
+
+                    System.out.println("Counting down latch");
+                    latch.countDown(); // Allows the method to finish and return
+                }).join();
+
+                try {
+                    System.out.println("Awaiting latch");
+                    latch.await(); // Waits for the files to be written
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("Latch unlocked");
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
+
 
             return copyArray; // Returns the copy array
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
         });
     }
 

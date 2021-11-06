@@ -35,9 +35,17 @@ public class CommandManager {
 
     public CommandManager(SkyblockPlugin main) {
         this.main = main;
+    }
 
+    public void runTests() {
         System.out.println("Running tests: ");
 
+        System.out.println("Testing full comparison - island -> " + get("island"));
+        System.out.println("Testing full comparison - island.go -> " + get("island.go"));
+
+        System.out.println("Testing tab complete - is -> " + Arrays.toString(tabComplete("is").toArray(new String[0])));
+        System.out.println("Testing tab complete - isl -> " + Arrays.toString(tabComplete("isl").toArray(new String[0])));
+        System.out.println("Testing tab complete - island -> " + Arrays.toString(tabComplete("island").toArray(new String[0])));
     }
 
     public void register(SkyblockCommand command) {
@@ -46,7 +54,11 @@ public class CommandManager {
         commands.put(command.getIdentifier(), command);
 
         String base = getBaseCommand(command.getIdentifier());
+
+        System.out.println(command.getIdentifier() + "'s base command is " + base);
+
         if (!registeredBaseCommands.contains(base)) {
+            System.out.println(base + " was not registered as a command, registering..");
             commandMap.register(base, new BaseCommand(base, main));
             registeredBaseCommands.add(base);
         }

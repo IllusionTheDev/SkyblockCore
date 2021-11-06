@@ -6,6 +6,7 @@ import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.spigot.command.CommandManager;
 import me.illusion.skyblockcore.spigot.command.island.IslandCommand;
+import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
 import me.illusion.skyblockcore.spigot.hook.VaultHook;
@@ -191,6 +192,9 @@ public class SkyblockPlugin extends JavaPlugin {
 
     private void registerDefaultCommands() {
         commandManager.register(new IslandCommand(this));
+        commandManager.register(new IslandGoCommand(this));
+
+        commandManager.runTests();
     }
 
     @Override

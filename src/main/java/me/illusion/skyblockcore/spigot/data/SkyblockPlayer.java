@@ -65,8 +65,14 @@ public class SkyblockPlayer {
 
                 data = new PlayerData();
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
-                sync(() -> main.getIslandManager().loadIsland(islandData));
+                sync(() -> main.getIslandManager().loadIsland(islandData)
+                        .thenAccept(island -> {
+                            System.out.println("Pasted island with id " + island.getData().getId());
+                            this.island = island;
+                            this.islandCenter = island.getCenter();
 
+                            teleportToIsland();
+                        }));
                 return;
             }
 
@@ -79,14 +85,12 @@ public class SkyblockPlayer {
 
 
                         sync(() -> {
-                            checkTeleport();
                             SerializedLocation last = data.getLastLocation(); // Obtains last location
 
                             // Assign player location if not found
                             if (last.getLocation() == null) {
-                                Location loc = islandCenter;
-                                last.update(loc);
-                                data.getIslandLocation().update(loc);
+                                teleportToIsland();
+                                return;
                             }
 
                             // Teleports
@@ -98,6 +102,19 @@ public class SkyblockPlayer {
         });
     }
 
+
+    public void teleportToIsland() {
+        if (!Bukkit.isPrimaryThread()) {
+            System.out.println("Detected async teleport - Calling it sync");
+            Bukkit.getScheduler().runTask(main, this::teleportToIsland);
+            return;
+        }
+
+        Player p = getPlayer();
+        p.teleport(islandCenter);
+        data.getIslandLocation().update(islandCenter);
+
+    }
 
     /**
      * Teleports player to last position
