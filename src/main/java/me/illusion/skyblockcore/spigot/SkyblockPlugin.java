@@ -5,6 +5,7 @@ import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.spigot.command.CommandManager;
+import me.illusion.skyblockcore.spigot.command.impl.OldCommandManager;
 import me.illusion.skyblockcore.spigot.command.island.IslandCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
@@ -93,7 +94,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        emptyWorldGenerator = new EmptyWorldGenerator();
+        emptyWorldGenerator = new EmptyWorldGenerator(this);
 
         System.out.println("Registering configuration files");
         messages = new MessagesFile(this);
@@ -118,7 +119,7 @@ public class SkyblockPlugin extends JavaPlugin {
     private void load() {
 
         islandManager = new IslandManager(this);
-        commandManager = new CommandManager(this);
+        commandManager = new OldCommandManager(this);
         playerManager = new PlayerManager();
 
         System.out.println("Setting up pasting handler");
@@ -153,7 +154,7 @@ public class SkyblockPlugin extends JavaPlugin {
      */
     public void setupWorld(String name) {
         new WorldCreator(name)
-                .generator(emptyWorldGenerator)
+                .generator("Skyblock")
                 .generateStructures(false)
                 .seed(0)
                 .createWorld();

@@ -114,7 +114,7 @@ public class IslandManager {
                 // If any island member is online (island pasted), then we don't need to paste
                 boolean paste = shouldRemoveIsland(data.getUsers()); // variable to store pasting
 
-                File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + data); // Create cache folder
+                File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + data.getId()); // Create cache folder
 
                 final Island[] island = {null};
 
@@ -138,7 +138,7 @@ public class IslandManager {
                         String world = main.getWorldManager().assignWorld(); // Assigns world
 
                         Bukkit.getScheduler().runTask(main, () -> {
-                            island[0] = loadIsland(data, new WorldCreator(world).generator(main.getEmptyWorldGenerator()).createWorld()); // Loads island
+                            island[0] = loadIsland(data, new WorldCreator(world).generator("Skyblock").createWorld()); // Loads island
                             latch.countDown();
                         });
 
@@ -280,6 +280,20 @@ public class IslandManager {
             throwable.printStackTrace();
             return null;
         });
+    }
+
+    public void deleteIsland(UUID islandId) {
+        Island island = getIsland(islandId);
+
+
+        File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
+
+        if (shouldRemoveIsland(island))
+            island.cleanIsland();
+
+        System.out.println("Attempting to delete island files");
+
+        folder.delete(); // Delete the folder
     }
 
 }

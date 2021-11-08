@@ -12,7 +12,7 @@ public class BaseCommand extends BukkitCommand {
 
     private final SkyblockPlugin main;
 
-    protected BaseCommand(String name, SkyblockPlugin main) {
+    public BaseCommand(String name, SkyblockPlugin main) {
         super(name);
         this.main = main;
     }

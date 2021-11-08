@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
-import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
@@ -12,11 +11,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Getter
 public class SkyblockPlayer {
@@ -71,6 +68,7 @@ public class SkyblockPlayer {
                             this.island = island;
                             this.islandCenter = island.getCenter();
 
+                            data.setIslandId(island.getData().getId());
                             teleportToIsland();
                         }));
                 return;
@@ -152,36 +150,8 @@ public class SkyblockPlayer {
         data.getIslandLocation().update(loc);
 
         island.save(() -> {
-            System.out.println("Saving data");
-            CompletableFuture.runAsync(() -> saveObject(uuid, data));
-
-            boolean delete = true;
-
-            for (UUID uuid : island.getData().getUsers()) {
-                if (uuid.equals(this.uuid))
-                    continue;
-                if (Bukkit.getPlayer(uuid) == null)
-                    continue;
-                delete = false;
-                break;
-            }
-
-            if (delete)
-                island.cleanIsland();
-
-            System.out.println("Attempting to delete island files");
-
-            for (SerializedFile serializedFile : island.getData().getIslandSchematic()) {
-                File file = null;
-                try {
-                    file = serializedFile.getFile().get();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-
-                if (file != null && file.exists())
-                    file.delete();
-            }
+            saveObject(uuid, data);
+            main.getIslandManager().deleteIsland(island.getData().getId());
 
         });
 
