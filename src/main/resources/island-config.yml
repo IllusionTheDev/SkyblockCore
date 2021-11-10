@@ -1,5 +1,12 @@
 # General island settings
 island:
+
+  # The spawn point of the island
+  spawn-location:
+    x: 256
+    y: 128
+    z: 256
+
   # Available choices:
   # FAWE - Uses FastAsyncWorldEdit to paste in the island
   # DEFAULT - Unloads the world, sets the region file and reloads

@@ -19,7 +19,8 @@ public class RedisListener extends BinaryJedisPubSub implements PacketProcessor 
     public RedisListener(SkyblockBungeePlugin main) {
         this.main = main;
         this.jedis = main.getJedisUtil().getJedis();
-        jedis.subscribe(this, KEY);
+
+        new Thread(() -> jedis.subscribe(this, KEY)).start();
     }
 
     public void updatePlayer(UUID uuid, String proxy) {

@@ -4,6 +4,7 @@ import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -139,7 +140,12 @@ public class IslandManager {
 
                         Bukkit.getScheduler().runTask(main, () -> {
                             island[0] = loadIsland(data, new WorldCreator(world).generator("Skyblock").createWorld()); // Loads island
-                            latch.countDown();
+
+                            new ScheduleBuilder(main)
+                                    .in(20).ticks()
+                                    .run(latch::countDown)
+                                    .async()
+                                    .start();
                         });
 
 
