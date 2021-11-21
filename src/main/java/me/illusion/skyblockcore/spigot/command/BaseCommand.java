@@ -2,23 +2,26 @@ package me.illusion.skyblockcore.spigot.command;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResultFull;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.command.TabCompleter;
 
 import java.util.Collections;
 import java.util.List;
 
-public class BaseCommand extends BukkitCommand {
+public class BaseCommand implements CommandExecutor, TabCompleter {
 
     private final SkyblockPlugin main;
 
-    public BaseCommand(String name, SkyblockPlugin main) {
-        super(name);
+    public BaseCommand(SkyblockPlugin main) {
         this.main = main;
     }
 
     @Override
-    public List<String> tabComplete(CommandSender sender, String name, String[] args) throws IllegalArgumentException {
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String name, String[] args) throws IllegalArgumentException {
+        System.out.println("tab completing this shit");
+
         if (args.length == 0)
             return Collections.emptyList();
 
@@ -28,7 +31,7 @@ public class BaseCommand extends BukkitCommand {
     }
 
     @Override
-    public boolean execute(CommandSender sender, String name, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String name, String[] args) {
         String identifier = String.join(".", name, String.join(".", args));
 
         SkyblockCommand command = main.getCommandManager().get(identifier);

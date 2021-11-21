@@ -26,6 +26,7 @@ public class MongoDBHandler implements StorageHandler {
             }
 
             this.database = mongoClient.getDatabase(database);
+            this.database.createCollection("islandData");
             islandStorage = this.database.getCollection("islandData");
             return true;
         });

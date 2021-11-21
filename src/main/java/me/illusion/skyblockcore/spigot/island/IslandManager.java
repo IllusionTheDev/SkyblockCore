@@ -4,11 +4,7 @@ import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
-import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 
 import java.io.File;
 import java.util.*;
@@ -119,7 +115,7 @@ public class IslandManager {
 
                 final Island[] island = {null};
 
-                CountDownLatch latch = new CountDownLatch(paste ? 1 : 0);
+                CountDownLatch latch = new CountDownLatch(paste ? 2 : 0);
 
                 System.out.println("Pasting required? " + paste);
                 // Pastes island if required
@@ -134,19 +130,27 @@ public class IslandManager {
                     CompletableFuture<SerializedFile[]> files = createFiles(folder, islandFiles); // Creates cache files
 
                     files.thenAccept(schematicFiles -> {
-                        data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
+                        try {
+                            data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
 
-                        String world = main.getWorldManager().assignWorld(); // Assigns world
+                            String world = main.getWorldManager().assignWorld(); // Assigns world
 
-                        Bukkit.getScheduler().runTask(main, () -> {
-                            island[0] = loadIsland(data, new WorldCreator(world).generator("Skyblock").createWorld()); // Loads island
+                            Runnable loadAction = () -> {
+                                main.getWorldManager().whenNextLoad(loadedWorld -> {
+                                    loadedWorld.loadChunk(loadedWorld.getSpawnLocation().getChunk());
+                                    System.out.println("Loaded world: " + loadedWorld.getName());
+                                    latch.countDown();
+                                    System.out.println("Unlocked world latch");
+                                }, world);
+                            };
 
-                            new ScheduleBuilder(main)
-                                    .in(20).ticks()
-                                    .run(latch::countDown)
-                                    .async()
-                                    .start();
-                        });
+                            Bukkit.getScheduler().runTask(main, () -> {
+                                island[0] = loadIsland(data, new WorldCreator(world).generator("Skyblock").type(WorldType.NORMAL).createWorld(), loadAction); // Loads island
+                                latch.countDown();
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
 
                     });
@@ -156,11 +160,15 @@ public class IslandManager {
 
                 data.setIsland(island[0]); // Updates island in the island data
 
+                System.out.println("Awaiting world latch");
+                System.out.println("Files creating started..");
                 try {
                     latch.await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+                System.out.println("Returned an island " + island[0]);
 
                 return island[0];
             } catch (Exception e) {
@@ -191,13 +199,14 @@ public class IslandManager {
      * @param world - The world to paste the island on
      * @return island object
      */
-    private Island loadIsland(IslandData data, World world) {
+    private Island loadIsland(IslandData data, World world, Runnable loadAction) {
         Location center = world.getSpawnLocation();
         int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
         Location one = center.clone().add(-offset, -128, -offset);
         Location two = center.clone().add(offset, 128, offset);
 
+        loadAction.run();
         main.getPastingHandler().paste(data.getIslandSchematic(), center);
 
         return new Island(main, one, two, center, data, world.getName());
