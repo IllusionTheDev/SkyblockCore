@@ -6,15 +6,14 @@ import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -27,51 +26,85 @@ public class DefaultHandler implements PastingHandler {
         this.main = main;
     }
 
-    private void paste(SerializedFile serializedFile, Location loc) {
-        File file = null;
-        try {
-            file = serializedFile.getFile().get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+    private CompletableFuture<Void> paste(SerializedFile serializedFile, String name) {
+        return CompletableFuture.runAsync(() -> {
+            File file = null;
+            try {
+                System.out.println("Getting region file");
+                file = serializedFile.getFile().get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
 
-        if (extension == null)
-            extension = getExtension(file.getName());
+            System.out.println("Checking extension");
+            if (extension == null)
+                extension = getExtension(file.getName());
 
-        World world = loc.getWorld();
+            // Obtain the region folder for the world
+            File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + name + File.separator + "region");
 
-        String name = world.getName();
+            System.out.println("Unloading");
 
-        // Obtain the region folder for the world
-        File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
+            deleteWorldFolder(regionFolder, file);
 
-        // Unload the world, to not cause issues
-        Bukkit.unloadWorld(world, false);
+        });
+        // Re-load world
+    }
 
+    private void deleteWorldFolder(File regionFolder, File finalFile) {
         regionFolder.delete();
         regionFolder.mkdir();
 
         // Create the new file
-        File newFile = new File(regionFolder, file.getName());
+        File newFile = new File(regionFolder, finalFile.getName());
 
         try {
             // Create the region file
             newFile.createNewFile();
 
+            System.out.println("Copied fake world");
             // Copy the file
-            Files.copy(file, newFile);
+            Files.copy(finalFile, newFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Re-load world
-        new WorldCreator(name).createWorld();
     }
 
     @Override
-    public void paste(SerializedFile[] file, Location loc) {
-        for (SerializedFile f : file)
-            paste(f, loc);
+    public CompletableFuture<Void> paste(SerializedFile[] file, Location loc) {
+        String name = loc.getWorld().getName();
+
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        Bukkit.unloadWorld(name, false);
+
+        main.getWorldManager().whenNextUnload(($) -> {
+            for (SerializedFile f : file)
+                futures.add(paste(f, name));
+        }, name);
+
+
+        return CompletableFuture.runAsync(() -> {
+            CountDownLatch latch = new CountDownLatch(1);
+
+            System.out.println("Waiting for all futures to finish");
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+            System.out.println("Load");
+            Bukkit.getScheduler().runTask(main, () -> new WorldCreator(name).generator("Skyblock").type(WorldType.NORMAL).createWorld());
+            main.getWorldManager().whenNextLoad(($) -> {
+                System.out.println("Loaded");
+                latch.countDown();
+            }, name);
+
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+
     }
 
     @Override

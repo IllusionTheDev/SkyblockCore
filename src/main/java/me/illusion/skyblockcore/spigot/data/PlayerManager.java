@@ -1,7 +1,10 @@
 package me.illusion.skyblockcore.spigot.data;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,6 +29,12 @@ public class PlayerManager {
      * @param uuid - The player UUID
      */
     public void unregister(UUID uuid) {
+        World world = Bukkit.getWorld("world");
+        File folder = world.getWorldFolder();
+
+        File dataFile = new File(folder + File.separator + "playerdata" + File.separator, uuid.toString() + ".dat");
+        dataFile.delete();
+
         players.remove(uuid);
     }
 

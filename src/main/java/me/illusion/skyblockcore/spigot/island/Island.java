@@ -3,9 +3,11 @@ package me.illusion.skyblockcore.spigot.island;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -39,8 +41,8 @@ public class Island {
         main.getPastingHandler().save(this, schem -> {
             data.setIslandSchematic(schem);
 
-            CompletableFuture.runAsync(this::saveData);
-            afterSave.run();
+            CompletableFuture.runAsync(this::saveData)
+                    .thenRun(afterSave);
         });
     }
 
@@ -50,19 +52,16 @@ public class Island {
     public void cleanIsland() {
         World world = center.getWorld();
 
-        int x1 = pointOne.getBlockX() >> 4;
-        int z1 = pointOne.getBlockZ() >> 4;
-        int x2 = pointTwo.getBlockX() >> 4;
-        int z2 = pointTwo.getBlockZ() >> 4;
-
-        for (int x = x1; x <= x2; x++)
-            for (int z = z1; z <= z2; z++)
-                world.regenerateChunk(x, z);
-
-        world.save();
+        Bukkit.unloadWorld(world, true);
 
         main.getIslandManager().unregister(this);
         main.getWorldManager().unregister(this.world);
+
+        main.getWorldManager().whenNextUnload(unloadedWorld -> {
+            File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
+            regionFolder.delete();
+            regionFolder.mkdir();
+        }, this.world);
     }
 
     /**

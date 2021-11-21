@@ -1,7 +1,9 @@
 package me.illusion.skyblockcore.spigot.listener;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +29,14 @@ public class DebugListener implements Listener {
         Player player = event.getPlayer();
 
         player.sendMessage("Your location: " + formatLocation(player.getLocation()));
-        player.sendMessage("Your island location: " + formatLocation(main.getPlayerManager().get(player).getIslandCenter()));
+
+        if (main.getIslandManager().getPlayerIsland(player.getUniqueId()) != null)
+            player.sendMessage("Your island location: " + formatLocation(main.getPlayerManager().get(player).getIslandCenter()));
+
+        player.sendMessage("Loaded worlds: ");
+
+        for (World world : Bukkit.getWorlds())
+            player.sendMessage("    - " + world.getName());
     }
 
     private String formatLocation(Location location) {

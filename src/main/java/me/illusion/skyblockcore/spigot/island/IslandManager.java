@@ -4,6 +4,7 @@ import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.*;
 
 import java.io.File;
@@ -12,6 +13,22 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
+/*
+    Island loading is hella weird, so I made spaghetti code
+
+    Sync -> Requests island loading ->
+
+    Async -> Checks if the island is already pasted,
+    creates files, if there isn't any pasting required,
+    return the already pasted island, otherwise ->
+
+    Sync -> Loads the world
+
+    Async -> Pastes the island (Sync -> Unloads the world, Async -> Replaces files)
+
+    Sync -> Makes sure the world is loaded, returning the island
+
+ */
 public class IslandManager {
 
     private final Map<UUID, Island> islands = new HashMap<>();
@@ -115,9 +132,11 @@ public class IslandManager {
 
                 final Island[] island = {null};
 
+                // If we need to paste, we make a latch with 2 uses, one for the island loading, and the second for the world loading
                 CountDownLatch latch = new CountDownLatch(paste ? 2 : 0);
 
-                System.out.println("Pasting required? " + paste);
+                System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 1");
+
                 // Pastes island if required
                 if (paste) {
                     SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
@@ -131,22 +150,42 @@ public class IslandManager {
 
                     files.thenAccept(schematicFiles -> {
                         try {
+                            System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 2");
                             data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
 
                             String world = main.getWorldManager().assignWorld(); // Assigns world
 
+                            // Prepares the unlocking once the world is loaded, while not running it
                             Runnable loadAction = () -> {
-                                main.getWorldManager().whenNextLoad(loadedWorld -> {
+                                World loadedWorld = Bukkit.getWorld(world);
+                                System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 3");
+
+                                Bukkit.getScheduler().runTask(main, () -> {
                                     loadedWorld.loadChunk(loadedWorld.getSpawnLocation().getChunk());
-                                    System.out.println("Loaded world: " + loadedWorld.getName());
-                                    latch.countDown();
+                                    new ScheduleBuilder(main)
+                                            .in(100).ticks()
+                                            .run(latch::countDown)
+                                            .sync().start();
                                     System.out.println("Unlocked world latch");
-                                }, world);
+                                });
+
+
                             };
 
+                            // In sync,
                             Bukkit.getScheduler().runTask(main, () -> {
-                                island[0] = loadIsland(data, new WorldCreator(world).generator("Skyblock").type(WorldType.NORMAL).createWorld(), loadAction); // Loads island
-                                latch.countDown();
+                                World loadedWorld = Bukkit.getWorld(world); // Obtains the world
+
+                                System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 4");
+
+
+                                if (loadedWorld == null) { // If the world is not loaded, we load it
+                                    System.out.println("Loading world: " + world);
+                                    loadedWorld = new WorldCreator(world).generator("Skyblock").type(WorldType.NORMAL).createWorld();
+                                }
+
+                                island[0] = loadIsland(data, loadedWorld, loadAction); // Loads island
+                                latch.countDown(); // Unlocks the island side of the latch
                             });
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -200,16 +239,24 @@ public class IslandManager {
      * @return island object
      */
     private Island loadIsland(IslandData data, World world, Runnable loadAction) {
-        Location center = world.getSpawnLocation();
-        int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
+        try {
+            System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 5");
 
-        Location one = center.clone().add(-offset, -128, -offset);
-        Location two = center.clone().add(offset, 128, offset);
+            System.out.println("Pasting island..");
+            Location center = world.getSpawnLocation();
+            int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
-        loadAction.run();
-        main.getPastingHandler().paste(data.getIslandSchematic(), center);
+            Location one = center.clone().add(-offset, -128, -offset);
+            Location two = center.clone().add(offset, 128, offset);
 
-        return new Island(main, one, two, center, data, world.getName());
+            main.getPastingHandler().paste(data.getIslandSchematic(), center).thenRun(loadAction);
+
+            return new Island(main, one, two, center, data, world.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     /**
@@ -230,36 +277,26 @@ public class IslandManager {
                 folder.getParentFile().mkdirs(); // Create parent folder if it doesn't exist
                 folder.mkdir(); // Create folder if it doesn't exist
 
-                System.out.println("Created folders");
                 CountDownLatch latch = new CountDownLatch(1); // Used to wait for the files to be written async
 
-                System.out.println("Created new latch");
-
                 CompletableFuture[] futures = new CompletableFuture[files.length]; // Used to manage all the files being written
-                System.out.println("Created an array of futures");
 
                 for (int index = 0; index < files.length; index++) { // Loops through all the serialized files
                     SerializedFile file = files[index].copy(); // Copies the file, so we don't modify the original
-                    System.out.println("Copied file at index" + index);
 
                     int finalI = index; // Java limitation REEEEEEEEEEE
 
-                    System.out.println("Creating future");
                     futures[index] = file.getFile() // Obtain a future of the file
                             .whenComplete((realFile, throwable) -> { // Which is then used to change internal data
-                                System.out.println("Obtained real file");
                                 try {
                                     if (throwable != null)
                                         throwable.printStackTrace();
 
 
-                                    System.out.println("Set new file");
                                     file.setFile(new File(folder, realFile.getName())); // Change the file to the new location
 
-                                    System.out.println("Saved file");
                                     file.save(); // Save the file
 
-                                    System.out.println("Updated array");
                                     copyArray[finalI] = file; // Add the file to the copy array
                                 } catch (Exception exception) {
                                     exception.printStackTrace();
@@ -268,23 +305,19 @@ public class IslandManager {
                             });
                 }
 
-                System.out.println("Running all futures");
                 CompletableFuture.allOf(futures).whenComplete((v, throwable) -> { // Waits for all the files to be written
                     if (throwable != null) // If there was an error
                         throwable.printStackTrace(); // Prints the error
 
-                    System.out.println("Counting down latch");
                     latch.countDown(); // Allows the method to finish and return
                 }).join();
 
                 try {
-                    System.out.println("Awaiting latch");
                     latch.await(); // Waits for the files to be written
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                System.out.println("Latch unlocked");
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -299,7 +332,6 @@ public class IslandManager {
 
     public void deleteIsland(UUID islandId) {
         Island island = getIsland(islandId);
-
 
         File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
 

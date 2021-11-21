@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.io.File;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ public class WorldManager implements Listener {
 
     private final Map<String, Consumer<World>> saveEvents = new HashMap<>();
     private final Map<String, Consumer<World>> loadEvents = new ConcurrentHashMap<>();
+    private final Map<String, Consumer<World>> unloadEvents = new ConcurrentHashMap<>();
 
     private final Map<String, UUID> loadedIslands = new HashMap<>();
 
@@ -48,7 +50,7 @@ public class WorldManager implements Listener {
 
     public void unregister(String world) {
         loadedIslands.put(world, null);
-        Bukkit.unloadWorld(world, false);
+        //Bukkit.unloadWorld(world, false);
     }
 
     public void whenNextSave(Consumer<World> worldConsumer, String worldname) {
@@ -59,6 +61,11 @@ public class WorldManager implements Listener {
     public void whenNextLoad(Consumer<World> worldConsumer, String worldname) {
         System.out.println("Queued up load for " + worldname);
         loadEvents.put(worldname.toLowerCase(Locale.ROOT), loadEvents.getOrDefault(worldname.toLowerCase(Locale.ROOT), (world) -> {
+        }).andThen(worldConsumer));
+    }
+
+    public void whenNextUnload(Consumer<World> worldConsumer, String worldname) {
+        unloadEvents.put(worldname.toLowerCase(Locale.ROOT), unloadEvents.getOrDefault(worldname.toLowerCase(Locale.ROOT), (world) -> {
         }).andThen(worldConsumer));
     }
 
@@ -86,6 +93,18 @@ public class WorldManager implements Listener {
         Consumer<World> action = loadEvents.remove(name);
 
         System.out.println("Action - " + action);
+
+        if (action != null)
+            action.accept(world);
+    }
+
+    @EventHandler
+    private void onUnload(WorldUnloadEvent event) {
+        System.out.println("UNLOADED WORLD " + event.getWorld().getName());
+        World world = event.getWorld();
+        String name = world.getName().toLowerCase(Locale.ROOT);
+
+        Consumer<World> action = unloadEvents.remove(name);
 
         if (action != null)
             action.accept(world);

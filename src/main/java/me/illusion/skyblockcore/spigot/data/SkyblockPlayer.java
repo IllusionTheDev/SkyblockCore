@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.shared.data.PlayerData;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -69,7 +70,10 @@ public class SkyblockPlayer {
                             this.islandCenter = island.getCenter();
 
                             data.setIslandId(island.getData().getId());
-                            teleportToIsland();
+
+                            new ScheduleBuilder(main)
+                                    .in(1).seconds()
+                                    .run(this::teleportToIsland).sync().start();
                         }));
                 return;
             }
@@ -150,9 +154,9 @@ public class SkyblockPlayer {
         data.getIslandLocation().update(loc);
 
         island.save(() -> {
+            System.out.println("Saved island data");
             saveObject(uuid, data);
             main.getIslandManager().deleteIsland(island.getData().getId());
-
         });
 
 

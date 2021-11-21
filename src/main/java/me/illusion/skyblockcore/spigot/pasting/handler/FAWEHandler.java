@@ -13,6 +13,7 @@ import org.bukkit.Location;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -49,9 +50,11 @@ public class FAWEHandler implements PastingHandler {
 
 
     @Override
-    public void paste(SerializedFile[] file, Location loc) {
+    public CompletableFuture<Void> paste(SerializedFile[] file, Location loc) {
         for (SerializedFile f : file)
             paste(f, loc);
+
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
