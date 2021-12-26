@@ -2,16 +2,19 @@ package me.illusion.skyblockcore.spigot.island;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 /*
     Island loading is hella weird, so I made spaghetti code
@@ -28,6 +31,13 @@ import java.util.concurrent.ExecutionException;
 
     Sync -> Makes sure the world is loaded, returning the island
 
+
+
+    Caching: Each island has a UUID, and a respective
+    temporary folder, the files get pasted into the cache/<island uuid>/ folder
+    and then the files are respectively used on their providers (FAWE pastes directly, .mca unloads the world)
+
+    Island cache folders are deleted upon island deletion.
  */
 public class IslandManager {
 
@@ -116,7 +126,7 @@ public class IslandManager {
 
                     return null;
                 }).exceptionally(throwable -> {
-                    throwable.printStackTrace();
+                    ExceptionLogger.log(throwable);
                     return null;
                 });
     }
@@ -125,6 +135,13 @@ public class IslandManager {
     public CompletableFuture<Island> loadIsland(IslandData data) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                long start = System.currentTimeMillis();
+                UUID owner = data.getOwner();
+
+                Player ownerPlayer = Bukkit.getPlayer(owner);
+
+                String startingWorld = ownerPlayer == null ? "N/A" : ownerPlayer.getWorld().getName();
+
                 // If any island member is online (island pasted), then we don't need to paste
                 boolean paste = shouldRemoveIsland(data.getUsers()); // variable to store pasting
 
@@ -135,7 +152,7 @@ public class IslandManager {
                 // If we need to paste, we make a latch with 2 uses, one for the island loading, and the second for the world loading
                 CountDownLatch latch = new CountDownLatch(paste ? 2 : 0);
 
-                System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 1");
+                printSync(1);
 
                 // Pastes island if required
                 if (paste) {
@@ -150,45 +167,49 @@ public class IslandManager {
 
                     files.thenAccept(schematicFiles -> {
                         try {
-                            System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 2");
+                            printSync(2);
                             data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
 
                             String world = main.getWorldManager().assignWorld(); // Assigns world
 
                             // Prepares the unlocking once the world is loaded, while not running it
                             Runnable loadAction = () -> {
-                                World loadedWorld = Bukkit.getWorld(world);
-                                System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 3");
+                                printSync(5);
 
-                                Bukkit.getScheduler().runTask(main, () -> {
-                                    loadedWorld.loadChunk(loadedWorld.getSpawnLocation().getChunk());
-                                    new ScheduleBuilder(main)
-                                            .in(100).ticks()
-                                            .run(latch::countDown)
-                                            .sync().start();
-                                    System.out.println("Unlocked world latch");
-                                });
+                                latch.countDown(); // Decrements the latch
 
+                                finishSync(5);
+                            };
 
+                            // Prepares the loading of the world
+                            Consumer<World> loadIslandTask = (loadedWorld) -> {
+                                island[0] = loadIsland(data, loadedWorld, loadAction); // Loads island
+                                latch.countDown(); // Unlocks the island side of the latch
+
+                                finishSync(3);
                             };
 
                             // In sync,
                             Bukkit.getScheduler().runTask(main, () -> {
                                 World loadedWorld = Bukkit.getWorld(world); // Obtains the world
 
-                                System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 4");
-
+                                printSync(3);
 
                                 if (loadedWorld == null) { // If the world is not loaded, we load it
                                     System.out.println("Loading world: " + world);
-                                    loadedWorld = new WorldCreator(world).generator("Skyblock").type(WorldType.NORMAL).createWorld();
+                                    main.getWorldManager().whenNextLoad(loadIslandTask, world);
+
+                                    new ScheduleBuilder(main).in(1).ticks().run(() -> new WorldCreator(world).generator("Skyblock").type(WorldType.NORMAL).createWorld()).sync().start();
+                                    return;
                                 }
 
-                                island[0] = loadIsland(data, loadedWorld, loadAction); // Loads island
-                                latch.countDown(); // Unlocks the island side of the latch
+                                loadIslandTask.accept(loadedWorld);
                             });
+
+                            finishSync(2);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            ExceptionLogger.log(e);
+
                         }
 
 
@@ -204,18 +225,31 @@ public class IslandManager {
                 try {
                     latch.await();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    ExceptionLogger.log(e);
+
                 }
 
                 System.out.println("Returned an island " + island[0]);
+                finishSync(1);
 
+                long end = System.currentTimeMillis();
+                String endWorld = ownerPlayer == null ? "N/A" : ownerPlayer.getWorld().getName();
+
+                System.out.println("After action report");
+                System.out.println("Time taken: " + (end - start) + "ms");
+                System.out.println("Player starting world: " + startingWorld);
+                System.out.println("Player ending world: " + endWorld);
+                System.out.println("Island world: " + (island[0] == null ? "N/A" : island[0].getWorld()));
+                System.out.println("Island loaded: " + (island[0] != null));
+                System.out.println("Island world loaded: " + (island[0] == null ? "N/A" : Bukkit.getWorld(island[0].getWorld()) != null));
                 return island[0];
             } catch (Exception e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
                 return null;
             }
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            ExceptionLogger.log(throwable);
+
             return null;
         });
 
@@ -240,9 +274,8 @@ public class IslandManager {
      */
     private Island loadIsland(IslandData data, World world, Runnable loadAction) {
         try {
-            System.out.println(Bukkit.isPrimaryThread() + " - Sync? | 5");
+            printSync(4);
 
-            System.out.println("Pasting island..");
             Location center = world.getSpawnLocation();
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
@@ -251,9 +284,10 @@ public class IslandManager {
 
             main.getPastingHandler().paste(data.getIslandSchematic(), center).thenRun(loadAction);
 
+            finishSync(4);
             return new Island(main, one, two, center, data, world.getName());
         } catch (Exception e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
             return null;
         }
 
@@ -341,6 +375,24 @@ public class IslandManager {
         System.out.println("Attempting to delete island files");
 
         folder.delete(); // Delete the folder
+    }
+
+    private void printSync(int step) {
+        boolean isSync = Bukkit.isPrimaryThread();
+
+        String sync = isSync ? "Sync" : "Async";
+
+        System.out.println("------------------------------------------------------");
+        System.out.println("Initiating step " + step + " " + sync);
+    }
+
+    private void finishSync(int step) {
+        boolean isSync = Bukkit.isPrimaryThread();
+
+        String sync = isSync ? "Sync" : "Async";
+
+        System.out.println("Finished step " + step + " " + sync);
+        System.out.println("-----------------------------------------------------");
     }
 
 }

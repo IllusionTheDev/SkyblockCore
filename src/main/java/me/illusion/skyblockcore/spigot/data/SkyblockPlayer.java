@@ -112,6 +112,7 @@ public class SkyblockPlayer {
             return;
         }
 
+        islandCenter.getChunk().load();
         Player p = getPlayer();
         p.teleport(islandCenter);
         data.getIslandLocation().update(islandCenter);

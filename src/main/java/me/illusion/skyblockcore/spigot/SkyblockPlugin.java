@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.command.CommandManager;
 import me.illusion.skyblockcore.spigot.command.impl.OldCommandManager;
 import me.illusion.skyblockcore.spigot.command.island.IslandCommand;
@@ -113,6 +114,8 @@ public class SkyblockPlugin extends JavaPlugin {
                 e.printStackTrace();
             }
         });
+
+        ExceptionLogger.setFolder(new File(getDataFolder() + File.separator + "log"));
 
     }
 

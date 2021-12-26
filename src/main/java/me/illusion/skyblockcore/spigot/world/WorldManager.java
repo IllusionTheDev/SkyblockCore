@@ -27,13 +27,13 @@ public class WorldManager implements Listener {
 
     public WorldManager(SkyblockPlugin main) {
         for (int i = 1; i <= main.getIslandConfig().getWorldCount(); i++) {
-            loadedIslands.put("SkyblockWorld" + i, null);
+            loadedIslands.put("skyblockworld" + i, null);
 
-            if (new File(Bukkit.getWorldContainer() + File.separator + "SkyblockWorld" + i).exists())
+            if (new File(Bukkit.getWorldContainer() + File.separator + "skyblockworld" + i).exists())
                 continue;
 
-            main.setupWorld("SkyblockWorld" + i);
-            Bukkit.unloadWorld("SkyblockWorld" + i, true);
+            main.setupWorld("skyblockworld" + i);
+            Bukkit.unloadWorld("skyblockworld" + i, true);
         }
 
         Bukkit.getPluginManager().registerEvents(this, main);
@@ -86,13 +86,13 @@ public class WorldManager implements Listener {
 
     @EventHandler
     private void onLoad(WorldLoadEvent event) {
-        System.out.println("AYO THE WORLD " + event.getWorld().getName() + " LOADED");
+        System.out.println("LOADED WORLD " + event.getWorld().getName());
         World world = event.getWorld();
         String name = world.getName().toLowerCase(Locale.ROOT);
 
         Consumer<World> action = loadEvents.remove(name);
 
-        System.out.println("Action - " + action);
+        System.out.println("Is there an action? " + (action != null ? "yes" : "no"));
 
         if (action != null)
             action.accept(world);

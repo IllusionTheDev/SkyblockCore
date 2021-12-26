@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.listener;
 
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,10 +22,16 @@ public class LeaveListener implements Listener {
 
         p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
 
-        main.getPlayerManager().get(p).save();
+        try {
+            main.getPlayerManager().get(p).save();
 
-        p.getInventory().clear();
-        main.getPlayerManager().unregister(p.getUniqueId());
+            p.getInventory().clear();
+            main.getPlayerManager().unregister(p.getUniqueId());
+
+        } catch (Exception ex) {
+            ExceptionLogger.log(ex);
+        }
+
 
     }
 }

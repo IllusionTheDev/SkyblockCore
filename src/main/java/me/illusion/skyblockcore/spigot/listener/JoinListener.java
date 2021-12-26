@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot.listener;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.data.SkyblockPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,6 +19,9 @@ public class JoinListener implements Listener {
     @EventHandler
     private void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
+
+        if (main.getWorldManager().isSkyblockWorld(p.getWorld().getName()))
+            p.teleport(Bukkit.getWorld("world").getSpawnLocation());
 
         SkyblockPlayer player = new SkyblockPlayer(main, p.getUniqueId());
 
