@@ -277,6 +277,8 @@ public class IslandManager {
             printSync(4);
 
             Location center = world.getSpawnLocation();
+
+            System.out.println(world.getName() + " spawn location: " + center);
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             Location one = center.clone().add(-offset, -128, -offset);
@@ -328,7 +330,6 @@ public class IslandManager {
 
 
                                     file.setFile(new File(folder, realFile.getName())); // Change the file to the new location
-
                                     file.save(); // Save the file
 
                                     copyArray[finalI] = file; // Add the file to the copy array

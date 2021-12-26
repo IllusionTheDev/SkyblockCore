@@ -76,15 +76,29 @@ public class DefaultHandler implements PastingHandler {
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-        Bukkit.unloadWorld(name, false);
+        if (loc.getWorld() == null)
+            System.out.println("\n\nWorld is null\n\n");
 
+        CountDownLatch mainLatch = new CountDownLatch(file.length);
         main.getWorldManager().whenNextUnload(($) -> {
+            System.out.println("Pasting stuff");
             for (SerializedFile f : file)
                 futures.add(paste(f, name));
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(($$) -> {
+                System.out.println("Done pasting");
+                mainLatch.countDown();
+            });
         }, name);
 
+        Bukkit.unloadWorld(name, false);
 
         return CompletableFuture.runAsync(() -> {
+            try {
+                mainLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             CountDownLatch latch = new CountDownLatch(1);
 
             System.out.println("Waiting for all futures to finish");

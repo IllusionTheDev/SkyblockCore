@@ -10,6 +10,7 @@ import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class SkyblockPlayer {
 
                 data = new PlayerData();
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
+                islandData.addUser(uuid);
                 sync(() -> main.getIslandManager().loadIsland(islandData)
                         .thenAccept(island -> {
                             System.out.println("Pasted island with id " + island.getData().getId());
@@ -112,7 +114,19 @@ public class SkyblockPlayer {
             return;
         }
 
-        islandCenter.getChunk().load();
+        World world = islandCenter.getWorld();
+
+        if (world == null) {
+            System.out.println("Teleporting - World is null");
+            islandCenter.setWorld(Bukkit.getWorld(island.getWorld()));
+        }
+
+        System.out.println("Teleporting to island");
+        System.out.println(islandCenter);
+
+        if (!islandCenter.getChunk().isLoaded())
+            islandCenter.getChunk().load();
+
         Player p = getPlayer();
         p.teleport(islandCenter);
         data.getIslandLocation().update(islandCenter);

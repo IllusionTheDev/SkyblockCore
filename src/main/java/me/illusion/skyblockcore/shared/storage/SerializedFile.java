@@ -56,6 +56,7 @@ public class SerializedFile implements Serializable {
             }
 
             try {
+                System.out.println("Writing " + contents.length + " bytes to " + file.getAbsolutePath());
                 Files.write(file.toPath(), contents);
             } catch (IOException e) {
                 e.printStackTrace();
