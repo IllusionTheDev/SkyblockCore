@@ -6,7 +6,10 @@ import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
-import org.bukkit.*;
+import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class DefaultHandler implements PastingHandler {
@@ -27,15 +29,7 @@ public class DefaultHandler implements PastingHandler {
     }
 
     private CompletableFuture<Void> paste(SerializedFile serializedFile, String name) {
-        return CompletableFuture.runAsync(() -> {
-            File file = null;
-            try {
-                System.out.println("Getting region file");
-                file = serializedFile.getFile().get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-
+        return serializedFile.getFile().thenAccept((file) -> {
             System.out.println("Checking extension");
             if (extension == null)
                 extension = getExtension(file.getName());
@@ -46,7 +40,6 @@ public class DefaultHandler implements PastingHandler {
             System.out.println("Unloading");
 
             deleteWorldFolder(regionFolder, file);
-
         });
         // Re-load world
     }
@@ -73,49 +66,29 @@ public class DefaultHandler implements PastingHandler {
     @Override
     public CompletableFuture<Void> paste(SerializedFile[] file, Location loc) {
         String name = loc.getWorld().getName();
-
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-        if (loc.getWorld() == null)
-            System.out.println("\n\nWorld is null\n\n");
-
         CountDownLatch mainLatch = new CountDownLatch(file.length);
-        main.getWorldManager().whenNextUnload(($) -> {
-            System.out.println("Pasting stuff");
-            for (SerializedFile f : file)
-                futures.add(paste(f, name));
 
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(($$) -> {
-                System.out.println("Done pasting");
-                mainLatch.countDown();
-            });
-        }, name);
+        WorldUtils
+                .unload(main, name)
+                .thenRun(() -> {
+                    for (SerializedFile f : file)
+                        futures.add(paste(f, name));
 
-        Bukkit.unloadWorld(name, false);
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(($$) -> {
+                        System.out.println("Done pasting");
+                        mainLatch.countDown();
+                    });
+                });
 
         return CompletableFuture.runAsync(() -> {
-            try {
-                mainLatch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            wait(mainLatch);
+
             CountDownLatch latch = new CountDownLatch(1);
 
-            System.out.println("Waiting for all futures to finish");
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            WorldUtils.load(main, name).thenRun(latch::countDown);
 
-            System.out.println("Load");
-            Bukkit.getScheduler().runTask(main, () -> new WorldCreator(name).generator("Skyblock").type(WorldType.NORMAL).createWorld());
-            main.getWorldManager().whenNextLoad(($) -> {
-                System.out.println("Loaded");
-                latch.countDown();
-            }, name);
-
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            wait(latch);
         });
 
 
@@ -124,7 +97,6 @@ public class DefaultHandler implements PastingHandler {
     @Override
     public void save(Island island, Consumer<SerializedFile[]> action) {
         World world = Bukkit.getWorld(island.getWorld());
-        world.save();
 
         main.getWorldManager().whenNextSave(($) -> {
             File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
@@ -146,6 +118,9 @@ public class DefaultHandler implements PastingHandler {
             action.accept(list.toArray(new SerializedFile[]{}));
         }, world.getName());
 
+        world.save();
+
+
     }
 
     @Override
@@ -156,5 +131,13 @@ public class DefaultHandler implements PastingHandler {
     private String getExtension(String filename) {
         int index = filename.lastIndexOf(".");
         return filename.substring(index + 1);
+    }
+
+    private void wait(CountDownLatch latch) {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

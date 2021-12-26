@@ -5,8 +5,10 @@ import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
-import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
-import org.bukkit.*;
+import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -189,23 +191,8 @@ public class IslandManager {
                                 finishSync(3);
                             };
 
-                            // In sync,
-                            Bukkit.getScheduler().runTask(main, () -> {
-                                World loadedWorld = Bukkit.getWorld(world); // Obtains the world
-
-                                printSync(3);
-
-                                if (loadedWorld == null) { // If the world is not loaded, we load it
-                                    System.out.println("Loading world: " + world);
-                                    main.getWorldManager().whenNextLoad(loadIslandTask, world);
-
-                                    new ScheduleBuilder(main).in(1).ticks().run(() -> new WorldCreator(world).generator("Skyblock").type(WorldType.NORMAL).createWorld()).sync().start();
-                                    return;
-                                }
-
-                                loadIslandTask.accept(loadedWorld);
-                            });
-
+                            printSync(3);
+                            WorldUtils.load(main, world).thenAccept(loadIslandTask);
                             finishSync(2);
                         } catch (Exception e) {
                             ExceptionLogger.log(e);

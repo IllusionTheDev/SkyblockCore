@@ -75,6 +75,7 @@ public class WorldManager implements Listener {
 
     @EventHandler
     private void onSave(WorldSaveEvent event) {
+        System.out.println("SAVED WORLD " + event.getWorld().getName());
         World world = event.getWorld();
         String name = world.getName();
 

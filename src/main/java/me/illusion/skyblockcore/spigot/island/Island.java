@@ -3,11 +3,9 @@ package me.illusion.skyblockcore.spigot.island;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
-import org.bukkit.Bukkit;
+import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import org.bukkit.Location;
-import org.bukkit.World;
 
-import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -50,18 +48,18 @@ public class Island {
      * Cleans the island, by regenerating its chunks
      */
     public void cleanIsland() {
-        World world = center.getWorld();
+        System.out.println("Cleaning island...");
 
-        Bukkit.unloadWorld(world, true);
+        WorldUtils
+                .unload(main, world)
+                .thenRun(() -> {
+                    WorldUtils.deleteRegionFolder(main, world);
 
-        main.getIslandManager().unregister(this);
-        main.getWorldManager().unregister(this.world);
+                    main.getIslandManager().unregister(this);
+                    main.getWorldManager().unregister(this.world);
+                });
 
-        main.getWorldManager().whenNextUnload(unloadedWorld -> {
-            File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
-            regionFolder.delete();
-            regionFolder.mkdir();
-        }, this.world);
+
     }
 
     /**
