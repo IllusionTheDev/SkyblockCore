@@ -14,7 +14,6 @@ import org.bukkit.Location;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import static me.illusion.skyblockcore.spigot.pasting.PastingType.FAWE;
@@ -38,14 +37,9 @@ public class FAWEHandler implements PastingHandler {
 
     @SneakyThrows
     private void paste(SerializedFile serializedFile, Location loc) {
-        File file = null;
-        try {
-            file = serializedFile.getFile().get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        provider.paste(file, loc);
+        serializedFile
+                .getFile()
+                .thenAccept(file -> provider.paste(file, loc));
     }
 
 

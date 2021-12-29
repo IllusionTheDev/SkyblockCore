@@ -9,7 +9,6 @@ import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +18,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
+import static me.illusion.skyblockcore.shared.utilities.CollectionUtils.arrayOf;
+
 public class DefaultHandler implements PastingHandler {
+
+    private static final int REDUCE_TO_CHUNK = 9;
 
     private final SkyblockPlugin main;
     private String extension;
@@ -75,7 +78,7 @@ public class DefaultHandler implements PastingHandler {
                     for (SerializedFile f : file)
                         futures.add(paste(f, name));
 
-                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(($$) -> {
+                    CompletableFuture.allOf(arrayOf(futures)).thenAccept(($$) -> {
                         System.out.println("Done pasting");
                         mainLatch.countDown();
                     });
@@ -96,31 +99,14 @@ public class DefaultHandler implements PastingHandler {
 
     @Override
     public void save(Island island, Consumer<SerializedFile[]> action) {
-        World world = Bukkit.getWorld(island.getWorld());
-
-        main.getWorldManager().whenNextSave(($) -> {
+        WorldUtils.save(main, island.getWorld(), (world) -> {
             File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
-
-            List<SerializedFile> list = new ArrayList<>();
 
             Location one = island.getPointOne();
             Location two = island.getPointTwo();
 
-            int xOne = one.getBlockX() >> 9;
-            int zOne = one.getBlockZ() >> 9;
-            int xTwo = two.getBlockX() >> 9;
-            int zTwo = two.getBlockZ() >> 9;
-
-            for (int x = xOne; x <= xTwo; x++)
-                for (int z = zOne; z <= zTwo; z++)
-                    list.add(new SerializedFile(new File(regionFolder, "r." + x + "." + z + "." + extension)));
-
-            action.accept(list.toArray(new SerializedFile[]{}));
-        }, world.getName());
-
-        world.save();
-
-
+            action.accept(SerializedFile.loadArray(WorldUtils.getAllFilesBetween(regionFolder, one, two)));
+        });
     }
 
     @Override

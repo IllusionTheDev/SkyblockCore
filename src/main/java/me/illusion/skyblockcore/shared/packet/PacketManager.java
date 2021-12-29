@@ -3,7 +3,6 @@ package me.illusion.skyblockcore.shared.packet;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.request.PacketRequestMessageSend;
 import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.response.PacketRespondServer;
-import me.illusion.skyblockcore.shared.utilities.HexUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -142,7 +141,7 @@ public class PacketManager {
         Class<? extends Packet> type = getPacketClass(bytes[0]);
 
         if (type == null) {
-            System.out.println("Unknown packet type: 0x" + HexUtil.bytesToHex(bytes[0]));
+            // System.out.println("Unknown packet type: 0x" + HexUtil.bytesToHex(bytes[0])); - Will get spammy
             return null;
         }
         try {

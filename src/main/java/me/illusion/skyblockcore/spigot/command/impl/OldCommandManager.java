@@ -18,6 +18,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static me.illusion.skyblockcore.shared.utilities.CollectionUtils.arrayOf;
+
 public class OldCommandManager implements CommandManager {
 
     private static CommandMap commandMap;
@@ -58,9 +60,9 @@ public class OldCommandManager implements CommandManager {
         System.out.println("Testing full comparison - island -> " + get("island"));
         System.out.println("Testing full comparison - island.go -> " + get("island.go"));
 
-        System.out.println("Testing tab complete - is -> " + Arrays.toString(tabComplete("is").toArray(new String[0])));
-        System.out.println("Testing tab complete - isl -> " + Arrays.toString(tabComplete("isl").toArray(new String[0])));
-        System.out.println("Testing tab complete - island -> " + Arrays.toString(tabComplete("island").toArray(new String[0])));
+        System.out.println("Testing tab complete - is -> " + Arrays.toString(arrayOf(tabComplete("is"))));
+        System.out.println("Testing tab complete - isl -> " + Arrays.toString(arrayOf(tabComplete("isl"))));
+        System.out.println("Testing tab complete - island -> " + Arrays.toString(arrayOf(tabComplete("island"))));
     }
 
     public void register(SkyblockCommand command) {

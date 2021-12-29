@@ -10,8 +10,11 @@ import org.bukkit.WorldCreator;
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 public final class WorldUtils {
+
+    private static final int REDUCE_TO_CHUNK = 9;
 
     private WorldUtils() {
         throw new IllegalStateException("Utility class");
@@ -102,5 +105,44 @@ public final class WorldUtils {
         int z = location.getBlockZ() >> 9;
 
         return new File(folder + File.separator + "r." + x + "." + z + ".mca");
+    }
+
+    public static File[] getAllFilesBetween(File folder, Location one, Location two) {
+        // get min and max locations
+        int minX = Math.min(one.getBlockX(), two.getBlockX()) >> REDUCE_TO_CHUNK;
+        int minZ = Math.min(one.getBlockZ(), two.getBlockZ()) >> REDUCE_TO_CHUNK;
+
+        int maxX = Math.max(one.getBlockX(), two.getBlockX()) >> REDUCE_TO_CHUNK;
+        int maxZ = Math.max(one.getBlockZ(), two.getBlockZ()) >> REDUCE_TO_CHUNK;
+
+        File[] files = new File[(maxX - minX + 1) * (maxZ - minZ + 1)];
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                File file = new File(folder + File.separator + "r." + x + "." + z + ".mca");
+
+                files[(x - minX) * (maxZ - minZ + 1) + (z - minZ)] = file;
+            }
+        }
+
+        return files;
+    }
+
+    public static void save(SkyblockPlugin main, String worldName, Consumer<World> worldAction) {
+        // save world, add worldFuture into next save
+
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(main, () -> save(main, worldName, worldAction));
+            return;
+        }
+
+        World world = Bukkit.getWorld(worldName);
+
+        if (world == null) {
+            return;
+        }
+
+        main.getWorldManager().whenNextSave(worldAction, worldName);
+        world.save();
     }
 }

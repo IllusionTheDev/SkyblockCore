@@ -21,7 +21,7 @@ public class ExceptionLogger {
 
     @SneakyThrows
     public static void log(final Throwable exception) {
-        File file = new File(folder, "exception-" + exceptionCount++ + ".log");
+        File file = new File(folder, "exception-" + ++exceptionCount + ".log");
         file.createNewFile();
 
         FileOutputStream output = new FileOutputStream(file, true);
