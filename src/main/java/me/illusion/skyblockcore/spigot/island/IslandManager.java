@@ -10,13 +10,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 /*
     Island loading is hella weird, so I made spaghetti code
@@ -152,7 +152,7 @@ public class IslandManager {
                 final Island[] island = {null};
 
                 // If we need to paste, we make a latch with 2 uses, one for the island loading, and the second for the world loading
-                CountDownLatch latch = new CountDownLatch(paste ? 2 : 0);
+                CountDownLatch latch = new CountDownLatch(paste ? 1 : 0);
 
                 printSync(1);
 
@@ -172,33 +172,15 @@ public class IslandManager {
                             printSync(2);
                             data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
 
-                            String world = main.getWorldManager().assignWorld(); // Assigns world
-
-                            // Prepares the unlocking once the world is loaded, while not running it
-                            Runnable loadAction = () -> {
-                                printSync(5);
-
-                                latch.countDown(); // Decrements the latch
-
-                                finishSync(5);
-                            };
-
-                            // Prepares the loading of the world
-                            Consumer<World> loadIslandTask = (loadedWorld) -> {
-                                island[0] = loadIsland(data, loadedWorld, loadAction); // Loads island
-                                latch.countDown(); // Unlocks the island side of the latch
-
-                                finishSync(3);
-                            };
+                            String world = main.getWorldManager().assignWorld(data.getId()); // Assigns world
 
                             printSync(3);
-                            WorldUtils.load(main, world).thenAccept(loadIslandTask);
+                            island[0] = loadIsland(data, world);// Creates island
+                            latch.countDown();
                             finishSync(2);
                         } catch (Exception e) {
                             ExceptionLogger.log(e);
-
                         }
-
 
                     });
 
@@ -259,8 +241,9 @@ public class IslandManager {
      * @param world - The world to paste the island on
      * @return island object
      */
-    private Island loadIsland(IslandData data, World world, Runnable loadAction) {
+    private Island loadIslandLoadedWorld(IslandData data, World world) {
         try {
+            CountDownLatch latch = new CountDownLatch(1);
             printSync(4);
 
             Location center = world.getSpawnLocation();
@@ -271,15 +254,57 @@ public class IslandManager {
             Location one = center.clone().add(-offset, -128, -offset);
             Location two = center.clone().add(offset, 128, offset);
 
-            main.getPastingHandler().paste(data.getIslandSchematic(), center).thenRun(loadAction);
+            main.getPastingHandler().paste(data.getIslandSchematic(), center).thenRun(latch::countDown);
 
             finishSync(4);
+            System.out.println("Awaiting paste latch");
+
+            latch.await();
+
             return new Island(main, one, two, center, data, world.getName());
         } catch (Exception e) {
             ExceptionLogger.log(e);
             return null;
         }
+    }
 
+    private Island loadIslandUnloadedWorld(IslandData data, String worldName) {
+        try {
+            CountDownLatch latch = new CountDownLatch(1);
+            printSync(4);
+
+            Vector center = main.getIslandConfig().getSpawnPoint();
+
+            System.out.println(worldName + " spawn location: " + center);
+            int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
+
+            main.getPastingHandler().paste(data.getIslandSchematic(), worldName, center)
+                    .thenRun(() -> WorldUtils.load(main, worldName)).thenRun(latch::countDown);
+
+            finishSync(4);
+
+            latch.await();
+
+            World world = Bukkit.getWorld(worldName);
+            Location one = world.getSpawnLocation().clone().add(-offset, -128, -offset);
+            Location two = world.getSpawnLocation().clone().add(offset, 128, offset);
+
+            return new Island(main, one, two, center.toLocation(world), data, worldName);
+
+        } catch (Exception e) {
+            ExceptionLogger.log(e);
+            return null;
+        }
+    }
+
+    private Island loadIsland(IslandData data, String worldName) {
+        boolean requiresLoad = main.getPastingHandler().requiresLoadedWorld();
+
+        if (requiresLoad) {
+            return loadIslandLoadedWorld(data, Bukkit.getWorld(worldName));
+        }
+
+        return loadIslandUnloadedWorld(data, worldName);
     }
 
     /**

@@ -40,10 +40,13 @@ public class WorldManager implements Listener {
 
     }
 
-    public String assignWorld() {
+    public String assignWorld(UUID islandId) {
         for (Map.Entry<String, UUID> entry : loadedIslands.entrySet())
-            if (entry.getValue() == null)
+            if (entry.getValue() == null) {
+                loadedIslands.put(entry.getKey(), islandId);
                 return entry.getKey();
+
+            }
 
         return null;
     }

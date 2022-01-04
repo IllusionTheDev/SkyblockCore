@@ -9,6 +9,7 @@ import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +22,6 @@ import java.util.function.Consumer;
 import static me.illusion.skyblockcore.shared.utilities.CollectionUtils.arrayOf;
 
 public class DefaultHandler implements PastingHandler {
-
-    private static final int REDUCE_TO_CHUNK = 9;
 
     private final SkyblockPlugin main;
     private String extension;
@@ -42,15 +41,12 @@ public class DefaultHandler implements PastingHandler {
 
             System.out.println("Unloading");
 
-            deleteWorldFolder(regionFolder, file);
+            writeFile(regionFolder, file);
         });
         // Re-load world
     }
 
-    private void deleteWorldFolder(File regionFolder, File finalFile) {
-        regionFolder.delete();
-        regionFolder.mkdir();
-
+    private void writeFile(File regionFolder, File finalFile) {
         // Create the new file
         File newFile = new File(regionFolder, finalFile.getName());
 
@@ -67,32 +63,24 @@ public class DefaultHandler implements PastingHandler {
     }
 
     @Override
-    public CompletableFuture<Void> paste(SerializedFile[] file, Location loc) {
-        String name = loc.getWorld().getName();
+    public CompletableFuture<Void> paste(SerializedFile[] file, String name, Vector point) {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         CountDownLatch mainLatch = new CountDownLatch(file.length);
 
-        WorldUtils
-                .unload(main, name)
-                .thenRun(() -> {
-                    for (SerializedFile f : file)
-                        futures.add(paste(f, name));
+        File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + name + File.separator + "region");
 
-                    CompletableFuture.allOf(arrayOf(futures)).thenAccept(($$) -> {
-                        System.out.println("Done pasting");
-                        mainLatch.countDown();
-                    });
-                });
+        regionFolder.delete();
+        regionFolder.mkdir();
 
-        return CompletableFuture.runAsync(() -> {
-            wait(mainLatch);
+        for (SerializedFile f : file)
+            futures.add(paste(f, name));
 
-            CountDownLatch latch = new CountDownLatch(1);
-
-            WorldUtils.load(main, name).thenRun(latch::countDown);
-
-            wait(latch);
+        CompletableFuture.allOf(arrayOf(futures)).thenAccept(($$) -> {
+            System.out.println("Done pasting");
+            mainLatch.countDown();
         });
+
+        return CompletableFuture.runAsync(() -> wait(mainLatch));
 
 
     }
@@ -125,5 +113,10 @@ public class DefaultHandler implements PastingHandler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean requiresLoadedWorld() {
+        return false;
     }
 }

@@ -79,4 +79,9 @@ public class FAWEHandler implements PastingHandler {
     public PastingType getType() {
         return FAWE;
     }
+
+    @Override
+    public boolean requiresLoadedWorld() {
+        return true;
+    }
 }
