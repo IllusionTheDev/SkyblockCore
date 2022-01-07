@@ -13,7 +13,7 @@
 
 To start, the plugin requires a SQL connection, used to store the islands and all the player data If you do not have/need a SQL connection, change the storage type to SQLITE on the config.yml file
 
-Best scaled with my [DataSync Plugin](https://github.com/IllusionTheDev/DataSync)
+Best paired with my [DataSync Plugin](https://github.com/IllusionTheDev/DataSync), which handles inventory, food, enderchest, potion synchronization and more!
 
 ------------
 
