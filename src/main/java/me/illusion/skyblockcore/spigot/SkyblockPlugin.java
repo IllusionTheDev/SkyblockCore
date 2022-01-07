@@ -184,6 +184,7 @@ public class SkyblockPlugin extends JavaPlugin {
             String password = getConfig().getString("database.password", "");
             int port = getConfig().getInt("database.port");
 
+            System.out.println("Created handler of type " + clazz.getSimpleName());
             return storageHandler.setup(host, port, database, username, password);
 
         } catch (InstantiationException | IllegalAccessException e) {

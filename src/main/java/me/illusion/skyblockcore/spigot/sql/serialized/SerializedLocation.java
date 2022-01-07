@@ -36,4 +36,9 @@ public class SerializedLocation implements Serializable {
 
         this.format = x + " " + y + " " + z + " " + yaw + " " + pitch + " " + world; // Not using String.format because it is awfully slow
     }
+
+    @Override
+    public String toString() {
+        return format;
+    }
 }

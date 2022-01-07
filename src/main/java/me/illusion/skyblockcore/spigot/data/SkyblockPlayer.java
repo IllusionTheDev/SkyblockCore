@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
@@ -57,6 +58,14 @@ public class SkyblockPlayer {
         System.out.println("Loading data for " + getPlayer().getName());
 
         load("PLAYER", uuid).whenComplete((object, $) -> {
+            System.out.println("COMPLETE");
+            if (object != null && !(object instanceof PlayerData)) {
+                System.err.println("Object is not a player data, send the message below to the developer");
+                System.err.println(object.getClass().getName());
+                System.err.println(object);
+                return;
+            }
+
             data = (PlayerData) object;
 
             if (data == null) {
@@ -81,7 +90,7 @@ public class SkyblockPlayer {
             }
 
             System.out.println("Loaded player data, loading island data");
-            main.getIslandManager().pasteIsland(data.getIslandId())
+            main.getIslandManager().pasteIsland(data.getIslandId(), uuid)
                     .thenAccept(island -> {
                         this.island = island;
                         this.islandCenter = island.getCenter();
@@ -103,6 +112,10 @@ public class SkyblockPlayer {
 
                     });
 
+        }).exceptionally(throwable -> {
+            System.out.println("Failed to load data for " + getPlayer().getName());
+            ExceptionLogger.log(throwable);
+            return null;
         });
     }
 
@@ -151,6 +164,7 @@ public class SkyblockPlayer {
      * @return deserialized object
      */
     private CompletableFuture<Object> load(String table, UUID uuid) {
+        System.out.println("Loading " + table + " data for " + uuid);
         return main.getStorageHandler().get(uuid, table);
     }
 

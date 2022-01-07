@@ -112,11 +112,12 @@ public class IslandManager {
         return onlinePlayers <= 1;
     }
 
-    public CompletableFuture<Island> pasteIsland(UUID islandId) {
+    public CompletableFuture<Island> pasteIsland(UUID islandId, UUID ownerId) {
         return load(islandId)
                 .thenApply(data -> {
+                    System.out.println("Pasting island " + islandId);
                     if (data == null)
-                        return null;
+                        data = new IslandData(islandId, ownerId, new ArrayList<>());
 
                     IslandData islandData = (IslandData) data;
 
@@ -204,14 +205,33 @@ public class IslandManager {
                 long end = System.currentTimeMillis();
                 String endWorld = ownerPlayer == null ? "N/A" : ownerPlayer.getWorld().getName();
 
+                Island result = island[0];
+
                 System.out.println("After action report");
                 System.out.println("Time taken: " + (end - start) + "ms");
                 System.out.println("Player starting world: " + startingWorld);
                 System.out.println("Player ending world: " + endWorld);
-                System.out.println("Island world: " + (island[0] == null ? "N/A" : island[0].getWorld()));
-                System.out.println("Island loaded: " + (island[0] != null));
-                System.out.println("Island world loaded: " + (island[0] == null ? "N/A" : Bukkit.getWorld(island[0].getWorld()) != null));
-                return island[0];
+                System.out.println("Island world: " + (result == null ? "N/A" : result.getWorld()));
+                System.out.println("Island loaded: " + (result != null));
+                System.out.println("Island world loaded: " + (result == null ? "N/A" : Bukkit.getWorld(result.getWorld()) != null));
+
+                // --- ENSURE WORLD IS PROPERLY LOADED ---
+                if (Bukkit.getWorld(result.getWorld()) == null) {
+                    System.out.println("World is null");
+                    CountDownLatch latch2 = new CountDownLatch(1);
+                    WorldUtils.load(main, result.getWorld()).thenRun(latch2::countDown);
+
+                    try {
+                        latch2.await();
+                    } catch (InterruptedException e) {
+                        ExceptionLogger.log(e);
+                    }
+                }
+
+                result.getCenter().setWorld(Bukkit.getWorld(result.getWorld()));
+                // ----------------------------------------
+
+                return result;
             } catch (Exception e) {
                 ExceptionLogger.log(e);
                 return null;
@@ -273,23 +293,29 @@ public class IslandManager {
             CountDownLatch latch = new CountDownLatch(1);
             printSync(4);
 
-            Vector center = main.getIslandConfig().getSpawnPoint();
+            Vector centerPoint = main.getIslandConfig().getSpawnPoint();
 
-            System.out.println(worldName + " spawn location: " + center);
+            System.out.println(worldName + " spawn location: " + centerPoint);
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
-            main.getPastingHandler().paste(data.getIslandSchematic(), worldName, center)
-                    .thenRun(() -> WorldUtils.load(main, worldName)).thenRun(latch::countDown);
+            main
+                    .getPastingHandler()
+                    .paste(data.getIslandSchematic(), worldName, centerPoint)
+                    .thenRun(() ->
+                            WorldUtils.load(main, worldName))
+                    .thenRun(latch::countDown);
 
             finishSync(4);
 
             latch.await();
 
             World world = Bukkit.getWorld(worldName);
-            Location one = world.getSpawnLocation().clone().add(-offset, -128, -offset);
-            Location two = world.getSpawnLocation().clone().add(offset, 128, offset);
+            Location center = centerPoint.toLocation(world);
 
-            return new Island(main, one, two, center.toLocation(world), data, worldName);
+            Location one = center.clone().add(-offset, -128, -offset);
+            Location two = center.clone().add(offset, 128, offset);
+
+            return new Island(main, one, two, center, data, worldName);
 
         } catch (Exception e) {
             ExceptionLogger.log(e);

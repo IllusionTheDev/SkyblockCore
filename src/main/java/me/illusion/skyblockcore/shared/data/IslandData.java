@@ -20,7 +20,7 @@ public class IslandData implements Serializable {
     private final UUID id;
     @Setter
     private SerializedFile[] islandSchematic;
-    private transient final List<UUID> users = new ArrayList<>();
+    private transient List<UUID> users = new ArrayList<>();
     private final UUID owner;
     private final List<OreGenerator> oreGenerators;
 
@@ -55,15 +55,22 @@ public class IslandData implements Serializable {
      * @return the list of UUIDs
      */
     public List<UUID> getUsers() {
+        if (users == null)
+            users = new ArrayList<>();
+
         if (!users.isEmpty())
             return users;
 
         List<UUID> list = new ArrayList<>();
 
         String[] split = StringUtil.split(serialized, ' ');
+        System.out.println(serialized);
 
-        for (String str : split)
+        for (String str : split) {
+            if (str.equalsIgnoreCase("null"))
+                continue;
             list.add(UUID.fromString(str));
+        }
 
         users.addAll(list);
         return list;

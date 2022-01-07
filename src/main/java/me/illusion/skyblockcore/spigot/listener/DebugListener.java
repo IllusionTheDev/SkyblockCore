@@ -40,8 +40,10 @@ public class DebugListener implements Listener {
     }
 
     private String formatLocation(Location location) {
+        if (location == null)
+            return "null";
         return
-                "World: " + location.getWorld().getName() + " | "
+                "World: " + (location.getWorld() == null ? "null" : location.getWorld().getName()) + " | "
                         + "X: " + location.getX() + " | "
                         + "Y: " + location.getY() + " | "
                         + "Z: " + location.getZ();

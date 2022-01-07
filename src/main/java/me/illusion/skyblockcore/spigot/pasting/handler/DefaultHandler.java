@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
-import static me.illusion.skyblockcore.shared.utilities.CollectionUtils.arrayOf;
+import static me.illusion.skyblockcore.shared.utilities.CollectionUtils.allOf;
 
 public class DefaultHandler implements PastingHandler {
 
@@ -64,7 +64,7 @@ public class DefaultHandler implements PastingHandler {
 
     @Override
     public CompletableFuture<Void> paste(SerializedFile[] file, String name, Vector point) {
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        List<CompletableFuture<?>> futures = new ArrayList<>();
         CountDownLatch mainLatch = new CountDownLatch(file.length);
 
         File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + name + File.separator + "region");
@@ -75,7 +75,7 @@ public class DefaultHandler implements PastingHandler {
         for (SerializedFile f : file)
             futures.add(paste(f, name));
 
-        CompletableFuture.allOf(arrayOf(futures)).thenAccept(($$) -> {
+        allOf(futures).thenRun(() -> {
             System.out.println("Done pasting");
             mainLatch.countDown();
         });
