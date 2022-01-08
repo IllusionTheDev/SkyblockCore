@@ -76,7 +76,6 @@ public class SkyblockPlayer {
                 islandData.addUser(uuid);
                 sync(() -> main.getIslandManager().loadIsland(islandData)
                         .thenAccept(island -> {
-                            System.out.println("Pasted island with id " + island.getData().getId());
                             this.island = island;
                             this.islandCenter = island.getCenter();
 
@@ -150,11 +149,18 @@ public class SkyblockPlayer {
      * Teleports player to last position
      */
     private void checkTeleport() {
-        System.out.println("Teleporting");
+        System.out.println("Teleporting to last location");
 
         Player p = getPlayer();
-        Location lastLoc = data.getLastLocation().getLocation();
-        p.teleport(lastLoc);
+        SerializedLocation last = data.getLastLocation();
+
+        String worldName = last.getWorldName();
+        Location location = last.getLocation();
+
+        if (worldName.startsWith("skyblockworld"))
+            location.setWorld(islandCenter.getWorld());
+
+        p.teleport(location);
     }
 
 
@@ -164,7 +170,7 @@ public class SkyblockPlayer {
      * @return deserialized object
      */
     private CompletableFuture<Object> load(String table, UUID uuid) {
-        System.out.println("Loading " + table + " data for " + uuid);
+        System.out.println("Loading " + table + " data for " + Bukkit.getPlayer(uuid).getName());
         return main.getStorageHandler().get(uuid, table);
     }
 

@@ -8,3 +8,20 @@ database:
   username: username  # Leave blank for MongoDB
   password: password  # Leave blank for MongoDB
   port: 3306
+
+
+
+delay: # All delays in ticks
+
+  # Delay between saving the world, and obtaining the saved data
+  # On spigot servers, this can be lower. PaperSpigot does async IO,
+  # without a way to tell if the IO is done, so we wait a pre-defined delay.
+
+  # If you're having issues where data is not being properly saved, increase this delay.
+  # If the server is not releasing islands quick enough, lower this delay.
+  after-save: 40
+
+  # Delay between unloading the island world, and allowing the world to be re-used
+  # Some servers experience corrupted data when reloading worlds too fast, so increase
+  # this delay if you're experiencing corruption issues when people join and leave too often.
+  release-world: 200

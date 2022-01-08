@@ -31,8 +31,8 @@ public class SerializedFile implements Serializable {
     public static SerializedFile[] loadArray(File[] array) {
         SerializedFile[] newArray = new SerializedFile[array.length];
 
-        for (int i = 0; i < array.length; i++)
-            newArray[i] = new SerializedFile(array[i]);
+        for (int index = 0; index < array.length; index++)
+            newArray[index] = new SerializedFile(array[index]);
 
         return newArray;
     }
@@ -56,7 +56,6 @@ public class SerializedFile implements Serializable {
             }
 
             try {
-                System.out.println("Writing " + contents.length + " bytes to " + file.getAbsolutePath());
                 Files.write(file.toPath(), contents);
             } catch (IOException e) {
                 e.printStackTrace();

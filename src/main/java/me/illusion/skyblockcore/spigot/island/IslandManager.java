@@ -162,8 +162,6 @@ public class IslandManager {
                 // If we need to paste, we make a latch with 2 uses, one for the island loading, and the second for the world loading
                 CountDownLatch latch = new CountDownLatch(paste ? 1 : 0);
 
-                printSync(1);
-
                 // Pastes island if required
                 if (paste) {
                     SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
@@ -178,15 +176,12 @@ public class IslandManager {
 
                     files.thenAccept(schematicFiles -> {
                         try {
-                            printSync(2);
                             data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
 
                             String world = main.getWorldManager().assignWorld(data.getId()); // Assigns world
 
-                            printSync(3);
                             island[0] = loadIsland(data, world);// Creates island
                             latch.countDown();
-                            finishSync(2);
                         } catch (Exception e) {
                             ExceptionLogger.log(e);
                         }
@@ -198,17 +193,11 @@ public class IslandManager {
 
                 data.setIsland(island[0]); // Updates island in the island data
 
-                System.out.println("Awaiting world latch");
-                System.out.println("Files creating started..");
                 try {
                     latch.await();
                 } catch (InterruptedException e) {
                     ExceptionLogger.log(e);
-
                 }
-
-                System.out.println("Returned an island " + island[0]);
-                finishSync(1);
 
                 long end = System.currentTimeMillis();
                 String endWorld = ownerPlayer == null ? "N/A" : ownerPlayer.getWorld().getName();
@@ -216,16 +205,18 @@ public class IslandManager {
                 Island result = island[0];
 
                 System.out.println("After action report");
+                System.out.println("----------------------------------------");
                 System.out.println("Time taken: " + (end - start) + "ms");
                 System.out.println("Player starting world: " + startingWorld);
                 System.out.println("Player ending world: " + endWorld);
                 System.out.println("Island world: " + (result == null ? "N/A" : result.getWorld()));
                 System.out.println("Island loaded: " + (result != null));
                 System.out.println("Island world loaded: " + (result == null ? "N/A" : Bukkit.getWorld(result.getWorld()) != null));
+                System.out.println("----------------------------------------");
 
                 // --- ENSURE WORLD IS PROPERLY LOADED ---
                 if (Bukkit.getWorld(result.getWorld()) == null) {
-                    System.out.println("World is null");
+                    System.out.println("Loading world");
                     CountDownLatch latch2 = new CountDownLatch(1);
                     WorldUtils.load(main, result.getWorld()).thenRun(latch2::countDown);
 
@@ -274,7 +265,6 @@ public class IslandManager {
     private Island loadIslandLoadedWorld(IslandData data, World world) {
         try {
             CountDownLatch latch = new CountDownLatch(1);
-            printSync(4);
 
             Location center = world.getSpawnLocation();
 
@@ -286,8 +276,6 @@ public class IslandManager {
 
             main.getPastingHandler().paste(data.getIslandSchematic(), center).thenRun(latch::countDown);
 
-            finishSync(4);
-            System.out.println("Awaiting paste latch");
 
             latch.await();
 
@@ -301,7 +289,6 @@ public class IslandManager {
     private Island loadIslandUnloadedWorld(IslandData data, String worldName) {
         try {
             CountDownLatch latch = new CountDownLatch(1);
-            printSync(4);
 
             Vector centerPoint = main.getIslandConfig().getSpawnPoint();
 
@@ -314,8 +301,6 @@ public class IslandManager {
                     .thenRun(() ->
                             WorldUtils.load(main, worldName))
                     .thenRun(latch::countDown);
-
-            finishSync(4);
 
             latch.await();
 
@@ -426,22 +411,5 @@ public class IslandManager {
         FileUtils.delete(folder); // Delete the folder
     }
 
-    private void printSync(int step) {
-        boolean isSync = Bukkit.isPrimaryThread();
-
-        String sync = isSync ? "Sync" : "Async";
-
-        System.out.println("------------------------------------------------------");
-        System.out.println("Initiating step " + step + " " + sync);
-    }
-
-    private void finishSync(int step) {
-        boolean isSync = Bukkit.isPrimaryThread();
-
-        String sync = isSync ? "Sync" : "Async";
-
-        System.out.println("Finished step " + step + " " + sync);
-        System.out.println("-----------------------------------------------------");
-    }
 
 }

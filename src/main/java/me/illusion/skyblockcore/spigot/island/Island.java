@@ -2,15 +2,11 @@ package me.illusion.skyblockcore.spigot.island;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
-import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Location;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -42,30 +38,9 @@ public class Island {
      */
     public void save(Runnable afterSave) {
         main.getPastingHandler().save(this, schem -> {
-            System.out.println("saved island");
-            System.out.println("Saved schematic names: ");
-
-            for (SerializedFile file : schem) {
-                // Check for similarity
-                byte[] size = file.getBytes();
-                File cached = file.getCachedFile();
-
-                if (cached.exists()) {
-                    try {
-                        byte[] cachedSize = Files.readAllBytes(cached.toPath());
-
-                        if (cachedSize.length == size.length && Arrays.equals(cachedSize, size)) {
-                            System.out.println("Files are equal yay");
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
             data.setIslandSchematic(schem);
 
-            CompletableFuture.runAsync(this::saveData)
-                    .thenRun(afterSave);
+            saveData().thenRun(afterSave);
         });
     }
 
@@ -79,9 +54,14 @@ public class Island {
                 .unload(main, world)
                 .thenRun(() -> {
                     WorldUtils.deleteRegionFolder(main, world);
-
                     main.getIslandManager().unregister(this);
-                    main.getWorldManager().unregister(this.world);
+
+                    new ScheduleBuilder(main) // Intentional 10 seconds delay so we don't corrupt worlds by loading and unloading very fast
+                            .in(10).seconds()
+                            .run(() -> main.getWorldManager().unregister(this.world))
+                            .sync()
+                            .start();
+
                 });
 
 
@@ -90,8 +70,8 @@ public class Island {
     /**
      * Saves Island data
      */
-    private void saveData() {
-        main.getStorageHandler().save(data.getId(), data, "ISLAND");
+    private CompletableFuture<Void> saveData() {
+        return main.getStorageHandler().save(data.getId(), data, "ISLAND");
     }
 
 }

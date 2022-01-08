@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.utilities;
 
+import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
@@ -66,8 +67,7 @@ public final class WorldUtils {
         // Delete the region folder
         File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + worldName + File.separator + "region");
 
-        regionFolder.delete();
-        regionFolder.mkdir();
+        FileUtils.delete(regionFolder);
     }
 
     public static CompletableFuture<World> load(SkyblockPlugin main, String worldName) {

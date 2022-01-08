@@ -62,7 +62,6 @@ public class WorldManager implements Listener {
     }
 
     public void whenNextLoad(Consumer<World> worldConsumer, String worldname) {
-        System.out.println("Queued up load for " + worldname);
         loadEvents.put(worldname.toLowerCase(Locale.ROOT), loadEvents.getOrDefault(worldname.toLowerCase(Locale.ROOT), (world) -> {
         }).andThen(worldConsumer));
     }
@@ -95,8 +94,6 @@ public class WorldManager implements Listener {
         String name = world.getName().toLowerCase(Locale.ROOT);
 
         Consumer<World> action = loadEvents.remove(name);
-
-        System.out.println("Is there an action? " + (action != null ? "yes" : "no"));
 
         if (action != null)
             action.accept(world);

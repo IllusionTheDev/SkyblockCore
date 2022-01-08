@@ -41,4 +41,8 @@ public class SerializedLocation implements Serializable {
     public String toString() {
         return format;
     }
+
+    public String getWorldName() {
+        return format.split(" ")[5];
+    }
 }

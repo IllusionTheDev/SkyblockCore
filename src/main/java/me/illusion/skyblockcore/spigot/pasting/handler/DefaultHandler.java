@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
@@ -32,14 +33,11 @@ public class DefaultHandler implements PastingHandler {
 
     private CompletableFuture<Void> paste(SerializedFile serializedFile, String name) {
         return serializedFile.getFile().thenAccept((file) -> {
-            System.out.println("Checking extension");
             if (extension == null)
                 extension = getExtension(file.getName());
 
             // Obtain the region folder for the world
             File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + name + File.separator + "region");
-
-            System.out.println("Unloading");
 
             writeFile(regionFolder, file);
         });
@@ -53,8 +51,6 @@ public class DefaultHandler implements PastingHandler {
         try {
             // Create the region file
             newFile.createNewFile();
-
-            System.out.println("Copied fake world");
             // Copy the file
             Files.copy(finalFile, newFile);
         } catch (IOException e) {
@@ -93,22 +89,15 @@ public class DefaultHandler implements PastingHandler {
             Location one = island.getPointOne();
             Location two = island.getPointTwo();
 
-            File[] worldFiles = WorldUtils.getAllFilesBetween(regionFolder, one, two);
+            new ScheduleBuilder(main)
+                    .in(3).seconds()
+                    .run(() -> {
+                        File[] worldFiles = WorldUtils.getAllFilesBetween(regionFolder, one, two);
+                        SerializedFile[] files = SerializedFile.loadArray(worldFiles);
 
-            for (File f : worldFiles) {
-                try {
-                    System.out.println(f.getName() + " has " + java.nio.file.Files.readAllBytes(f.toPath()).length);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            SerializedFile[] files = SerializedFile.loadArray(worldFiles);
+                        action.accept(files);
+                    }).sync().start();
 
-            for (SerializedFile file : files) {
-                System.out.println("Saving " + file.getCachedFile().getAbsolutePath() + " with " + file.getBytes().length + " bytes");
-            }
-
-            action.accept(files);
         });
     }
 
