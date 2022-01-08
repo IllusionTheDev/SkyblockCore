@@ -20,18 +20,17 @@ public class LeaveListener implements Listener {
     private void onLeave(PlayerQuitEvent e) {
         Player p = e.getPlayer();
 
-        p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
 
         try {
             main.getPlayerManager().get(p).save();
 
-            p.getInventory().clear();
             main.getPlayerManager().unregister(p.getUniqueId());
 
         } catch (Exception ex) {
             ExceptionLogger.log(ex);
         }
 
+        p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
 
     }
 }

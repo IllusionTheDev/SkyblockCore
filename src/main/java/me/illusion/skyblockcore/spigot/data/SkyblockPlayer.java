@@ -174,11 +174,11 @@ public class SkyblockPlayer {
      * Saves all the player data, and cleans the island if possible
      */
     public void save() {
-        Player p = getPlayer();
-        Location loc = p.getLocation();
+        Player player = getPlayer();
+        Location loc = player.getLocation();
 
-        data.setExperience(p.getExp());
-        data.setExperienceLevel(p.getLevel());
+        data.setExperience(player.getExp());
+        data.setExperienceLevel(player.getLevel());
         data.getLastLocation().update(loc);
         data.getIslandLocation().update(loc);
 

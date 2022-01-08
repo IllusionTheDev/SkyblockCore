@@ -82,4 +82,12 @@ public class SerializedFile implements Serializable {
             e.printStackTrace();
         }
     }
+
+    public byte[] getBytes() {
+        return contents;
+    }
+
+    public File getCachedFile() {
+        return file;
+    }
 }

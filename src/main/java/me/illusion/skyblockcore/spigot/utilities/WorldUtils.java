@@ -119,7 +119,7 @@ public final class WorldUtils {
 
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
-                File file = new File(folder + File.separator + "r." + x + "." + z + ".mca");
+                File file = new File(folder, "r." + x + "." + z + ".mca");
 
                 files[(x - minX) * (maxZ - minZ + 1) + (z - minZ)] = file;
             }
@@ -129,8 +129,7 @@ public final class WorldUtils {
     }
 
     public static void save(SkyblockPlugin main, String worldName, Consumer<World> worldAction) {
-        // save world, add worldFuture into next save
-
+        // mandatory sync
         if (!Bukkit.isPrimaryThread()) {
             Bukkit.getScheduler().runTask(main, () -> save(main, worldName, worldAction));
             return;

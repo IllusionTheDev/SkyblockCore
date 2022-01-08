@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.spigot.island;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
+import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
@@ -49,7 +50,13 @@ public class IslandManager {
 
     public IslandManager(SkyblockPlugin main) {
         this.main = main;
+
+        File cache = new File(main.getDataFolder(), "cache");
+
+        FileUtils.delete(cache);
+        cache.mkdirs();
     }
+
 
     void register(Island island) {
         islands.put(island.getData().getId(), island);
@@ -163,6 +170,7 @@ public class IslandManager {
 
                     if (islandFiles == null) {
                         // Assigns default if not found
+                        System.out.println("No schematic found for island " + data.getId());
                         islandFiles = SerializedFile.loadArray(main.getStartSchematic());
                     }
 
@@ -229,6 +237,8 @@ public class IslandManager {
                 }
 
                 result.getCenter().setWorld(Bukkit.getWorld(result.getWorld()));
+
+                FileUtils.delete(folder); // Deletes folder
                 // ----------------------------------------
 
                 return result;
@@ -413,7 +423,7 @@ public class IslandManager {
 
         System.out.println("Attempting to delete island files");
 
-        folder.delete(); // Delete the folder
+        FileUtils.delete(folder); // Delete the folder
     }
 
     private void printSync(int step) {

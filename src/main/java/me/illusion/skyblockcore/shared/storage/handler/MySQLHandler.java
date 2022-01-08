@@ -33,14 +33,11 @@ public class MySQLHandler implements StorageHandler {
 
     @Override
     public CompletableFuture<Object> get(UUID uuid, String category) {
-        System.out.println("Getting " + uuid + " from " + category);
         return SQLSerializer.deserialize(connection, uuid, category);
     }
 
     @Override
     public CompletableFuture<Void> save(UUID uuid, Object object, String category) {
-        System.out.println("Saving " + uuid + " to " + category + " with " + object);
-        System.out.println("Object class: " + object.getClass().getName());
         return CompletableFuture.runAsync(() -> SQLSerializer.serialize(connection, uuid, object, category)).exceptionally(throwable -> {
             ExceptionLogger.log(throwable);
             return null;

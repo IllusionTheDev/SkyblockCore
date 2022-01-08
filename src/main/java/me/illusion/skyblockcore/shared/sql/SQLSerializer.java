@@ -37,7 +37,6 @@ public final class SQLSerializer {
         try (PreparedStatement statement = connection
                 .prepareStatement(StringUtil.replaceFirst(operation, '?', table))) {
 
-            System.out.println(objectToSerialize.getClass().getName() + " is being serialized for " + uuid);
             statement.setString(1, uuid.toString());
             statement.setBytes(2, getBytes(objectToSerialize));
             statement.executeUpdate();
@@ -55,28 +54,21 @@ public final class SQLSerializer {
      */
 
     public static CompletableFuture<Object> deserialize(Connection connection, UUID uuid, String table) {
-        System.out.println("Deserializing " + uuid + " from " + table);
         return CompletableFuture.supplyAsync(() -> {
-            System.out.println("Started Future");
             PreparedStatement statement = null;
             ResultSet result = null;
 
             Object deSerializedObject = null;
 
             try {
-                System.out.println("Started try");
                 statement = connection.prepareStatement(StringUtil.replaceFirst(SQL_DESERIALIZE_OBJECT, '?', table));
                 statement.setString(1, uuid.toString());
 
-                System.out.println("Prepared statement");
-
                 result = statement.executeQuery();
 
-                System.out.println("Executed query");
                 if (!result.next())
                     return null;
 
-                System.out.println("Got next");
                 deSerializedObject = getObject(result.getBytes(1));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -90,7 +82,6 @@ public final class SQLSerializer {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            System.out.println("Finished");
             return deSerializedObject;
         }).exceptionally(throwable -> {
             ExceptionLogger.log(throwable);

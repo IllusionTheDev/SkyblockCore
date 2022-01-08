@@ -2,10 +2,15 @@ package me.illusion.skyblockcore.spigot.island;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
+import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import org.bukkit.Location;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -37,6 +42,26 @@ public class Island {
      */
     public void save(Runnable afterSave) {
         main.getPastingHandler().save(this, schem -> {
+            System.out.println("saved island");
+            System.out.println("Saved schematic names: ");
+
+            for (SerializedFile file : schem) {
+                // Check for similarity
+                byte[] size = file.getBytes();
+                File cached = file.getCachedFile();
+
+                if (cached.exists()) {
+                    try {
+                        byte[] cachedSize = Files.readAllBytes(cached.toPath());
+
+                        if (cachedSize.length == size.length && Arrays.equals(cachedSize, size)) {
+                            System.out.println("Files are equal yay");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             data.setIslandSchematic(schem);
 
             CompletableFuture.runAsync(this::saveData)

@@ -88,12 +88,27 @@ public class DefaultHandler implements PastingHandler {
     @Override
     public void save(Island island, Consumer<SerializedFile[]> action) {
         WorldUtils.save(main, island.getWorld(), (world) -> {
-            File regionFolder = new File(world.getWorldFolder() + File.separator + "region");
+            File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + island.getWorld() + File.separator + "region");
 
             Location one = island.getPointOne();
             Location two = island.getPointTwo();
 
-            action.accept(SerializedFile.loadArray(WorldUtils.getAllFilesBetween(regionFolder, one, two)));
+            File[] worldFiles = WorldUtils.getAllFilesBetween(regionFolder, one, two);
+
+            for (File f : worldFiles) {
+                try {
+                    System.out.println(f.getName() + " has " + java.nio.file.Files.readAllBytes(f.toPath()).length);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            SerializedFile[] files = SerializedFile.loadArray(worldFiles);
+
+            for (SerializedFile file : files) {
+                System.out.println("Saving " + file.getCachedFile().getAbsolutePath() + " with " + file.getBytes().length + " bytes");
+            }
+
+            action.accept(files);
         });
     }
 

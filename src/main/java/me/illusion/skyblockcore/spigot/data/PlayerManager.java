@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.data;
 
+import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public class PlayerManager {
         File folder = world.getWorldFolder();
 
         File dataFile = new File(folder + File.separator + "playerdata" + File.separator, uuid.toString() + ".dat");
-        dataFile.delete();
+        FileUtils.delete(dataFile);
 
         players.remove(uuid);
     }
