@@ -40,8 +40,8 @@ public class VaultHook implements Economy {
     }
 
     @Override
-    public String format(double v) {
-        return String.valueOf(v);
+    public String format(double value) {
+        return String.valueOf(value);
     }
 
     @Override

@@ -10,8 +10,8 @@ import net.md_5.bungee.event.EventHandler;
 public class ConnectListener implements Listener {
 
     @EventHandler
-    public void onConnect(ServerConnectedEvent e) {
-        Server server = e.getServer();
+    public void onConnect(ServerConnectedEvent event) {
+        Server server = event.getServer();
         String serverName = server.getInfo().getName();
 
         server.sendData("SkyblockChannel", formMessage(serverName));

@@ -73,8 +73,8 @@ public class ObservableHashMap<K, V> extends HashMap<K, V> {
     }
 
     @Override
-    public void putAll(Map<? extends K, ? extends V> m) {
-        putEvents.forEach(m::forEach);
-        super.putAll(m);
+    public void putAll(Map<? extends K, ? extends V> otherMap) {
+        putEvents.forEach(otherMap::forEach);
+        super.putAll(otherMap);
     }
 }

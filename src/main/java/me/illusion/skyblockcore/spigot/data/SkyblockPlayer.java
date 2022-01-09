@@ -139,8 +139,8 @@ public class SkyblockPlayer {
         if (!islandCenter.getChunk().isLoaded())
             islandCenter.getChunk().load();
 
-        Player p = getPlayer();
-        p.teleport(islandCenter);
+        Player player = getPlayer();
+        player.teleport(islandCenter);
         data.getIslandLocation().update(islandCenter);
 
     }
@@ -151,7 +151,7 @@ public class SkyblockPlayer {
     private void checkTeleport() {
         System.out.println("Teleporting to last location");
 
-        Player p = getPlayer();
+        Player player = getPlayer();
         SerializedLocation last = data.getLastLocation();
 
         String worldName = last.getWorldName();
@@ -160,7 +160,7 @@ public class SkyblockPlayer {
         if (worldName.startsWith("skyblockworld"))
             location.setWorld(islandCenter.getWorld());
 
-        p.teleport(location);
+        player.teleport(location);
     }
 
 

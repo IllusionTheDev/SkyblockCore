@@ -20,11 +20,11 @@ public class SpigotListener implements Listener, PacketProcessor {
     }
 
     @EventHandler
-    public void onPluginMessage(PluginMessageEvent e) {
-        if (!e.getTag().equals("SkyblockChannel"))
+    public void onPluginMessage(PluginMessageEvent event) {
+        if (!event.getTag().equals("SkyblockChannel"))
             return;
 
-        main.getPacketManager().read(e.getData());
+        main.getPacketManager().read(event.getData());
     }
 
 
@@ -34,16 +34,16 @@ public class SpigotListener implements Listener, PacketProcessor {
             return;
 
         ProxyToServerPacket proxyToServerPacket = (ProxyToServerPacket) packet;
-
         String targetServer = proxyToServerPacket.getTargetServer();
+        byte[] bytes = packet.getAllBytes();
 
         if (targetServer == null) {
             for (ServerInfo serverInfo : ProxyServer.getInstance().getServers().values())
-                serverInfo.sendData("SkyblockChannel", packet.getAllBytes());
+                serverInfo.sendData("SkyblockChannel", bytes);
         }
         ProxyServer
                 .getInstance()
                 .getServerInfo(proxyToServerPacket.getTargetServer())
-                .sendData("SkyblockChannel", packet.getAllBytes());
+                .sendData("SkyblockChannel", bytes);
     }
 }

@@ -23,7 +23,7 @@ public class MessagesFile extends YMLBase {
     }
 
     public void sendMessage(CommandSender player, String name) {
-        sendMessage(player, name, (s) -> s);
+        sendMessage(player, name, (message) -> message);
     }
 
     public void sendMessage(CommandSender player, String name, Function<String, String> action) {

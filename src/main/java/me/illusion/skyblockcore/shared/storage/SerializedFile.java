@@ -47,20 +47,15 @@ public class SerializedFile implements Serializable {
 
     public CompletableFuture<File> getFile() {
         return CompletableFuture.supplyAsync(() -> {
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
             try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+
                 Files.write(file.toPath(), contents);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             return file;
         });
     }

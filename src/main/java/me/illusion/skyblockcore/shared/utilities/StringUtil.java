@@ -27,12 +27,12 @@ public final class StringUtil {
         char[] chars = str.toCharArray(); // String characters
         int size = chars.length; // Array length, used to iterate
 
-        for (int i = 0; i < size; i++) { // Loop through all characters
-            char c = chars[i]; // Obtain the character
+        for (int position = 0; position < size; position++) { // Loop through all characters
+            char letter = chars[position]; // Obtain the character
 
-            if (c == delimiter) { // Compare character to delimiter
-                array[index++] = str.substring(start + 1, i); // Adds the substring between <START> + 1 (<START> is the previous delimiter) and the current position
-                start = i; // Resets the <START> position to the current delimiter
+            if (letter == delimiter) { // Compare character to delimiter
+                array[index++] = str.substring(start + 1, position); // Adds the substring between <START> + 1 (<START> is the previous delimiter) and the current position
+                start = position; // Resets the <START> position to the current delimiter
             }
         }
 
@@ -45,11 +45,11 @@ public final class StringUtil {
         char[] chars = str.toCharArray();
         int size = chars.length;
 
-        for (int i = 0; i < size; i++) {
-            char c = chars[i];
+        for (int index = 0; index < size; index++) {
+            char letter = chars[index];
 
-            if (c == key)
-                return str.substring(0, i) + replacement + str.substring(i + 1);
+            if (letter == key)
+                return str.substring(0, index) + replacement + str.substring(index + 1);
         }
 
         return str;

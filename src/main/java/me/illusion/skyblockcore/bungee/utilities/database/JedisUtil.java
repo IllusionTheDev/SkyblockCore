@@ -28,7 +28,7 @@ public class JedisUtil {
     }
 
     public Jedis getJedis() {
-        Jedis j = jedisPool.getResource();
+        Jedis jedis = jedisPool.getResource();
 
         if (!password.isEmpty())
             j.auth(password);

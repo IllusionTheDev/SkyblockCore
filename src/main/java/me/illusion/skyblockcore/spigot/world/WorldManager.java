@@ -26,14 +26,14 @@ public class WorldManager implements Listener {
     private final Map<String, UUID> loadedIslands = new HashMap<>();
 
     public WorldManager(SkyblockPlugin main) {
-        for (int i = 1; i <= main.getIslandConfig().getWorldCount(); i++) {
-            loadedIslands.put("skyblockworld" + i, null);
+        for (int index = 1; index <= main.getIslandConfig().getWorldCount(); index++) {
+            loadedIslands.put("skyblockworld" + index, null);
 
-            if (new File(Bukkit.getWorldContainer() + File.separator + "skyblockworld" + i).exists())
+            if (new File(Bukkit.getWorldContainer() + File.separator + "skyblockworld" + index).exists())
                 continue;
 
-            main.setupWorld("skyblockworld" + i);
-            Bukkit.unloadWorld("skyblockworld" + i, true);
+            main.setupWorld("skyblockworld" + index);
+            Bukkit.unloadWorld("skyblockworld" + index, true);
         }
 
         Bukkit.getPluginManager().registerEvents(this, main);

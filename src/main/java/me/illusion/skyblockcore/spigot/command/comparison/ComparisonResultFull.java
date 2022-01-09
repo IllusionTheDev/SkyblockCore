@@ -50,12 +50,12 @@ public class ComparisonResultFull {
 
         if (inputs.length > args.length) return false;
         //inputs has to be smaller than the command for autocomplete to work
-        for (int i = 1; i < inputs.length; i++) {
-            if (args[i].equals("*")) {
-                wildCards.add(i);
+        for (int index = 1; index < inputs.length; index++) {
+            if (args[index].equals("*")) {
+                wildCards.add(index);
                 continue;
             }
-            if (!args[i].equals(inputs[i])) {
+            if (!args[index].equals(inputs[index])) {
                 return false;
             }
         }
