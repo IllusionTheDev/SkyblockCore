@@ -2,18 +2,13 @@ package me.illusion.skyblockcore.spigot.command.comparison;
 
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class ComparisonResultFull {
     private final Map<String, SkyblockCommand> commands;
-    private final LinkedList<Integer> wildCards;
 
     public ComparisonResultFull(Map<String, SkyblockCommand> commands) {
         this.commands = commands;
-        this.wildCards = new LinkedList<>();
     }
 
     public SkyblockCommand match(String input) {
@@ -52,7 +47,6 @@ public class ComparisonResultFull {
         //inputs has to be smaller than the command for autocomplete to work
         for (int index = 1; index < inputs.length; index++) {
             if (args[index].equals("*")) {
-                wildCards.add(index);
                 continue;
             }
             if (!args[index].equals(inputs[index])) {
@@ -91,8 +85,5 @@ public class ComparisonResultFull {
 
     }
 
-    public List<Integer> getWildCards() {
-        return Collections.unmodifiableList(wildCards);
-    }
 
 }

@@ -67,6 +67,9 @@ public class OldCommandManager implements CommandManager {
     public void register(SkyblockCommand command) {
         System.out.println("Registered command " + command.getClass().getSimpleName());
 
+        if (command.getIdentifier().startsWith("*"))
+            throw new IllegalArgumentException("Command identifier cannot start with *");
+
         commands.put(command.getIdentifier(), command);
 
         String base = getBaseCommand(command.getIdentifier());

@@ -2,6 +2,9 @@ package me.illusion.skyblockcore.spigot.command;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface SkyblockCommand {
 
     /**
@@ -51,4 +54,19 @@ public interface SkyblockCommand {
      * @param args   - The arguments external to the identifier
      */
     void execute(CommandSender sender, String... args);
+
+    default List<Integer> getWildcards() {
+        String identifier = getIdentifier();
+        List<Integer> wildcards = new ArrayList<>();
+
+        String[] split = identifier.split("\\.");
+
+        for (int index = 0; index < split.length; index++) {
+            if (split[index].equals("*")) {
+                wildcards.add(index);
+            }
+        }
+
+        return wildcards;
+    }
 }

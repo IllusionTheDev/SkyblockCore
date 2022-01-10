@@ -6,12 +6,9 @@ import java.util.*;
 
 public class ComparisonResult {
     private final Map<String, SkyblockCommand> commands;
-    private final LinkedList<Integer> wildCards;
-    private SkyblockCommand storedCommand;
 
     public ComparisonResult(Map<String, SkyblockCommand> commands) {
         this.commands = commands;
-        this.wildCards = new LinkedList<>();
     }
 
     public List<String> match(String input) {
@@ -47,7 +44,6 @@ public class ComparisonResult {
         //inputs has to be smaller than the command for autocomplete to work
         for (int index = 1; index < inputs.length; index++) {
             if (args[index].equals("*")) {
-                wildCards.add(index);
                 continue;
             }
             if (!args[index].startsWith(inputs[index]))
@@ -82,10 +78,6 @@ public class ComparisonResult {
         return id.equals(inputs[0]);
     }
 
-
-    public List<Integer> getWildCards() {
-        return Collections.unmodifiableList(wildCards);
-    }
 
     private boolean findAliasingCommand(String input, SkyblockCommand command) {
         String id = command.getIdentifier().split("\\.")[0];

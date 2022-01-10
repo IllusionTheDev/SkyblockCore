@@ -1,7 +1,6 @@
 package me.illusion.skyblockcore.spigot.command;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
-import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResultFull;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -61,17 +60,15 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        ComparisonResultFull fullComparison = main.getCommandManager().fullComparison(identifier);
-        SkyblockCommand command1 = main.getCommandManager().get(identifier);
 
-        List<Integer> wildcards = fullComparison.getWildCards();
+        List<Integer> wildcards = command.getWildcards();
 
         String[] commandArgs = new String[wildcards.size()];
 
         for (int index = 0; index < wildcards.size(); index++)
             commandArgs[index] = args[wildcards.get(index) - 1];
 
-        command1.execute(sender, commandArgs);
+        command.execute(sender, commandArgs);
         return true;
     }
 
