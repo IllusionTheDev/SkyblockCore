@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.spigot.command.impl;
 
-import me.illusion.skyblockcore.shared.utilities.StringUtil;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.BaseCommand;
 import me.illusion.skyblockcore.spigot.command.CommandManager;
@@ -112,18 +111,22 @@ public class OldCommandManager implements CommandManager {
         List<String> results = result.match(identifier);
 
         // Extra processing
-        int length = StringUtil.split(identifier, '.').length;
         List<String> toReturn = new ArrayList<>();
 
         for (String str : results) {
-            String[] split = StringUtil.split(str, '.');
+            int index = str.lastIndexOf('.');
 
-            String[] newArray = new String[split.length - length];
+            if (index == -1 || str.equalsIgnoreCase(identifier)) {
+                toReturn.add("");
+                continue;
+            }
 
-            if (split.length - length >= 0)
-                System.arraycopy(split, length, newArray, 0, split.length - length);
+            String sub = str.substring(index + 1);
 
-            toReturn.add(String.join(".", newArray));
+            // Remove dots
+            sub = sub.replace(".", "");
+
+            toReturn.add(sub);
         }
 
         return toReturn;

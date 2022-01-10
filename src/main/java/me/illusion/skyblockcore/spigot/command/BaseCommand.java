@@ -27,12 +27,20 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
 
         String identifier = String.join(".", name, String.join(".", args));
 
+        // Remove trailing dots
+        while (identifier.endsWith("."))
+            identifier = identifier.substring(0, identifier.length() - 1);
+
         return main.getCommandManager().tabComplete(identifier);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String name, String[] args) {
         String identifier = String.join(".", name, String.join(".", args));
+
+        // Remove trailing dots
+        while (identifier.endsWith("."))
+            identifier = identifier.substring(0, identifier.length() - 1);
 
         SkyblockCommand command = main.getCommandManager().get(identifier);
 
