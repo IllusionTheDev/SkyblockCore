@@ -31,9 +31,9 @@ public class JedisUtil {
         Jedis jedis = jedisPool.getResource();
 
         if (!password.isEmpty())
-            j.auth(password);
+            jedis.auth(password);
 
-        return j;
+        return jedis;
     }
 
     private boolean checkJedis(SkyblockBungeePlugin main) {

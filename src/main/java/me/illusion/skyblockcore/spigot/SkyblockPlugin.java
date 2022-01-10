@@ -96,6 +96,9 @@ public class SkyblockPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         emptyWorldGenerator = new EmptyWorldGenerator(this);
+        commandManager = new OldCommandManager(this);
+
+        registerDefaultCommands();
 
         System.out.println("Registering configuration files");
         messages = new MessagesFile(this);
@@ -122,7 +125,6 @@ public class SkyblockPlugin extends JavaPlugin {
     private void load() {
 
         islandManager = new IslandManager(this);
-        commandManager = new OldCommandManager(this);
         playerManager = new PlayerManager();
 
         System.out.println("Setting up pasting handler");
@@ -136,10 +138,7 @@ public class SkyblockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
-
-        System.out.println("Registering default commands.");
-        registerDefaultCommands();
-
+        
         System.out.println("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
