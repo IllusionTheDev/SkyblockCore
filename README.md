@@ -18,7 +18,7 @@ Best paired with my [DataSync Plugin](https://github.com/IllusionTheDev/DataSync
 ------------
 
 ### Known issues:
-- Default .mca file is 1.17.1+
+- Default .mca file is 1.17.1+ (Possible fix: Start the server on 1.17.1, replace start-schematic/r.0.0.mca file with a new island schematic, delete all worlds and change versions)
 - FAWE doesn't work (Has to do with versioning)
 
 I am aware of both issues, and aim to release fixes soon, please do not annoy me about them.
@@ -82,7 +82,7 @@ Servers communicate using the Plugin Messaging API, when doing any proxy <-> ins
 ### Some thoughts:
 SkyblockCore is incredibly difficult to develop, unlike a regular core, there is a lot of thought put into every line of code, the plugin is supposed to expect players switching across servers, proxies, players leaving mid-loading, different proxies for the same team members, all of it while handling all of the commands on the spigot side, so players on a survival server can't run skyblock commands.
 
-It might not seem like it, but this project is absolutely massive on its current state, and I'd say it's about 15% done.
+It might not seem like it, but this project is absolutely massive on its current state, and I'd say it's about 20% done.
 
 If you'd like to help with the project, even as someone without any code experience, here are some things that would greatly help me out:
 
