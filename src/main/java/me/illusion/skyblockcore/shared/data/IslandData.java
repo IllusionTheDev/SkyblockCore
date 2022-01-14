@@ -6,7 +6,6 @@ import lombok.Setter;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
 import me.illusion.skyblockcore.spigot.island.Island;
-import me.illusion.skyblockcore.spigot.island.generator.OreGenerator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,21 +21,11 @@ public class IslandData implements Serializable {
     private SerializedFile[] islandSchematic;
     private transient List<UUID> users = new ArrayList<>();
     private final UUID owner;
-    private final List<OreGenerator> oreGenerators;
 
     @Setter
     private transient Island island;
     private String serialized;
 
-
-    /**
-     * Registers an OreGenerator
-     *
-     * @param generator - The ore generator
-     */
-    public void addGenerator(OreGenerator generator) {
-        oreGenerators.add(generator);
-    }
 
     /**
      * Adds a user to the island

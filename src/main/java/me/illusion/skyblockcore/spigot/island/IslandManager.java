@@ -10,7 +10,6 @@ import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -148,10 +147,6 @@ public class IslandManager {
                 long start = System.currentTimeMillis();
                 UUID owner = data.getOwner();
 
-                Player ownerPlayer = Bukkit.getPlayer(owner);
-
-                String startingWorld = ownerPlayer == null ? "N/A" : ownerPlayer.getWorld().getName();
-
                 // If any island member is online (island pasted), then we don't need to paste
                 boolean paste = shouldRemoveIsland(data.getUsers()); // variable to store pasting
 
@@ -200,17 +195,13 @@ public class IslandManager {
                 }
 
                 long end = System.currentTimeMillis();
-                String endWorld = ownerPlayer == null ? "N/A" : ownerPlayer.getWorld().getName();
 
                 Island result = island[0];
 
                 System.out.println("After action report");
                 System.out.println("----------------------------------------");
                 System.out.println("Time taken: " + (end - start) + "ms");
-                System.out.println("Player starting world: " + startingWorld);
-                System.out.println("Player ending world: " + endWorld);
                 System.out.println("Island world: " + (result == null ? "N/A" : result.getWorld()));
-                System.out.println("Island loaded: " + (result != null));
                 System.out.println("Island world loaded: " + (result == null ? "N/A" : Bukkit.getWorld(result.getWorld()) != null));
                 System.out.println("----------------------------------------");
 
