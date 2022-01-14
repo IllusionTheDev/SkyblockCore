@@ -4,6 +4,7 @@ import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
+import me.illusion.skyblockcore.shared.utilities.Reference;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
@@ -143,94 +144,82 @@ public class IslandManager {
 
     public CompletableFuture<Island> loadIsland(IslandData data) {
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                long start = System.currentTimeMillis();
-                UUID owner = data.getOwner();
+            long start = System.currentTimeMillis();
+            UUID islandId = data.getId();
 
-                // If any island member is online (island pasted), then we don't need to paste
-                boolean paste = shouldRemoveIsland(data.getUsers()); // variable to store pasting
+            // If any island member is online (island pasted), then we don't need to paste
+            boolean paste = shouldRemoveIsland(data.getUsers()); // variable to store pasting
 
-                File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + data.getId()); // Create cache folder
+            if (!paste) {
+                return main.getIslandManager().getIsland(islandId);
+            }
 
-                final Island[] island = {null};
+            File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
 
-                // If we need to paste, we make a latch with 2 uses, one for the island loading, and the second for the world loading
-                CountDownLatch latch = new CountDownLatch(paste ? 1 : 0);
+            final Reference<Island> islandReference = new Reference<>();
 
-                // Pastes island if required
-                if (paste) {
-                    SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
+            // If we need to paste, we make a latch with 1 use, used for the island loading
+            CountDownLatch latch = new CountDownLatch(1);
 
-                    if (islandFiles == null) {
-                        // Assigns default if not found
-                        System.out.println("No schematic found for island " + data.getId());
-                        islandFiles = SerializedFile.loadArray(main.getStartSchematic());
-                    }
+            // Pastes island if required
+            SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
 
-                    CompletableFuture<SerializedFile[]> files = createFiles(folder, islandFiles); // Creates cache files
+            if (islandFiles == null) {
+                // Assigns default if not found
+                System.out.println("No schematic found for island " + islandId);
+                islandFiles = SerializedFile.loadArray(main.getStartSchematic());
+            }
 
-                    files.thenAccept(schematicFiles -> {
-                        try {
-                            data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
+            createFiles(folder, islandFiles) // Creates cache files
+                    .thenAccept(schematicFiles -> {
+                        data.setIslandSchematic(schematicFiles); // Updates schematic with cache files
 
-                            String world = main.getWorldManager().assignWorld(data.getId()); // Assigns world
+                        String world = main.getWorldManager().assignWorld(islandId); // Assigns world
 
-                            island[0] = loadIsland(data, world);// Creates island
-                            latch.countDown();
-                        } catch (Exception e) {
-                            ExceptionLogger.log(e);
-                        }
-
+                        islandReference.set(loadIsland(data, world)); // Creates island
+                        latch.countDown();
+                    }).exceptionally(throwable -> {
+                        ExceptionLogger.log(throwable);
+                        return null;
                     });
 
-                } else // If it doesn't need pasting
-                    island[0] = getIslandFromId(data.getId()).orElse(null); // Obtains island from ID (loaded by a teammate)
 
-                data.setIsland(island[0]); // Updates island in the island data
+            wait(latch);
 
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    ExceptionLogger.log(e);
-                }
+            long end = System.currentTimeMillis();
 
-                long end = System.currentTimeMillis();
+            Island result = islandReference.get();
+            data.setIsland(result); // Updates island in the island data
 
-                Island result = island[0];
-
-                System.out.println("After action report");
-                System.out.println("----------------------------------------");
-                System.out.println("Time taken: " + (end - start) + "ms");
-                System.out.println("Island world: " + (result == null ? "N/A" : result.getWorld()));
-                System.out.println("Island world loaded: " + (result == null ? "N/A" : Bukkit.getWorld(result.getWorld()) != null));
-                System.out.println("----------------------------------------");
-
-                // --- ENSURE WORLD IS PROPERLY LOADED ---
-                if (Bukkit.getWorld(result.getWorld()) == null) {
-                    System.out.println("Loading world");
-                    CountDownLatch latch2 = new CountDownLatch(1);
-                    WorldUtils.load(main, result.getWorld()).thenRun(latch2::countDown);
-
-                    try {
-                        latch2.await();
-                    } catch (InterruptedException e) {
-                        ExceptionLogger.log(e);
-                    }
-                }
-
-                result.getCenter().setWorld(Bukkit.getWorld(result.getWorld()));
-
-                FileUtils.delete(folder); // Deletes folder
-                // ----------------------------------------
-
-                return result;
-            } catch (Exception e) {
-                ExceptionLogger.log(e);
+            if (result == null) {
+                System.out.println("Island " + islandId + " failed to load");
                 return null;
             }
+
+            World islandWorld = Bukkit.getWorld(result.getWorld());
+
+            System.out.println("After action report");
+            System.out.println("----------------------------------------");
+            System.out.println("Time taken: " + (end - start) + "ms");
+            System.out.println("Island world: " + result.getWorld());
+            System.out.println("Island world loaded: " + (islandWorld != null));
+            System.out.println("----------------------------------------");
+
+            // --- ENSURE WORLD IS PROPERLY LOADED ---
+            if (islandWorld == null) {
+                System.out.println("Loading world");
+                islandWorld = WorldUtils.load(main, result.getWorld()).join();
+            }
+
+            result.getCenter().setWorld(islandWorld);
+
+            FileUtils.delete(folder); // Deletes folder
+            // ----------------------------------------
+
+            return result;
+
         }).exceptionally(throwable -> {
             ExceptionLogger.log(throwable);
-
             return null;
         });
 
@@ -400,6 +389,14 @@ public class IslandManager {
         System.out.println("Attempting to delete island files");
 
         FileUtils.delete(folder); // Delete the folder
+    }
+
+    private void wait(CountDownLatch latch) {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.utilities;
 
+import me.illusion.skyblockcore.shared.exceptions.UnsafeSyncOperationException;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
@@ -143,5 +144,10 @@ public final class WorldUtils {
 
         main.getWorldManager().whenNextSave(worldAction, worldName);
         world.save();
+    }
+
+    public static void assertAsync() {
+        if (Bukkit.isPrimaryThread())
+            throw new UnsafeSyncOperationException();
     }
 }
