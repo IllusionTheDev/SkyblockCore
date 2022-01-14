@@ -14,7 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -72,7 +71,7 @@ public class SkyblockPlayer {
                 System.out.println("No PlayerData has been found, creating new data");
 
                 data = new PlayerData();
-                IslandData islandData = new IslandData(UUID.randomUUID(), uuid, new ArrayList<>());
+                IslandData islandData = new IslandData(UUID.randomUUID(), uuid);
                 islandData.addUser(uuid);
                 sync(() -> main.getIslandManager().loadIsland(islandData)
                         .thenAccept(island -> {

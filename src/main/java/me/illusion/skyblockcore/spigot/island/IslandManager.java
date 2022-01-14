@@ -123,7 +123,7 @@ public class IslandManager {
                 .thenApply(data -> {
                     System.out.println("Pasting island " + islandId);
                     if (data == null)
-                        data = new IslandData(islandId, ownerId, new ArrayList<>());
+                        data = new IslandData(islandId, ownerId);
 
                     IslandData islandData = (IslandData) data;
 
