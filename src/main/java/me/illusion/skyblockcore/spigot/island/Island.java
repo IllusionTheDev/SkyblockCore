@@ -56,8 +56,8 @@ public class Island {
                     WorldUtils.deleteRegionFolder(main, world);
                     main.getIslandManager().unregister(this);
 
-                    new ScheduleBuilder(main) // Intentional 10 seconds delay so we don't corrupt worlds by loading and unloading very fast
-                            .in(10).seconds()
+                    new ScheduleBuilder(main) // Intentional delay so we don't corrupt worlds by loading and unloading very fast
+                            .in(main.getSettings().getReleaseDelay()).ticks()
                             .run(() -> main.getWorldManager().unregister(this.world))
                             .sync()
                             .start();

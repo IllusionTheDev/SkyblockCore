@@ -11,6 +11,7 @@ import me.illusion.skyblockcore.spigot.command.island.IslandCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
+import me.illusion.skyblockcore.spigot.file.SettingsFile;
 import me.illusion.skyblockcore.spigot.hook.VaultHook;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.island.world.EmptyWorldGenerator;
@@ -25,6 +26,7 @@ import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -87,6 +89,12 @@ public class SkyblockPlugin extends JavaPlugin {
     private MessagesFile messages;
 
     /*
+        Settings file, contains essential info that are crucial for the plugin,
+        such as world anti-corruption delays and database information
+     */
+    private SettingsFile settings;
+
+    /*
         Start schematics, default island on selected format
      */
     private File[] startSchematic;
@@ -103,6 +111,7 @@ public class SkyblockPlugin extends JavaPlugin {
         System.out.println("Registering configuration files");
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
+        settings = new SettingsFile(this);
 
         System.out.println("Creating worlds");
         worldManager = new WorldManager(this);
@@ -166,9 +175,8 @@ public class SkyblockPlugin extends JavaPlugin {
      * Opens the SQL connection async
      */
     private CompletableFuture<Boolean> setupStorage() {
-        saveDefaultConfig();
-
-        StorageType type = StorageType.valueOf(getConfig().getString("database.type").toUpperCase(Locale.ROOT));
+        FileConfiguration config = settings.getConfiguration();
+        StorageType type = StorageType.valueOf(config.getString("database.type").toUpperCase(Locale.ROOT));
 
         Class<? extends StorageHandler> clazz = type.getHandlerClass();
         try {
@@ -177,11 +185,11 @@ public class SkyblockPlugin extends JavaPlugin {
             if (storageHandler.isFileBased())
                 return storageHandler.setup(getDataFolder());
 
-            String host = getConfig().getString("database.host", "");
-            String database = getConfig().getString("database.database", "");
-            String username = getConfig().getString("database.username", "");
-            String password = getConfig().getString("database.password", "");
-            int port = getConfig().getInt("database.port");
+            String host = config.getString("database.host", "");
+            String database = config.getString("database.database", "");
+            String username = config.getString("database.username", "");
+            String password = config.getString("database.password", "");
+            int port = config.getInt("database.port");
 
             System.out.println("Created handler of type " + clazz.getSimpleName());
             return storageHandler.setup(host, port, database, username, password);

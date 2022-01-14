@@ -19,7 +19,7 @@ delay: # All delays in ticks
 
   # If you're having issues where data is not being properly saved, increase this delay.
   # If the server is not releasing islands quick enough, lower this delay.
-  after-save: 40
+  after-save: 4
 
   # Delay between unloading the island world, and allowing the world to be re-used
   # Some servers experience corrupted data when reloading worlds too fast, so increase
