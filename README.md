@@ -31,6 +31,12 @@ I am aware of both issues, and aim to release fixes soon, please do not annoy me
 - Restart
 - Configure to your liking
 
+#### If you're running SlimeWorldManager:
+- Ensure that SlimeWorldManager saves to `file`, as SkyblockCore handles world serialization automatically
+- Set the pasting type to SLIME, otherwise things will break
+- Restart
+- Test thoroughly
+
 #### If on a proxy:
 - Put the plugin on the proxy's plugins folder, as well as set-up each instance with the steps above.
 - Set the SQL / MongoDB database info into the bungee-config.yml file (note that instances should also be running on the same database)
