@@ -1,7 +1,18 @@
+buildscript {
+    repositories {
+        maven { url = "https://plugins.gradle.org/m2/"}
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+    }
+}
+
 group 'ImIllusion'
 version '1.0'
 
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
 
@@ -19,7 +30,7 @@ repositories {
     maven { url = 'https://mvn.intellectualsites.com/content/repositories/releases/' }
     maven { url = "https://repo.glaremasters.me/repository/concuncan/" }
 
-    maven { url = "https://libraries.minecraft.net"}
+    maven { url = "https://libraries.minecraft.net" }
 
 }
 
@@ -38,10 +49,16 @@ dependencies {
     implementation group: 'redis.clients', name: 'jedis', version: '3.7.0'
     implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.7'
 
+    implementation 'com.grinderwolf:slimeworldmanager-plugin:2.2.1'
+
+
     implementation 'com.mojang:brigadier:1.0.18'
 
 
-
 }
+shadowJar {
+    dependencies {
 
+    }
+}
 

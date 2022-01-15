@@ -28,7 +28,7 @@ public class SerializedFile implements Serializable {
         return new SerializedFile(this.file, contents);
     }
 
-    public static SerializedFile[] loadArray(File[] array) {
+    public static SerializedFile[] loadArray(File... array) {
         SerializedFile[] newArray = new SerializedFile[array.length];
 
         for (int index = 0; index < array.length; index++)

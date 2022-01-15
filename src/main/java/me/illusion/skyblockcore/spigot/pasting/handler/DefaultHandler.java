@@ -115,6 +115,7 @@ public class DefaultHandler implements PastingHandler {
 
     private void wait(CountDownLatch latch) {
         try {
+            WorldUtils.assertAsync();
             latch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();

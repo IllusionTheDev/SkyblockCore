@@ -256,7 +256,7 @@ public class IslandManager {
 
             main.getPastingHandler().paste(data.getIslandSchematic(), center).thenRun(latch::countDown);
 
-
+            WorldUtils.assertAsync();
             latch.await();
 
             return new Island(main, one, two, center, data, world.getName());
@@ -282,6 +282,7 @@ public class IslandManager {
                             WorldUtils.load(main, worldName))
                     .thenRun(latch::countDown);
 
+            WorldUtils.assertAsync();
             latch.await();
 
             World world = Bukkit.getWorld(worldName);
@@ -361,6 +362,7 @@ public class IslandManager {
                 }).join();
 
                 try {
+                    WorldUtils.assertAsync();
                     latch.await(); // Waits for the files to be written
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -393,6 +395,7 @@ public class IslandManager {
 
     private void wait(CountDownLatch latch) {
         try {
+            WorldUtils.assertAsync();
             latch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
