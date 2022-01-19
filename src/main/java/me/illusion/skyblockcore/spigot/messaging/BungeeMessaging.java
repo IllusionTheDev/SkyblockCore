@@ -49,7 +49,6 @@ public class BungeeMessaging implements PluginMessageListener, PacketProcessor {
             return;
 
         main.getPacketManager().read(bytes);
-
     }
 
 

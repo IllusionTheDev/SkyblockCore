@@ -2,7 +2,6 @@ package me.illusion.skyblockcore.spigot.command.impl;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.BaseCommand;
-import me.illusion.skyblockcore.spigot.command.CommandManager;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResult;
 import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResultFull;
@@ -17,9 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-import static me.illusion.skyblockcore.shared.utilities.CollectionUtils.arrayOf;
-
-public class OldCommandManager implements CommandManager {
+public class CommandManager {
 
     private static CommandMap commandMap;
     private static Constructor<PluginCommand> pluginCommandConstructor;
@@ -49,19 +46,8 @@ public class OldCommandManager implements CommandManager {
     private final Map<String, SkyblockCommand> commands = new HashMap<>();
     private final SkyblockPlugin main;
 
-    public OldCommandManager(SkyblockPlugin main) {
+    public CommandManager(SkyblockPlugin main) {
         this.main = main;
-    }
-
-    public void runTests() {
-        System.out.println("Running tests: ");
-
-        System.out.println("Testing full comparison - island -> " + get("island"));
-        System.out.println("Testing full comparison - island.go -> " + get("island.go"));
-
-        System.out.println("Testing tab complete - is -> " + Arrays.toString(arrayOf(tabComplete("is"))));
-        System.out.println("Testing tab complete - isl -> " + Arrays.toString(arrayOf(tabComplete("isl"))));
-        System.out.println("Testing tab complete - island -> " + Arrays.toString(arrayOf(tabComplete("island"))));
     }
 
     public void register(SkyblockCommand command) {

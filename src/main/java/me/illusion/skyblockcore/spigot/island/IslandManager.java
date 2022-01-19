@@ -254,10 +254,8 @@ public class IslandManager {
             Location one = center.clone().add(-offset, -128, -offset);
             Location two = center.clone().add(offset, 128, offset);
 
-            main.getPastingHandler().paste(data.getIslandSchematic(), center).thenRun(latch::countDown);
-
             WorldUtils.assertAsync();
-            latch.await();
+            main.getPastingHandler().paste(data.getIslandSchematic(), center).join();
 
             return new Island(main, one, two, center, data, world.getName());
         } catch (Exception e) {
@@ -354,19 +352,13 @@ public class IslandManager {
                             });
                 }
 
+                WorldUtils.assertAsync();
                 CompletableFuture.allOf(futures).whenComplete((v, throwable) -> { // Waits for all the files to be written
                     if (throwable != null) // If there was an error
                         throwable.printStackTrace(); // Prints the error
 
-                    latch.countDown(); // Allows the method to finish and return
                 }).join();
 
-                try {
-                    WorldUtils.assertAsync();
-                    latch.await(); // Waits for the files to be written
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
             } catch (Exception exception) {
                 exception.printStackTrace();

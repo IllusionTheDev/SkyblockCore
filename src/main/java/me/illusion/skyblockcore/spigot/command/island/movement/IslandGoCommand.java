@@ -10,21 +10,17 @@ import org.bukkit.entity.Player;
 public class IslandGoCommand implements SkyblockCommand {
 
     private final SkyblockPlugin main;
+    private final String identifier;
 
-    public IslandGoCommand(SkyblockPlugin main) {
+    public IslandGoCommand(SkyblockPlugin main, String identifier) {
         this.main = main;
+        this.identifier = identifier;
     }
 
     @Override
     public String getIdentifier() {
-        return "island.go";
+        return identifier;
     }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{};
-    }
-
 
     @Override
     public boolean canExecute(CommandSender sender) {
@@ -39,5 +35,6 @@ public class IslandGoCommand implements SkyblockCommand {
         Location center = island.getCenter();
 
         player.teleport(center);
+        main.getMessages().sendMessage(sender, "command.island-teleport");
     }
 }

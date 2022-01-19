@@ -48,14 +48,14 @@ public class IslandInviteCommand implements SkyblockCommand {
                     return null;
                 });
 
-        return;
     }
 
     private CompletableFuture<PacketInviteResponse.Response> sendInvite(Player origin, String targetName) {
         return CompletableFuture.supplyAsync(() -> {
             UUID inviteID = UUID.randomUUID();
 
-            PacketInvitePlayer packet = new PacketInvitePlayer(main.getBungeeMessaging().getServerIdentifier(),
+            PacketInvitePlayer packet = new PacketInvitePlayer(
+                    main.getBungeeMessaging().getServerIdentifier(),
                     new IslandInvite(inviteID, origin.getUniqueId(), targetName));
 
             main.getPacketManager().send(packet);

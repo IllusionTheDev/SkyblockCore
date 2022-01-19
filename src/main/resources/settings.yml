@@ -10,6 +10,21 @@ database:
   port: 3306
 
 
+communication:
+  # Available types: Bungee, Redis
+  type: Bungee
+
+  # Specific to Redis
+
+  # host: localhost
+  # port: 6379
+  # password: password
+
+  # Specific to Bungee
+
+  # PLEASE CHANGE THIS TO SOMETHING UNIQUE, OTHERWISE PEOPLE WILL BE ABLE TO SPY INTO SOME ISLAND DATA
+  channel: skyblock:communication
+
 
 delay: # All delays in ticks
 

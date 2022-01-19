@@ -5,9 +5,8 @@ import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
-import me.illusion.skyblockcore.spigot.command.CommandManager;
-import me.illusion.skyblockcore.spigot.command.impl.OldCommandManager;
-import me.illusion.skyblockcore.spigot.command.island.IslandCommand;
+import me.illusion.skyblockcore.spigot.command.impl.CommandManager;
+import me.illusion.skyblockcore.spigot.command.island.information.IslandHelpCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
@@ -104,7 +103,7 @@ public class SkyblockPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         emptyWorldGenerator = new EmptyWorldGenerator(this);
-        commandManager = new OldCommandManager(this);
+        commandManager = new CommandManager(this);
 
         registerDefaultCommands();
 
@@ -203,10 +202,9 @@ public class SkyblockPlugin extends JavaPlugin {
     }
 
     private void registerDefaultCommands() {
-        commandManager.register(new IslandCommand(this));
-        commandManager.register(new IslandGoCommand(this));
-
-        commandManager.runTests();
+        commandManager.register(new IslandGoCommand(this, "island"));
+        commandManager.register(new IslandGoCommand(this, "island.go"));
+        commandManager.register(new IslandHelpCommand(this));
     }
 
     @Override

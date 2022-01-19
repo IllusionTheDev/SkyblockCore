@@ -21,7 +21,7 @@ public interface SkyblockCommand {
      * @return NULL if no aliases are present
      */
     default String[] getAliases() {
-        return null;
+        return new String[0];
     }
 
     /**

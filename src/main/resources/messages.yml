@@ -1,2 +1,11 @@
 messages:
   prefix: "&e&lSkyblock &7»&f"
+
+  commands:
+    island-help:
+    - '&e&l-- Skyblock Commands --'
+    - '&f/island help &7- &fShows this help menu.'
+    - '&f/island [go] &7- &fTeleports you to your island.'
+    - '&e&l------------------'
+
+    island-teleport: "%prefix% &7Teleported to your island."
