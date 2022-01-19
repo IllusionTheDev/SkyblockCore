@@ -81,6 +81,7 @@ Servers communicate using the Plugin Messaging API, when doing any proxy <-> ins
 #### Plugin Hooks
 - Vault
 - FastAsyncWorldEdit
+- SlimeWorldManager
 
 
 ------------
