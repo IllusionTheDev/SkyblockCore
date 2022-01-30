@@ -69,8 +69,6 @@ public class PlayerFinder {
                     return null;
 
                 return response.getResultServer();
-
-                // expect packet read, return packet value
             }
 
             return player.getServer().getInfo().getName();

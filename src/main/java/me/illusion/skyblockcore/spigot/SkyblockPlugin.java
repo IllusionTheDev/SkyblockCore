@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
@@ -98,12 +99,23 @@ public class SkyblockPlugin extends JavaPlugin {
      */
     private File[] startSchematic;
 
+    /*
+        Dependency downloader, used to automatically download required drivers
+     */
+    private DependencyDownloader dependencyDownloader;
+
     private PacketManager packetManager;
 
     @Override
     public void onEnable() {
         emptyWorldGenerator = new EmptyWorldGenerator(this);
         commandManager = new CommandManager(this);
+
+        dependencyDownloader = new DependencyDownloader(getDataFolder());
+        dependencyDownloader.onDownload(() -> {
+            System.err.println("[SkyblockCore] Dependencies downloaded!");
+            System.err.println("[SkyblockCore] Since you have downloaded dependencies, you will need to restart the server.");
+        });
 
         registerDefaultCommands();
 
@@ -176,6 +188,7 @@ public class SkyblockPlugin extends JavaPlugin {
     private CompletableFuture<Boolean> setupStorage() {
         FileConfiguration config = settings.getConfiguration();
         StorageType type = StorageType.valueOf(config.getString("database.type").toUpperCase(Locale.ROOT));
+        type.checkDependencies(this);
 
         Class<? extends StorageHandler> clazz = type.getHandlerClass();
         try {

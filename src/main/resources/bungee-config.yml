@@ -1,8 +1,12 @@
 database:
+  # Available types: MySQL, MONGODB
+  type: MySQL
+
+  # Specific to MySQL, leave blank with SQLite
   host: localhost
   database: Skyblock
-  username: username
-  password: password
+  username: username  # Leave blank for MongoDB
+  password: password  # Leave blank for MongoDB
   port: 3306
 
 # Server communication (proxy <-> server)

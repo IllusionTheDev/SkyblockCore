@@ -1,7 +1,5 @@
 package me.illusion.skyblockcore.bungee.utilities.database;
 
-import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
-import me.illusion.skyblockcore.shared.updating.Updater;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -14,10 +12,7 @@ public class JedisUtil {
 
     private String password; // NOT SAFE but it's a configurable value so
 
-    public boolean connect(SkyblockBungeePlugin main, String ip, String port, String password) {
-        if (!checkJedis(main))
-            return false;
-
+    public boolean connect(String ip, String port, String password) {
         if (port.isEmpty())
             jedisPool = new JedisPool(ip);
         else
@@ -36,16 +31,6 @@ public class JedisUtil {
         return jedis;
     }
 
-    private boolean checkJedis(SkyblockBungeePlugin main) {
-        try {
-            Class.forName("redis.clients.jedis.Jedis");
-            return true;
-        } catch (ClassNotFoundException e) {
-            File pluginsFolder = main.getDataFolder().getParentFile();
-            new Updater(pluginsFolder, 88516, createJedisFile(pluginsFolder));
-            return false;
-        }
-    }
 
     private File createJedisFile(File folder) {
         File file = new File(folder, "JedisDependency-1.0-all.jar");
