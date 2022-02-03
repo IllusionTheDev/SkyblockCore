@@ -3,7 +3,9 @@ package me.illusion.skyblockcore.spigot.command;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface SkyblockCommand {
 
@@ -45,6 +47,10 @@ public interface SkyblockCommand {
 
     default boolean hasPermission() {
         return getPermission().isEmpty();
+    }
+
+    default Map<Integer, List<String>> tabCompleteWildcards() {
+        return new HashMap<>(0);
     }
 
     /**

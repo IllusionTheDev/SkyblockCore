@@ -99,6 +99,7 @@ public class CommandManager {
         ComparisonResult result = new ComparisonResult(commands);
         List<String> results = result.match(identifier);
 
+        System.out.println(identifier);
         // Extra processing
         List<String> toReturn = new ArrayList<>();
 
@@ -117,6 +118,9 @@ public class CommandManager {
 
             toReturn.add(sub);
         }
+
+        // island.invite.* -> [SkyblockCommand#tabComplete().get(1)]
+        // island.invite.*.* -> [SkyblockCommand#tabComplete().get(2)]
 
         return toReturn;
     }

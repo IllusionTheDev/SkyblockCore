@@ -10,7 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class IslandInviteCommand implements SkyblockCommand {
@@ -48,6 +48,21 @@ public class IslandInviteCommand implements SkyblockCommand {
                     return null;
                 });
 
+    }
+
+    @Override
+    public Map<Integer, List<String>> tabCompleteWildcards() {
+        List<String> playerNames = new ArrayList<>();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            playerNames.add(player.getName());
+        }
+
+        Map<Integer, List<String>> results = new HashMap<>();
+
+        results.put(1, playerNames);
+
+        return results;
     }
 
     private CompletableFuture<PacketInviteResponse.Response> sendInvite(Player origin, String targetName) {
