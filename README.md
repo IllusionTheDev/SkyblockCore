@@ -56,7 +56,8 @@ Each player currently occupies ~32.5KB max, with each island occupying ~4MB max 
 
 All storage operations are done async (Island saving, pasting and regenerating) when possible.
 
-Player inventories are stored via SQL aswell, meaning you can have 20 servers hosting this same plugin connected to the same database and it will seem as one.
+~~Player inventories are stored via SQL aswell, meaning you can have 20 servers hosting this same plugin connected to the same database and it will seem as one.
+~~ Please use my [DataSync Plugin](https://github.com/IllusionTheDev/DataSync) mentioned above. 
 
 Now for RAM / DISK usage on the instance itself, I'd say around 2GB DISK and 2GB RAM per instance
 
