@@ -2,7 +2,6 @@ package me.illusion.skyblockcore.shared.sql;
 
 import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
-import me.illusion.skyblockcore.shared.utilities.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,10 +34,11 @@ public final class SQLSerializer {
         String operation = !connection.getMetaData().getDatabaseProductName().contains("SQLite") ? SQL_SERIALIZE_OBJECT : SQLITE_SERIALIZE_OBJECT;
 
         try (PreparedStatement statement = connection
-                .prepareStatement(StringUtil.replaceFirst(operation, '?', table))) {
+                .prepareStatement(operation)) {
 
-            statement.setString(1, uuid.toString());
-            statement.setBytes(2, getBytes(objectToSerialize));
+            statement.setString(1, table);
+            statement.setString(2, uuid.toString());
+            statement.setBytes(3, getBytes(objectToSerialize));
             statement.executeUpdate();
 
         } catch (Exception e) {
@@ -61,8 +61,9 @@ public final class SQLSerializer {
             Object deSerializedObject = null;
 
             try {
-                statement = connection.prepareStatement(StringUtil.replaceFirst(SQL_DESERIALIZE_OBJECT, '?', table));
-                statement.setString(1, uuid.toString());
+                statement = connection.prepareStatement(SQL_DESERIALIZE_OBJECT);
+                statement.setString(1, table);
+                statement.setString(2, uuid.toString());
 
                 result = statement.executeQuery();
 
