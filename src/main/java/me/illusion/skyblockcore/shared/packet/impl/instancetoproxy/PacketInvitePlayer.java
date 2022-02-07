@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.shared.packet.impl.instance;
+package me.illusion.skyblockcore.shared.packet.impl.instancetoproxy;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandInvite;

@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.illusion.skyblockcore.shared.packet.Packet;
 import me.illusion.skyblockcore.shared.packet.PacketHandler;
 import me.illusion.skyblockcore.shared.packet.PacketProcessor;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.instance.response.PacketDetermineServerInfo;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketDetermineServerInfo;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

@@ -1,8 +1,8 @@
 package me.illusion.skyblockcore.shared.packet;
 
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.request.PacketRequestMessageSend;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.response.PacketRespondServer;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.response.PacketRespondServer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

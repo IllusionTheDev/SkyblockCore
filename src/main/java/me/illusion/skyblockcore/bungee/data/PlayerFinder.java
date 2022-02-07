@@ -1,16 +1,17 @@
 package me.illusion.skyblockcore.bungee.data;
 
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
-import me.illusion.skyblockcore.shared.packet.PacketHandler;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.request.PacketRequestServer;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.response.PacketRespondServer;
+import me.illusion.skyblockcore.shared.data.PlayerData;
+import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class PlayerFinder {
 
@@ -22,56 +23,32 @@ public class PlayerFinder {
         this.main = main;
 
 
-        main.getPacketManager().subscribe(PacketRequestServer.class, new PacketHandler<PacketRequestServer>() {
-            @Override
-            public void onReceive(PacketRequestServer packet) {
-                if (packet.getOriginProxy().equalsIgnoreCase(PROXY_ID))
-                    return;
-
-                UUID uuid = packet.getUuid();
-
-                ProxyServer server = ProxyServer.getInstance();
-                ProxiedPlayer player = server.getPlayer(uuid);
-
-                if (player == null)
-                    return;
-
-                String result = player.getServer().getInfo().getName();
-
-                PacketRespondServer response = new PacketRespondServer(uuid, PROXY_ID, packet.getOriginProxy(), result);
-
-                main.getPacketManager().send(response);
-            }
-        });
     }
 
     public String getAvailableServer() {
         return null;
     }
 
-    public CompletableFuture<String> request(UUID uuid) {
+    public CompletableFuture<String> requestIslandServer(UUID uuid) {
+        return getIslandId(uuid).thenAccept(islandId -> {
+
+        });
+    }
+
+    private CompletableFuture<UUID> getIslandId(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
-            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-
-            if (player == null || !player.isConnected()) {
-                String proxy = getProxy(uuid);
-
-                if (proxy == null)
-                    return null;
-
-                PacketRequestServer packet = new PacketRequestServer(uuid, PROXY_ID, proxy);
-
-                main.getPacketManager().send(packet);
-
-                PacketRespondServer response = main.getPacketManager().await(PacketRespondServer.class, (packetIn) -> packetIn.getUuid().equals(uuid));
-
-                if (response == null)
-                    return null;
-
-                return response.getResultServer();
+            StorageHandler handler = main.getStorageHandler();
+            PlayerData data;
+            try {
+                data = (PlayerData) handler.get(uuid, "PLAYER").get(3, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                data = null;
             }
 
-            return player.getServer().getInfo().getName();
+            if (data == null)
+                return null;
+
+            return data.getIslandId();
         });
     }
 

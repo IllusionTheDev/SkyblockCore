@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.shared.packet.impl.proxy.instance.response;
+package me.illusion.skyblockcore.shared.packet.impl.proxytoinstance;
 
 import me.illusion.skyblockcore.shared.packet.data.ProxyToServerPacket;
 

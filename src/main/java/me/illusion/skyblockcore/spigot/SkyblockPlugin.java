@@ -26,6 +26,7 @@ import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -176,11 +177,15 @@ public class SkyblockPlugin extends JavaPlugin {
      * Generates the empty island worlds
      */
     public void setupWorld(String name) {
-        new WorldCreator(name)
+        World world = new WorldCreator(name)
                 .generator("Skyblock")
                 .generateStructures(false)
                 .seed(0)
                 .createWorld();
+
+        world.setAutoSave(false); // Disable auto-saving
+        world.setKeepSpawnInMemory(false); // Disable spawn chunk loading
+        world.setPVP(false); // Disable PVP
     }
 
     /**

@@ -26,7 +26,7 @@ public class SkyblockCommand extends Command {
         ProxiedPlayer player = (ProxiedPlayer) sender;
         PlayerFinder playerFinder = main.getPlayerFinder();
 
-        playerFinder.request(player.getUniqueId()).whenComplete((servername, thr) -> {
+        playerFinder.requestIslandServer(player.getUniqueId()).whenComplete((servername, thr) -> {
             if (servername == null) // Assign available server if no members are online
                 servername = playerFinder.getAvailableServer();
 

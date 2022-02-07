@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.bungee.handler;
 
 import me.illusion.skyblockcore.shared.packet.PacketHandler;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.request.PacketRequestMessageSend;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 

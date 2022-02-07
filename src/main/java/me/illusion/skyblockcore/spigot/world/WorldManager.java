@@ -25,7 +25,11 @@ public class WorldManager implements Listener {
 
     private final Map<String, UUID> loadedIslands = new HashMap<>();
 
+    private final SkyblockPlugin main;
+
     public WorldManager(SkyblockPlugin main) {
+        this.main = main;
+
         for (int index = 1; index <= main.getIslandConfig().getWorldCount(); index++) {
             loadedIslands.put("skyblockworld" + index, null);
 

@@ -30,7 +30,7 @@ public class PacketWaiter {
      * @return NULL if timed out (after 15 seconds), the packet otherwise
      */
     public <T extends Packet> T await(Class<T> packetClass, Predicate<T> returnIf) {
-        return await(packetClass, returnIf, 15);
+        return await(packetClass, returnIf, 5);
     }
 
     /**

@@ -12,7 +12,7 @@ import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.proxy.request.PacketRequestMessageSend;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;

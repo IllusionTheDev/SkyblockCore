@@ -1,8 +1,8 @@
 package me.illusion.skyblockcore.spigot.command.island.invite;
 
 import me.illusion.skyblockcore.shared.data.IslandInvite;
-import me.illusion.skyblockcore.shared.packet.impl.instance.PacketInvitePlayer;
-import me.illusion.skyblockcore.shared.packet.impl.proxy.instance.response.PacketInviteResponse;
+import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketInvitePlayer;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketInviteResponse;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import org.bukkit.Bukkit;
