@@ -19,7 +19,8 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String name, String[] args) throws IllegalArgumentException {
-        System.out.println("tab completing this shit");
+        // Useless
+        // System.out.println("tab completing this shit");
 
         if (args.length == 0)
             return Collections.emptyList();

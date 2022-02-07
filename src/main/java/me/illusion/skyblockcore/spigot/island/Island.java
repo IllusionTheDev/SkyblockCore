@@ -48,7 +48,7 @@ public class Island {
      * Cleans the island, by regenerating its chunks
      */
     public void cleanIsland() {
-        System.out.println("Cleaning island...");
+        SkyblockPlugin.log("Cleaning island...");
 
         WorldUtils
                 .unload(main, world)
@@ -56,7 +56,7 @@ public class Island {
                     WorldUtils.deleteRegionFolder(main, world);
                     main.getIslandManager().unregister(this);
 
-                    new ScheduleBuilder(main) // Intentional delay so we don't corrupt worlds by loading and unloading very fast
+                    new ScheduleBuilder(main) // Intentional delay, so we don't corrupt worlds by loading and unloading very fast
                             .in(main.getSettings().getReleaseDelay()).ticks()
                             .run(() -> main.getWorldManager().unregister(this.world))
                             .sync()

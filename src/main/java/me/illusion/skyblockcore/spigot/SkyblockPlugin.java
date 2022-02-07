@@ -108,6 +108,8 @@ public class SkyblockPlugin extends JavaPlugin {
 
     private PacketManager packetManager;
 
+    private static SkyblockPlugin instance;
+
     @Override
     public void onEnable() {
         emptyWorldGenerator = new EmptyWorldGenerator(this);
@@ -115,18 +117,19 @@ public class SkyblockPlugin extends JavaPlugin {
 
         dependencyDownloader = new DependencyDownloader(getDataFolder());
         dependencyDownloader.onDownload(() -> {
-            System.err.println("[SkyblockCore] Dependencies downloaded!");
-            System.err.println("[SkyblockCore] Since you have downloaded dependencies, you will need to restart the server.");
+            warn("Dependencies downloaded!");
+            warn("Since you have downloaded dependencies, you will need to restart the server.");
         });
 
         registerDefaultCommands();
 
-        System.out.println("Registering configuration files");
+        getLogger().info("Registering configuration files");
+        instance = this;
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
         settings = new SettingsFile(this);
 
-        System.out.println("Creating worlds");
+        getLogger().info("Creating worlds");
         worldManager = new WorldManager(this);
         // Loads the SQL, when that's complete with a response (true|false), loads if false
         setupStorage().whenComplete((val, throwable) -> {
@@ -149,32 +152,34 @@ public class SkyblockPlugin extends JavaPlugin {
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
-        System.out.println("Setting up pasting handler");
+        getLogger().info("Setting up pasting handler");
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
 
-        System.out.println("Registering start files");
+        getLogger().info("Registering start files");
         startSchematic = startFiles();
 
-        System.out.println("Registering listeners");
+        getLogger().info("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
-        
-        System.out.println("Registering possible hooks");
+
+        getLogger().info("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
 
-        System.out.println("Registering bungeecord messaging listener");
+        getLogger().info("Registering BungeeCord messaging listener");
         packetManager = new PacketManager();
         bungeeMessaging = new BungeeMessaging(this);
 
-        System.out.println("Loaded");
+        getLogger().info("Loaded");
 
     }
 
     /**
      * Generates the empty island worlds
+     *
+     * @param name World name
      */
     public void setupWorld(String name) {
         World world = new WorldCreator(name)
@@ -209,7 +214,11 @@ public class SkyblockPlugin extends JavaPlugin {
             String password = config.getString("database.password", "");
             int port = config.getInt("database.port");
 
-            System.out.println("Created handler of type " + clazz.getSimpleName());
+            if (host.equals("")) {
+                severe("Database host is unset! Please check configuration.");
+            }
+
+            getLogger().info("Created handler of type " + clazz.getSimpleName());
             return storageHandler.setup(host, port, database, username, password);
 
         } catch (InstantiationException | IllegalAccessException e) {
@@ -258,5 +267,43 @@ public class SkyblockPlugin extends JavaPlugin {
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         return emptyWorldGenerator;
+    }
+
+    /**
+     * Log
+     * @param message message
+     */
+    public static void log(Object... message) {
+        StringBuilder builder = new StringBuilder();
+
+        for (Object obj : message) {
+            builder.append(obj);
+        }
+
+        instance.getLogger().info(builder.toString());
+    }
+
+    /**
+     * Output a warning
+     * @param message content
+     */
+    public static void warn(Object... message) {
+        StringBuilder builder = new StringBuilder();
+
+        for (Object obj : message) {
+            builder.append(obj);
+        }
+
+        instance.getLogger().warning(builder.toString());
+    }
+
+    public static void severe(Object... message) {
+        StringBuilder builder = new StringBuilder();
+
+        for (Object obj : message) {
+            builder.append(obj);
+        }
+
+        instance.getLogger().severe(builder.toString());
     }
 }
