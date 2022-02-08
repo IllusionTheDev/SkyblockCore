@@ -8,9 +8,9 @@ import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 public enum StorageType {
     MYSQL(MySQLHandler.class),
     SQLITE(SQLiteHandler.class),
-    MONGODB(MongoDBHandler.class);
+    MONGODB(MongoDBHandler.class, "com.mongodb.MongoClient");
 
-    Class<? extends StorageHandler> handlerClass;
+    final Class<? extends StorageHandler> handlerClass;
 
     private String className;
 
