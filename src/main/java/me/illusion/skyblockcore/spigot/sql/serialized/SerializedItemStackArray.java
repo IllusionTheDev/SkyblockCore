@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.spigot.sql.serialized;
 
-import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.spigot.utilities.LoggingProvider;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;

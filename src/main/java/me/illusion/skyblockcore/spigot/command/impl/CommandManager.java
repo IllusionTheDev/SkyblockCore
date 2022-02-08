@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.spigot.command.impl;
 
-import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.BaseCommand;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;

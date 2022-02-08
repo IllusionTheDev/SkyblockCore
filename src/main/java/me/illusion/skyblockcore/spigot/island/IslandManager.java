@@ -1,7 +1,6 @@
 package me.illusion.skyblockcore.spigot.island;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
-import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;

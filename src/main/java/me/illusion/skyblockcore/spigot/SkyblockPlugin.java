@@ -2,13 +2,11 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
-import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.shared.environment.EnvironmentUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
-import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.spigot.command.impl.CommandManager;
 import me.illusion.skyblockcore.spigot.command.island.information.IslandHelpCommand;
 import me.illusion.skyblockcore.spigot.command.island.invite.IslandInviteCommand;
