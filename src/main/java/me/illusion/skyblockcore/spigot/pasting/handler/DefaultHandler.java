@@ -6,6 +6,7 @@ import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
+import me.illusion.skyblockcore.spigot.utilities.LoggingProvider;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
@@ -72,7 +73,7 @@ public class DefaultHandler implements PastingHandler {
             futures.add(paste(f, name));
 
         allOf(futures).thenRun(() -> {
-            System.out.println("Done pasting");
+            LoggingProvider.get().info("Done pasting");
             mainLatch.countDown();
         });
 

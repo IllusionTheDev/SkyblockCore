@@ -5,6 +5,7 @@ import me.illusion.skyblockcore.spigot.command.BaseCommand;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResult;
 import me.illusion.skyblockcore.spigot.command.comparison.ComparisonResultFull;
+import me.illusion.skyblockcore.spigot.utilities.LoggingProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandMap;
@@ -51,7 +52,7 @@ public class CommandManager {
     }
 
     public void register(SkyblockCommand command) {
-        System.out.println("Registered command " + command.getClass().getSimpleName());
+        LoggingProvider.get().info("Registered command " + command.getClass().getSimpleName());
 
         if (command.getIdentifier().startsWith("*"))
             throw new IllegalArgumentException("Command identifier cannot start with *");
@@ -60,10 +61,10 @@ public class CommandManager {
 
         String base = getBaseCommand(command.getIdentifier());
 
-        System.out.println(command.getIdentifier() + "'s base command is " + base);
+        LoggingProvider.get().info(command.getIdentifier() + "'s base command is " + base);
 
         if (!registeredBaseCommands.contains(base)) {
-            System.out.println(base + " was not registered as a command, registering..");
+            LoggingProvider.get().info(base + " was not registered as a command, registering..");
 
             try {
                 PluginCommand pluginCommand = pluginCommandConstructor.newInstance(base, main);
@@ -79,7 +80,7 @@ public class CommandManager {
                 e.printStackTrace();
             }
 
-            System.out.println(base + " was registered as a command");
+            LoggingProvider.get().info(base + " was registered as a command");
             registeredBaseCommands.add(base);
         }
     }
@@ -99,7 +100,7 @@ public class CommandManager {
         ComparisonResult result = new ComparisonResult(commands);
         List<String> results = result.match(identifier);
 
-        System.out.println(identifier);
+        LoggingProvider.get().info(identifier);
         // Extra processing
         List<String> toReturn = new ArrayList<>();
 

@@ -26,14 +26,14 @@ public class SkyblockCommand extends Command {
         ProxiedPlayer player = (ProxiedPlayer) sender;
         PlayerFinder playerFinder = main.getPlayerFinder();
 
-        playerFinder.requestIslandServer(player.getUniqueId()).whenComplete((servername, thr) -> {
-            if (servername == null) // Assign available server if no members are online
-                servername = playerFinder.getAvailableServer();
+        playerFinder.requestIslandServer(player.getUniqueId()).whenComplete((serverName, thr) -> {
+            if (serverName == null) // Assign available server if no members are online
+                serverName = playerFinder.getAvailableServer();
 
-            if (servername == null) // If no space found
+            if (serverName == null) // If no space found
                 return;
 
-            ServerInfo targetServer = main.getProxy().getServerInfo(servername);
+            ServerInfo targetServer = main.getProxy().getServerInfo(serverName);
 
             player.connect(targetServer);
         });

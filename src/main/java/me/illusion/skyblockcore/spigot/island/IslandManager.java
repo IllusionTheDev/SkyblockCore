@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.shared.utilities.Reference;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
+import me.illusion.skyblockcore.spigot.utilities.LoggingProvider;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -122,7 +123,7 @@ public class IslandManager {
     public CompletableFuture<Island> pasteIsland(UUID islandId, UUID ownerId) {
         return load(islandId)
                 .thenApply(data -> {
-                    System.out.println("Pasting island " + islandId);
+                    LoggingProvider.get().info("Pasting island " + islandId);
                     if (data == null)
                         data = new IslandData(islandId, ownerId);
 
@@ -166,7 +167,7 @@ public class IslandManager {
 
             if (islandFiles == null) {
                 // Assigns default if not found
-                System.out.println("No schematic found for island " + islandId);
+                LoggingProvider.get().info("No schematic found for island " + islandId);
                 islandFiles = SerializedFile.loadArray(main.getStartSchematic());
             }
 
@@ -192,22 +193,22 @@ public class IslandManager {
             data.setIsland(result); // Updates island in the island data
 
             if (result == null) {
-                System.out.println("Island " + islandId + " failed to load");
+                LoggingProvider.get().info("Island " + islandId + " failed to load");
                 return null;
             }
 
             World islandWorld = Bukkit.getWorld(result.getWorld());
 
-            System.out.println("After action report");
-            System.out.println("----------------------------------------");
-            System.out.println("Time taken: " + (end - start) + "ms");
-            System.out.println("Island world: " + result.getWorld());
-            System.out.println("Island world loaded: " + (islandWorld != null));
-            System.out.println("----------------------------------------");
+            LoggingProvider.get().info("After action report");
+            LoggingProvider.get().info("----------------------------------------");
+            LoggingProvider.get().info("Time taken: " + (end - start) + "ms");
+            LoggingProvider.get().info("Island world: " + result.getWorld());
+            LoggingProvider.get().info("Island world loaded: " + (islandWorld != null));
+            LoggingProvider.get().info("----------------------------------------");
 
             // --- ENSURE WORLD IS PROPERLY LOADED ---
             if (islandWorld == null) {
-                System.out.println("Loading world");
+                LoggingProvider.get().info("Loading world");
                 islandWorld = WorldUtils.load(main, result.getWorld()).join();
             }
 
@@ -248,7 +249,7 @@ public class IslandManager {
 
             Location center = world.getSpawnLocation();
 
-            System.out.println(world.getName() + " spawn location: " + center);
+            LoggingProvider.get().info(world.getName() + " spawn location: " + center);
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             Location one = center.clone().add(-offset, -128, -offset);
@@ -270,7 +271,7 @@ public class IslandManager {
 
             Vector centerPoint = main.getIslandConfig().getSpawnPoint();
 
-            System.out.println(worldName + " spawn location: " + centerPoint);
+            LoggingProvider.get().info(worldName + " spawn location: " + centerPoint);
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             main
@@ -380,7 +381,7 @@ public class IslandManager {
         if (shouldRemoveIsland(island))
             island.cleanIsland();
 
-        System.out.println("Attempting to delete island files");
+        LoggingProvider.get().info("Attempting to delete island files");
 
         FileUtils.delete(folder); // Delete the folder
     }

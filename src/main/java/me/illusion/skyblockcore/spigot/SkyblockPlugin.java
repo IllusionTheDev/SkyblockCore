@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
+import me.illusion.skyblockcore.shared.environment.EnvironmentUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
@@ -24,6 +25,7 @@ import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.CommunicationRegistry;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
+import me.illusion.skyblockcore.spigot.utilities.LoggingProvider;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
 import org.bukkit.Bukkit;
@@ -104,25 +106,32 @@ public class SkyblockPlugin extends JavaPlugin {
 
     private PacketManager packetManager;
 
+    private static SkyblockPlugin instance;
+
+    public static boolean enabled = false;
+
     @Override
     public void onEnable() {
+        enabled = true;
         emptyWorldGenerator = new EmptyWorldGenerator(this);
         commandManager = new CommandManager(this);
+        EnvironmentUtil.setLogger(getLogger());
 
         dependencyDownloader = new DependencyDownloader(getDataFolder());
         dependencyDownloader.onDownload(() -> {
-            System.err.println("[SkyblockCore] Dependencies downloaded!");
-            System.err.println("[SkyblockCore] Since you have downloaded dependencies, you will need to restart the server.");
+            LoggingProvider.get().warn("Dependencies downloaded!");
+            LoggingProvider.get().warn("Since you have downloaded dependencies, you will need to restart the server.");
         });
 
         registerDefaultCommands();
 
-        System.out.println("Registering configuration files");
+        LoggingProvider.get().info("Registering configuration files");
+        instance = this;
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
         settings = new SettingsFile(this);
 
-        System.out.println("Creating worlds");
+        LoggingProvider.get().info("Creating worlds");
         worldManager = new WorldManager(this);
         // Loads the SQL, when that's complete with a response (true|false), loads if false
         setupStorage().whenComplete((val, throwable) -> {
@@ -145,32 +154,34 @@ public class SkyblockPlugin extends JavaPlugin {
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
-        System.out.println("Setting up pasting handler");
+        LoggingProvider.get().info("Setting up pasting handler");
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
 
-        System.out.println("Registering start files");
+        LoggingProvider.get().info("Registering start files");
         startSchematic = startFiles();
 
-        System.out.println("Registering listeners");
+        LoggingProvider.get().info("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
-        
-        System.out.println("Registering possible hooks");
+
+        LoggingProvider.get().info("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
 
-        System.out.println("Registering bungeecord messaging listener");
+        LoggingProvider.get().info("Registering BungeeCord messaging listener");
         packetManager = new PacketManager();
         packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
 
-        System.out.println("Loaded");
+        LoggingProvider.get().info("Loaded");
 
     }
 
     /**
      * Generates the empty island worlds
+     *
+     * @param name World name
      */
     public void setupWorld(String name) {
         World world = new WorldCreator(name)
@@ -205,7 +216,11 @@ public class SkyblockPlugin extends JavaPlugin {
             String password = config.getString("database.password", "");
             int port = config.getInt("database.port");
 
-            System.out.println("Created handler of type " + clazz.getSimpleName());
+            if (host.equals("")) {
+                LoggingProvider.get().severe("Database host is unset! Please check configuration.");
+            }
+
+            LoggingProvider.get().info("Created handler of type " + clazz.getSimpleName());
             return storageHandler.setup(host, port, database, username, password);
 
         } catch (InstantiationException | IllegalAccessException e) {
@@ -227,6 +242,7 @@ public class SkyblockPlugin extends JavaPlugin {
     public void onDisable() {
         for (Player player : Bukkit.getOnlinePlayers())
             playerManager.get(player).save();
+        enabled = false;
     }
 
     private File[] startFiles() {
