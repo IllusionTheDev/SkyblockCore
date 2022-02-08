@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.shared.environment;
 
-public interface Log {
+public interface ILogging {
     void info(Object... message);
     void warn(Object... message);
     void severe(Object... message);
