@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.shared.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import me.illusion.skyblockcore.shared.environment.Core;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
 import me.illusion.skyblockcore.spigot.island.Island;
@@ -53,7 +54,7 @@ public class IslandData implements Serializable {
         List<UUID> list = new ArrayList<>();
 
         String[] split = StringUtil.split(serialized, ' ');
-        System.out.println(serialized);
+        Core.info(serialized);
 
         for (String str : split) {
             if (str.equalsIgnoreCase("null"))

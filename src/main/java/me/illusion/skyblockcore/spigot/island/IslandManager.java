@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.island;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
+import me.illusion.skyblockcore.shared.environment.Core;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
@@ -122,7 +123,7 @@ public class IslandManager {
     public CompletableFuture<Island> pasteIsland(UUID islandId, UUID ownerId) {
         return load(islandId)
                 .thenApply(data -> {
-                    System.out.println("Pasting island " + islandId);
+                    Core.info("Pasting island " + islandId);
                     if (data == null)
                         data = new IslandData(islandId, ownerId);
 
@@ -166,7 +167,7 @@ public class IslandManager {
 
             if (islandFiles == null) {
                 // Assigns default if not found
-                System.out.println("No schematic found for island " + islandId);
+                Core.info("No schematic found for island " + islandId);
                 islandFiles = SerializedFile.loadArray(main.getStartSchematic());
             }
 
@@ -192,22 +193,22 @@ public class IslandManager {
             data.setIsland(result); // Updates island in the island data
 
             if (result == null) {
-                System.out.println("Island " + islandId + " failed to load");
+                Core.info("Island " + islandId + " failed to load");
                 return null;
             }
 
             World islandWorld = Bukkit.getWorld(result.getWorld());
 
-            System.out.println("After action report");
-            System.out.println("----------------------------------------");
-            System.out.println("Time taken: " + (end - start) + "ms");
-            System.out.println("Island world: " + result.getWorld());
-            System.out.println("Island world loaded: " + (islandWorld != null));
-            System.out.println("----------------------------------------");
+            Core.info("After action report");
+            Core.info("----------------------------------------");
+            Core.info("Time taken: " + (end - start) + "ms");
+            Core.info("Island world: " + result.getWorld());
+            Core.info("Island world loaded: " + (islandWorld != null));
+            Core.info("----------------------------------------");
 
             // --- ENSURE WORLD IS PROPERLY LOADED ---
             if (islandWorld == null) {
-                System.out.println("Loading world");
+                Core.info("Loading world");
                 islandWorld = WorldUtils.load(main, result.getWorld()).join();
             }
 
@@ -248,7 +249,7 @@ public class IslandManager {
 
             Location center = world.getSpawnLocation();
 
-            System.out.println(world.getName() + " spawn location: " + center);
+            Core.info(world.getName() + " spawn location: " + center);
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             Location one = center.clone().add(-offset, -128, -offset);
@@ -270,7 +271,7 @@ public class IslandManager {
 
             Vector centerPoint = main.getIslandConfig().getSpawnPoint();
 
-            System.out.println(worldName + " spawn location: " + centerPoint);
+            Core.info(worldName + " spawn location: " + centerPoint);
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             main
@@ -380,7 +381,7 @@ public class IslandManager {
         if (shouldRemoveIsland(island))
             island.cleanIsland();
 
-        System.out.println("Attempting to delete island files");
+        Core.info("Attempting to delete island files");
 
         FileUtils.delete(folder); // Delete the folder
     }

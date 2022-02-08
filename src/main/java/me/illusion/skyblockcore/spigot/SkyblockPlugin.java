@@ -2,6 +2,8 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
+import me.illusion.skyblockcore.shared.environment.Core;
+import me.illusion.skyblockcore.shared.environment.EnvironmentUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
@@ -110,26 +112,30 @@ public class SkyblockPlugin extends JavaPlugin {
 
     private static SkyblockPlugin instance;
 
+    public static boolean enabled = false;
+
     @Override
     public void onEnable() {
+        enabled = true;
         emptyWorldGenerator = new EmptyWorldGenerator(this);
         commandManager = new CommandManager(this);
+        EnvironmentUtil.setLogger(getLogger());
 
         dependencyDownloader = new DependencyDownloader(getDataFolder());
         dependencyDownloader.onDownload(() -> {
-            warn("Dependencies downloaded!");
-            warn("Since you have downloaded dependencies, you will need to restart the server.");
+            Core.warn("Dependencies downloaded!");
+            Core.warn("Since you have downloaded dependencies, you will need to restart the server.");
         });
 
         registerDefaultCommands();
 
-        getLogger().info("Registering configuration files");
+        Core.info("Registering configuration files");
         instance = this;
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
         settings = new SettingsFile(this);
 
-        getLogger().info("Creating worlds");
+        Core.info("Creating worlds");
         worldManager = new WorldManager(this);
         // Loads the SQL, when that's complete with a response (true|false), loads if false
         setupStorage().whenComplete((val, throwable) -> {
@@ -152,27 +158,27 @@ public class SkyblockPlugin extends JavaPlugin {
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
-        getLogger().info("Setting up pasting handler");
+        Core.info("Setting up pasting handler");
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
 
-        getLogger().info("Registering start files");
+        Core.info("Registering start files");
         startSchematic = startFiles();
 
-        getLogger().info("Registering listeners");
+        Core.info("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
 
-        getLogger().info("Registering possible hooks");
+        Core.info("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
 
-        getLogger().info("Registering BungeeCord messaging listener");
+        Core.info("Registering BungeeCord messaging listener");
         packetManager = new PacketManager();
         bungeeMessaging = new BungeeMessaging(this);
 
-        getLogger().info("Loaded");
+        Core.info("Loaded");
 
     }
 
@@ -215,7 +221,7 @@ public class SkyblockPlugin extends JavaPlugin {
             int port = config.getInt("database.port");
 
             if (host.equals("")) {
-                severe("Database host is unset! Please check configuration.");
+                Core.severe("Database host is unset! Please check configuration.");
             }
 
             getLogger().info("Created handler of type " + clazz.getSimpleName());
@@ -240,6 +246,7 @@ public class SkyblockPlugin extends JavaPlugin {
     public void onDisable() {
         for (Player player : Bukkit.getOnlinePlayers())
             playerManager.get(player).save();
+        enabled = false;
     }
 
     private File[] startFiles() {
@@ -273,6 +280,7 @@ public class SkyblockPlugin extends JavaPlugin {
      * Log
      * @param message message
      */
+    @Deprecated
     public static void log(Object... message) {
         StringBuilder builder = new StringBuilder();
 
@@ -287,6 +295,7 @@ public class SkyblockPlugin extends JavaPlugin {
      * Output a warning
      * @param message content
      */
+    @Deprecated
     public static void warn(Object... message) {
         StringBuilder builder = new StringBuilder();
 
@@ -297,6 +306,7 @@ public class SkyblockPlugin extends JavaPlugin {
         instance.getLogger().warning(builder.toString());
     }
 
+    @Deprecated
     public static void severe(Object... message) {
         StringBuilder builder = new StringBuilder();
 

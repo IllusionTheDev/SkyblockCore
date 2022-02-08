@@ -141,7 +141,7 @@ public class PacketManager {
         Class<? extends Packet> type = getPacketClass(bytes[0]);
 
         if (type == null) {
-            // System.out.println("Unknown packet type: 0x" + HexUtil.bytesToHex(bytes[0])); - Will get spammy
+            // Core.info("Unknown packet type: 0x" + HexUtil.bytesToHex(bytes[0])); - Will get spammy
             return null;
         }
         try {

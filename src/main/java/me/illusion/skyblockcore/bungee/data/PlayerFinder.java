@@ -31,7 +31,7 @@ public class PlayerFinder {
 
     public CompletableFuture<String> requestIslandServer(UUID uuid) {
         return getIslandId(uuid).thenAccept(islandId -> {
-
+            
         });
     }
 
