@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.spigot.sql.serialized;
 
-import me.illusion.skyblockcore.shared.environment.Core;
+import me.illusion.skyblockcore.shared.utilities.Log;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -74,7 +74,7 @@ public class SerializedItemStackArray implements Serializable {
      */
     public void updateArray(ItemStack... items) {
         base64 = itemStackArrayToBase64(items);
-        Core.info("Updated internal base64 to " + base64);
+        Log.info("Updated internal base64 to " + base64);
     }
 
     /**

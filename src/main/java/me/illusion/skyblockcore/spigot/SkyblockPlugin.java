@@ -2,12 +2,13 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
-import me.illusion.skyblockcore.shared.environment.Core;
+import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.shared.environment.EnvironmentUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
+import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.spigot.command.impl.CommandManager;
 import me.illusion.skyblockcore.spigot.command.island.information.IslandHelpCommand;
 import me.illusion.skyblockcore.spigot.command.island.invite.IslandInviteCommand;
@@ -123,19 +124,19 @@ public class SkyblockPlugin extends JavaPlugin {
 
         dependencyDownloader = new DependencyDownloader(getDataFolder());
         dependencyDownloader.onDownload(() -> {
-            Core.warn("Dependencies downloaded!");
-            Core.warn("Since you have downloaded dependencies, you will need to restart the server.");
+            Log.warn("Dependencies downloaded!");
+            Log.warn("Since you have downloaded dependencies, you will need to restart the server.");
         });
 
         registerDefaultCommands();
 
-        Core.info("Registering configuration files");
+        Log.info("Registering configuration files");
         instance = this;
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
         settings = new SettingsFile(this);
 
-        Core.info("Creating worlds");
+        Log.info("Creating worlds");
         worldManager = new WorldManager(this);
         // Loads the SQL, when that's complete with a response (true|false), loads if false
         setupStorage().whenComplete((val, throwable) -> {
@@ -158,27 +159,27 @@ public class SkyblockPlugin extends JavaPlugin {
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
-        Core.info("Setting up pasting handler");
+        Log.info("Setting up pasting handler");
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
 
-        Core.info("Registering start files");
+        Log.info("Registering start files");
         startSchematic = startFiles();
 
-        Core.info("Registering listeners");
+        Log.info("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
 
-        Core.info("Registering possible hooks");
+        Log.info("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
 
-        Core.info("Registering BungeeCord messaging listener");
+        Log.info("Registering BungeeCord messaging listener");
         packetManager = new PacketManager();
         bungeeMessaging = new BungeeMessaging(this);
 
-        Core.info("Loaded");
+        Log.info("Loaded");
 
     }
 
@@ -221,7 +222,7 @@ public class SkyblockPlugin extends JavaPlugin {
             int port = config.getInt("database.port");
 
             if (host.equals("")) {
-                Core.severe("Database host is unset! Please check configuration.");
+                Log.severe("Database host is unset! Please check configuration.");
             }
 
             getLogger().info("Created handler of type " + clazz.getSimpleName());

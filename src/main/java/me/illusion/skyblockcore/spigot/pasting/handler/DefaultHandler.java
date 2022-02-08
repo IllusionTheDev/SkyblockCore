@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.spigot.pasting.handler;
 
 import com.google.common.io.Files;
-import me.illusion.skyblockcore.shared.environment.Core;
+import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
@@ -73,7 +73,7 @@ public class DefaultHandler implements PastingHandler {
             futures.add(paste(f, name));
 
         allOf(futures).thenRun(() -> {
-            Core.info("Done pasting");
+            Log.info("Done pasting");
             mainLatch.countDown();
         });
 

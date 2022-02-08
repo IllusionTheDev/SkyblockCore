@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.spigot.command.impl;
 
-import me.illusion.skyblockcore.shared.environment.Core;
+import me.illusion.skyblockcore.shared.utilities.Log;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.BaseCommand;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
@@ -52,7 +52,7 @@ public class CommandManager {
     }
 
     public void register(SkyblockCommand command) {
-        Core.info("Registered command " + command.getClass().getSimpleName());
+        Log.info("Registered command " + command.getClass().getSimpleName());
 
         if (command.getIdentifier().startsWith("*"))
             throw new IllegalArgumentException("Command identifier cannot start with *");
@@ -61,10 +61,10 @@ public class CommandManager {
 
         String base = getBaseCommand(command.getIdentifier());
 
-        Core.info(command.getIdentifier() + "'s base command is " + base);
+        Log.info(command.getIdentifier() + "'s base command is " + base);
 
         if (!registeredBaseCommands.contains(base)) {
-            Core.info(base + " was not registered as a command, registering..");
+            Log.info(base + " was not registered as a command, registering..");
 
             try {
                 PluginCommand pluginCommand = pluginCommandConstructor.newInstance(base, main);
@@ -80,7 +80,7 @@ public class CommandManager {
                 e.printStackTrace();
             }
 
-            Core.info(base + " was registered as a command");
+            Log.info(base + " was registered as a command");
             registeredBaseCommands.add(base);
         }
     }
@@ -100,7 +100,7 @@ public class CommandManager {
         ComparisonResult result = new ComparisonResult(commands);
         List<String> results = result.match(identifier);
 
-        Core.info(identifier);
+        Log.info(identifier);
         // Extra processing
         List<String> toReturn = new ArrayList<>();
 

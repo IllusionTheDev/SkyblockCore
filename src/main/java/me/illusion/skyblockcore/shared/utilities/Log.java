@@ -1,11 +1,14 @@
-package me.illusion.skyblockcore.shared.environment;
+package me.illusion.skyblockcore.shared.utilities;
 
-// Keep this class name short!
-public class Core {
+import me.illusion.skyblockcore.shared.environment.EnvironmentUtil;
+
+public class Log {
     /**
      * Log
+     *
      * @param message message
      */
+    @Deprecated
     public static void info(Object... message) {
         StringBuilder builder = new StringBuilder();
 
@@ -18,8 +21,10 @@ public class Core {
 
     /**
      * Output a warning
+     *
      * @param message content
      */
+    @Deprecated
     public static void warn(Object... message) {
         StringBuilder builder = new StringBuilder();
 
@@ -32,8 +37,10 @@ public class Core {
 
     /**
      * Output an error (maybe something else)
+     *
      * @param message message content
      */
+    @Deprecated
     public static void severe(Object... message) {
         StringBuilder builder = new StringBuilder();
 
