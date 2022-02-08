@@ -2,6 +2,9 @@ package me.illusion.skyblockcore.shared.environment;
 
 import me.illusion.skyblockcore.shared.utilities.SoftwareDetectionUtil;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
 
@@ -22,11 +25,11 @@ public class EnvironmentUtil {
     }
 
     public static Logger getLogger() {
-        if (logger == null) {
-            throw new IllegalStateException("Requested for logger before it's set");
+        if (getServerType() == ServerType.SPIGOT) {
+            return JavaPlugin.getPlugin(SkyblockPlugin.class).getLogger();
+        } else {
+            return ProxyServer.getInstance().getLogger();
         }
-
-        return logger;
     }
 
     public static ServerType getServerType() {

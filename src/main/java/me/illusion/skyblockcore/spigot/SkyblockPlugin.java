@@ -26,6 +26,7 @@ import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.BungeeMessaging;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
+import me.illusion.skyblockcore.spigot.utilities.LoggingProvider;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
 import org.bukkit.Bukkit;
@@ -124,19 +125,19 @@ public class SkyblockPlugin extends JavaPlugin {
 
         dependencyDownloader = new DependencyDownloader(getDataFolder());
         dependencyDownloader.onDownload(() -> {
-            Log.warn("Dependencies downloaded!");
-            Log.warn("Since you have downloaded dependencies, you will need to restart the server.");
+            LoggingProvider.get().warn("Dependencies downloaded!");
+            LoggingProvider.get().warn("Since you have downloaded dependencies, you will need to restart the server.");
         });
 
         registerDefaultCommands();
 
-        Log.info("Registering configuration files");
+        LoggingProvider.get().info("Registering configuration files");
         instance = this;
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
         settings = new SettingsFile(this);
 
-        Log.info("Creating worlds");
+        LoggingProvider.get().info("Creating worlds");
         worldManager = new WorldManager(this);
         // Loads the SQL, when that's complete with a response (true|false), loads if false
         setupStorage().whenComplete((val, throwable) -> {
@@ -159,27 +160,27 @@ public class SkyblockPlugin extends JavaPlugin {
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
-        Log.info("Setting up pasting handler");
+        LoggingProvider.get().info("Setting up pasting handler");
         pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
 
-        Log.info("Registering start files");
+        LoggingProvider.get().info("Registering start files");
         startSchematic = startFiles();
 
-        Log.info("Registering listeners");
+        LoggingProvider.get().info("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
 
-        Log.info("Registering possible hooks");
+        LoggingProvider.get().info("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
 
-        Log.info("Registering BungeeCord messaging listener");
+        LoggingProvider.get().info("Registering BungeeCord messaging listener");
         packetManager = new PacketManager();
         bungeeMessaging = new BungeeMessaging(this);
 
-        Log.info("Loaded");
+        LoggingProvider.get().info("Loaded");
 
     }
 
@@ -222,10 +223,10 @@ public class SkyblockPlugin extends JavaPlugin {
             int port = config.getInt("database.port");
 
             if (host.equals("")) {
-                Log.severe("Database host is unset! Please check configuration.");
+                LoggingProvider.get().severe("Database host is unset! Please check configuration.");
             }
 
-            getLogger().info("Created handler of type " + clazz.getSimpleName());
+            LoggingProvider.get().info("Created handler of type " + clazz.getSimpleName());
             return storageHandler.setup(host, port, database, username, password);
 
         } catch (InstantiationException | IllegalAccessException e) {
@@ -275,46 +276,5 @@ public class SkyblockPlugin extends JavaPlugin {
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         return emptyWorldGenerator;
-    }
-
-    /**
-     * Log
-     * @param message message
-     */
-    @Deprecated
-    public static void log(Object... message) {
-        StringBuilder builder = new StringBuilder();
-
-        for (Object obj : message) {
-            builder.append(obj);
-        }
-
-        instance.getLogger().info(builder.toString());
-    }
-
-    /**
-     * Output a warning
-     * @param message content
-     */
-    @Deprecated
-    public static void warn(Object... message) {
-        StringBuilder builder = new StringBuilder();
-
-        for (Object obj : message) {
-            builder.append(obj);
-        }
-
-        instance.getLogger().warning(builder.toString());
-    }
-
-    @Deprecated
-    public static void severe(Object... message) {
-        StringBuilder builder = new StringBuilder();
-
-        for (Object obj : message) {
-            builder.append(obj);
-        }
-
-        instance.getLogger().severe(builder.toString());
     }
 }

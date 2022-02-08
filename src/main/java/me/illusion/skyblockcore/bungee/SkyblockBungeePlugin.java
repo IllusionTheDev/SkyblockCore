@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.bungee.handler.MessagePacketHandler;
 import me.illusion.skyblockcore.bungee.listener.ConnectListener;
 import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.listener.SpigotListener;
+import me.illusion.skyblockcore.bungee.utilities.BungeeLoggingProvider;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
 import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
@@ -37,7 +38,7 @@ public class SkyblockBungeePlugin extends Plugin {
     private RedisListener redisListener;
     private StorageHandler storageHandler;
 
-    private static SkyblockBungeePlugin instance;
+    public static SkyblockBungeePlugin instance;
 
     @Override
     public void onEnable() {
@@ -49,8 +50,8 @@ public class SkyblockBungeePlugin extends Plugin {
         DependencyDownloader dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
 
         dependencyDownloader.onDownload(() -> {
-            warn("Dependencies downloaded!");
-            warn("Since dependencies have been downloaded, you will need to restart your server.");
+            BungeeLoggingProvider.get().warn("Dependencies downloaded!");
+            BungeeLoggingProvider.get().warn("Since dependencies have been downloaded, you will need to restart your server.");
             disable();
         });
 
@@ -94,7 +95,7 @@ public class SkyblockBungeePlugin extends Plugin {
         StorageType type = StorageType.valueOf(config.getString("database.type").toUpperCase(Locale.ROOT));
 
         if (type == StorageType.SQLITE) {
-            severe("Proxies are not supported for SQLite!");
+            BungeeLoggingProvider.get().severe("Proxies are not supported for SQLite!");
             return CompletableFuture.completedFuture(false);
         }
 
@@ -111,7 +112,7 @@ public class SkyblockBungeePlugin extends Plugin {
             String password = config.getString("database.password", "");
             int port = config.getInt("database.port");
 
-            log("Created handler of type " + clazz.getSimpleName());
+            BungeeLoggingProvider.get().info("Created handler of type " + clazz.getSimpleName());
             return storageHandler.setup(host, port, database, username, password);
 
         } catch (InstantiationException | IllegalAccessException e) {
@@ -145,44 +146,5 @@ public class SkyblockBungeePlugin extends Plugin {
         getProxy().getPluginManager().unregisterListeners(this);
         getProxy().getPluginManager().unregisterCommands(this);
         onDisable();
-    }
-
-
-    /**
-     * Log
-     * @param message message
-     */
-    public static void log(Object... message) {
-        StringBuilder builder = new StringBuilder();
-
-        for (Object obj : message) {
-            builder.append(obj);
-        }
-
-        instance.getLogger().info(builder.toString());
-    }
-
-    /**
-     * Output a warning
-     * @param message content
-     */
-    public static void warn(Object... message) {
-        StringBuilder builder = new StringBuilder();
-
-        for (Object obj : message) {
-            builder.append(obj);
-        }
-
-        instance.getLogger().warning(builder.toString());
-    }
-
-    public static void severe(Object... message) {
-        StringBuilder builder = new StringBuilder();
-
-        for (Object obj : message) {
-            builder.append(obj);
-        }
-
-        instance.getLogger().severe(builder.toString());
     }
 }

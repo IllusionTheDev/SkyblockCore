@@ -54,7 +54,7 @@ public class IslandData implements Serializable {
         List<UUID> list = new ArrayList<>();
 
         String[] split = StringUtil.split(serialized, ' ');
-        Log.info(serialized);
+        System.out.println(serialized);
 
         for (String str : split) {
             if (str.equalsIgnoreCase("null"))

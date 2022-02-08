@@ -9,6 +9,7 @@ import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
+import me.illusion.skyblockcore.spigot.utilities.LoggingProvider;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -55,10 +56,10 @@ public class SkyblockPlayer {
      */
     private void load() {
 
-        Log.info("Loading data for " + getPlayer().getName());
+        LoggingProvider.get().info("Loading data for " + getPlayer().getName());
 
         load("PLAYER", uuid).whenComplete((object, $) -> {
-            Log.info("COMPLETE");
+            LoggingProvider.get().info("COMPLETE");
             if (object != null && !(object instanceof PlayerData)) {
                 System.err.println("Object is not a player data, send the message below to the developer");
                 System.err.println(object.getClass().getName());
@@ -69,7 +70,7 @@ public class SkyblockPlayer {
             data = (PlayerData) object;
 
             if (data == null) {
-                Log.info("No PlayerData has been found, creating new data");
+                LoggingProvider.get().info("No PlayerData has been found, creating new data");
 
                 data = new PlayerData();
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid);
@@ -88,12 +89,12 @@ public class SkyblockPlayer {
                 return;
             }
 
-            Log.info("Loaded player data, loading island data");
+            LoggingProvider.get().info("Loaded player data, loading island data");
             main.getIslandManager().pasteIsland(data.getIslandId(), uuid)
                     .thenAccept(island -> {
                         this.island = island;
                         this.islandCenter = island.getCenter();
-                        Log.info("Loaded island data");
+                        LoggingProvider.get().info("Loaded island data");
 
 
                         sync(() -> {
@@ -112,7 +113,7 @@ public class SkyblockPlayer {
                     });
 
         }).exceptionally(throwable -> {
-            Log.info("Failed to load data for " + getPlayer().getName());
+            LoggingProvider.get().info("Failed to load data for " + getPlayer().getName());
             ExceptionLogger.log(throwable);
             return null;
         });
@@ -121,7 +122,7 @@ public class SkyblockPlayer {
 
     public void teleportToIsland() {
         if (!Bukkit.isPrimaryThread()) {
-            Log.info("Detected async teleport - Calling it sync");
+            LoggingProvider.get().info("Detected async teleport - Calling it sync");
             Bukkit.getScheduler().runTask(main, this::teleportToIsland);
             return;
         }
@@ -129,12 +130,12 @@ public class SkyblockPlayer {
         World world = islandCenter.getWorld();
 
         if (world == null) {
-            Log.info("Teleporting - World is null");
+            LoggingProvider.get().info("Teleporting - World is null");
             islandCenter.setWorld(Bukkit.getWorld(island.getWorld()));
         }
 
-        Log.info("Teleporting to island");
-        Log.info(islandCenter);
+        LoggingProvider.get().info("Teleporting to island");
+        LoggingProvider.get().info(islandCenter);
 
         if (!islandCenter.getChunk().isLoaded())
             islandCenter.getChunk().load();
@@ -149,7 +150,7 @@ public class SkyblockPlayer {
      * Teleports player to last position
      */
     private void checkTeleport() {
-        Log.info("Teleporting to last location");
+        LoggingProvider.get().info("Teleporting to last location");
 
         Player player = getPlayer();
         SerializedLocation last = data.getLastLocation();
@@ -170,7 +171,7 @@ public class SkyblockPlayer {
      * @return deserialized object
      */
     private CompletableFuture<Object> load(String table, UUID uuid) {
-        Log.info("Loading " + table + " data for " + Bukkit.getPlayer(uuid).getName());
+        LoggingProvider.get().info("Loading " + table + " data for " + Bukkit.getPlayer(uuid).getName());
         return main.getStorageHandler().get(uuid, table);
     }
 
@@ -189,7 +190,7 @@ public class SkyblockPlayer {
         data.getIslandLocation().update(loc);
 
         island.save(() -> {
-            Log.info("Saved island data");
+            LoggingProvider.get().info("Saved island data");
             saveObject(uuid, data);
             main.getIslandManager().deleteIsland(island.getData().getId());
         });
