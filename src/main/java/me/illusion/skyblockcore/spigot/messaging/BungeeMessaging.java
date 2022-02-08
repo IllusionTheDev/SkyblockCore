@@ -24,6 +24,7 @@ import java.util.Collection;
  */
 public class BungeeMessaging implements PluginMessageListener, PacketProcessor {
 
+    private final String channel;
     private final SkyblockPlugin main;
 
     @Getter
@@ -32,8 +33,9 @@ public class BungeeMessaging implements PluginMessageListener, PacketProcessor {
     public BungeeMessaging(SkyblockPlugin main) {
         this.main = main;
 
-        Bukkit.getMessenger().registerIncomingPluginChannel(main, "skyblock:channel", this);
-        Bukkit.getMessenger().registerOutgoingPluginChannel(main, "skyblock:channel");
+        channel = main.getSettings().getConfiguration().getString("communication.channel", "skyblock:channel");
+        Bukkit.getMessenger().registerIncomingPluginChannel(main, channel, this);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(main, channel);
 
         main.getPacketManager().subscribe(PacketDetermineServerInfo.class, new PacketHandler<PacketDetermineServerInfo>() {
             @Override
@@ -45,7 +47,7 @@ public class BungeeMessaging implements PluginMessageListener, PacketProcessor {
 
     @Override
     public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
-        if (!s.equalsIgnoreCase("skyblock:Channel"))
+        if (!s.equalsIgnoreCase(channel))
             return;
 
         main.getPacketManager().read(bytes);
@@ -61,6 +63,6 @@ public class BungeeMessaging implements PluginMessageListener, PacketProcessor {
 
         Player player = players.iterator().next();
 
-        player.sendPluginMessage(main, "skyblock:Channel", packet.getAllBytes());
+        player.sendPluginMessage(main, channel, packet.getAllBytes());
     }
 }

@@ -51,10 +51,6 @@ dependencies {
 
     implementation 'com.grinderwolf:slimeworldmanager-plugin:2.2.1'
 
-
-    implementation 'com.mojang:brigadier:1.0.18'
-
-
 }
 shadowJar {
     dependencies {

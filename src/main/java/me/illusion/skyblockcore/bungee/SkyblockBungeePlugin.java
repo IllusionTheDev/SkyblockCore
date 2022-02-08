@@ -8,8 +8,8 @@ import me.illusion.skyblockcore.bungee.listener.ConnectListener;
 import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.listener.SpigotListener;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
-import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
+import me.illusion.skyblockcore.shared.dependency.JedisUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
@@ -35,6 +35,7 @@ public class SkyblockBungeePlugin extends Plugin {
     private JedisUtil jedisUtil;
     private RedisListener redisListener;
     private StorageHandler storageHandler;
+    private DependencyDownloader dependencyDownloader;
 
     @Override
     public void onEnable() {
@@ -42,18 +43,13 @@ public class SkyblockBungeePlugin extends Plugin {
         config = new YMLBase(this, "bungee-config.yml").getConfiguration();
 
 
-        DependencyDownloader dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
+        dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
 
         dependencyDownloader.onDownload(() -> {
             System.err.println("[SkyblockCore] Dependencies downloaded!");
             System.err.println("[SkyblockCore] Since dependencies have been downloaded, you will need to restart your server.");
             disable();
         });
-
-        dependencyDownloader.dependOn(
-                "redis.clients.Jedis",
-                "https://www.illusionthe.dev/dependencies/Skyblock.html",
-                "SkyblockDependencies.jar");
 
         setupStorage().thenAccept(success -> {
             if (!success)
@@ -123,6 +119,12 @@ public class SkyblockBungeePlugin extends Plugin {
 
         if (!multiProxy)
             return;
+
+        dependencyDownloader.dependOn(
+                "redis.clients.Jedis",
+                "https://www.illusionthe.dev/dependencies/Skyblock.html",
+                "SkyblockDependencies.jar"
+        );
 
         jedisUtil = new JedisUtil();
 

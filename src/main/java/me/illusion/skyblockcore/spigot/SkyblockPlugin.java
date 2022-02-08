@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.spigot;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
+import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
@@ -20,7 +21,7 @@ import me.illusion.skyblockcore.spigot.listener.DeathListener;
 import me.illusion.skyblockcore.spigot.listener.DebugListener;
 import me.illusion.skyblockcore.spigot.listener.JoinListener;
 import me.illusion.skyblockcore.spigot.listener.LeaveListener;
-import me.illusion.skyblockcore.spigot.messaging.BungeeMessaging;
+import me.illusion.skyblockcore.spigot.messaging.CommunicationRegistry;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
@@ -79,11 +80,6 @@ public class SkyblockPlugin extends JavaPlugin {
         The empty world generator, seems obvious
      */
     private EmptyWorldGenerator emptyWorldGenerator;
-
-    /*
-        Bungee messaging handler, responsible for communication to proxy(ies)
-     */
-    private BungeeMessaging bungeeMessaging;
 
     /*
         Message file, used to send and obtain messages
@@ -167,7 +163,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
         System.out.println("Registering bungeecord messaging listener");
         packetManager = new PacketManager();
-        bungeeMessaging = new BungeeMessaging(this);
+        packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
 
         System.out.println("Loaded");
 
