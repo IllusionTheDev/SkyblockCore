@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.shared.environment;
 
+import me.illusion.skyblockcore.shared.utilities.SoftwareDetectionUtil;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 
 import java.util.logging.Logger;
@@ -29,10 +30,6 @@ public class EnvironmentUtil {
     }
 
     public static ServerType getServerType() {
-        if (SkyblockPlugin.enabled) {
-            return ServerType.SPIGOT;
-        }
-
-        return ServerType.BUNGEE;
+        return SoftwareDetectionUtil.isBukkit() ? ServerType.SPIGOT : ServerType.BUNGEE;
     }
 }
