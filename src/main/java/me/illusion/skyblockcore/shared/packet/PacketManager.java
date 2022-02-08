@@ -88,6 +88,9 @@ public class PacketManager {
      * @param processor - The packet processor
      */
     public void registerProcessor(PacketDirection direction, PacketProcessor processor) {
+        if (processor == null)
+            return;
+
         List<PacketProcessor> list = processors.getOrDefault(direction, null);
 
         if (list == null) {

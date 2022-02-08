@@ -9,9 +9,8 @@ import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.listener.SpigotListener;
 import me.illusion.skyblockcore.bungee.utilities.BungeeLoggingProvider;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
-import me.illusion.skyblockcore.bungee.utilities.database.JedisUtil;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
-import me.illusion.skyblockcore.shared.environment.EnvironmentUtil;
+import me.illusion.skyblockcore.shared.dependency.JedisUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
@@ -37,6 +36,7 @@ public class SkyblockBungeePlugin extends Plugin {
     private JedisUtil jedisUtil;
     private RedisListener redisListener;
     private StorageHandler storageHandler;
+    private DependencyDownloader dependencyDownloader;
 
     public static SkyblockBungeePlugin instance;
 
@@ -45,20 +45,14 @@ public class SkyblockBungeePlugin extends Plugin {
         enabled = true;
         config = new YMLBase(this, "bungee-config.yml").getConfiguration();
         instance = this;
-        EnvironmentUtil.setLogger(getLogger());
 
-        DependencyDownloader dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
+        dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
 
         dependencyDownloader.onDownload(() -> {
             BungeeLoggingProvider.get().warn("Dependencies downloaded!");
             BungeeLoggingProvider.get().warn("Since dependencies have been downloaded, you will need to restart your server.");
             disable();
         });
-
-        dependencyDownloader.dependOn(
-                "redis.clients.Jedis",
-                "https://www.illusionthe.dev/dependencies/Skyblock.html",
-                "SkyblockDependencies.jar");
 
         setupStorage().thenAccept(success -> {
             if (!success)
@@ -128,6 +122,12 @@ public class SkyblockBungeePlugin extends Plugin {
 
         if (!multiProxy)
             return;
+
+        dependencyDownloader.dependOn(
+                "redis.clients.Jedis",
+                "https://www.illusionthe.dev/dependencies/Skyblock.html",
+                "SkyblockDependencies.jar"
+        );
 
         jedisUtil = new JedisUtil();
 
