@@ -49,6 +49,11 @@ public abstract class Packet {
             stream = ByteStreams.newDataOutput();
     }
 
+    protected void writeBoolean(boolean value) {
+        validateStream();
+        stream.writeBoolean(value);
+    }
+
     protected void writeByte(byte value) {
         validateStream();
         stream.writeByte(value);
@@ -117,6 +122,10 @@ public abstract class Packet {
         // ignore close exception
     }
 
+
+    protected boolean readBoolean() {
+        return input.readBoolean();
+    }
 
     protected byte readByte() {
         return input.readByte();

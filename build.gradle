@@ -21,7 +21,6 @@ repositories {
 
     mavenLocal()
 
-
     maven { url = 'https://nexus.hc.to/content/repositories/pub_releases' }
     maven { url = 'https://hub.spigotmc.org/nexus/content/groups/public/' }
     maven { url = 'https://repo.codemc.org/repository/maven-public/' }

@@ -14,7 +14,7 @@ public class PacketInviteResponse extends ProxyToServerPacket {
         super(bytes);
 
         invite = new IslandInvite(readUUID(), readUUID(), readString());
-        response = Response.getResponse(readByte());
+        response = Response.getResponse(readInt());
     }
 
     public PacketInviteResponse(String proxyId, String targetServer, IslandInvite invite, Response response) {
@@ -26,7 +26,7 @@ public class PacketInviteResponse extends ProxyToServerPacket {
         writeUUID(invite.getInviteId());
         writeUUID(invite.getSender());
         writeString(invite.getTarget());
-        writeByte(response.getId());
+        writeInt(response.ordinal());
     }
 
     public enum Response {
@@ -38,16 +38,9 @@ public class PacketInviteResponse extends ProxyToServerPacket {
 
         private static final Response[] VALUES = values();
 
-        public static Response getResponse(byte id) {
+        public static Response getResponse(int id) {
             return VALUES[id];
         }
 
-        public byte getId() {
-            for (byte pos = 0; pos < VALUES.length; pos++)
-                if (getResponse(pos) == this)
-                    return pos;
-
-            return 0;
-        }
     }
 }
