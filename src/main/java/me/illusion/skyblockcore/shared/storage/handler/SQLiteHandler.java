@@ -4,12 +4,13 @@ import me.illusion.skyblockcore.shared.sql.SQLUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class SQLiteHandler extends MySQLHandler {
 
     @Override
-    public CompletableFuture<Boolean> setup(File folder) {
+    public CompletableFuture<Boolean> setup(File folder, Map<String, Object> config) {
         File file = new File(folder + File.separator + "storage", "database.db");
 
         file.getParentFile().mkdirs();
@@ -33,13 +34,4 @@ public class SQLiteHandler extends MySQLHandler {
         });
     }
 
-    @Override
-    public CompletableFuture<Boolean> setup(String ip, int port, String database, String username, String password) {
-        return CompletableFuture.supplyAsync(() -> false);
-    }
-
-    @Override
-    public boolean isFileBased() {
-        return true;
-    }
 }

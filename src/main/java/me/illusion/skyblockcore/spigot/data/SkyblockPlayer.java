@@ -71,6 +71,7 @@ public class SkyblockPlayer {
                 System.out.println("No PlayerData has been found, creating new data");
 
                 data = new PlayerData();
+                data.setPlayerId(uuid);
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid);
                 islandData.addUser(uuid);
                 sync(() -> main.getIslandManager().loadIsland(islandData)

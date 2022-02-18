@@ -1,14 +1,14 @@
 package me.illusion.skyblockcore.shared.storage;
 
-import me.illusion.skyblockcore.shared.storage.handler.MongoDBHandler;
-import me.illusion.skyblockcore.shared.storage.handler.MySQLHandler;
-import me.illusion.skyblockcore.shared.storage.handler.SQLiteHandler;
-import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
+import me.illusion.skyblockcore.shared.storage.handler.*;
 
 public enum StorageType {
     MYSQL(MySQLHandler.class),
     SQLITE(SQLiteHandler.class),
-    MONGODB(MongoDBHandler.class, "com.mongodb.MongoClient");
+    MONGODB(MongoDBHandler.class, "com.mongodb.MongoClient"),
+    FILE(FileStorageHandler.class),
+    S3(S3StorageHandler.class, "com.amazonaws.services.s3.AmazonS3");
 
     final Class<? extends StorageHandler> handlerClass;
 
@@ -23,11 +23,11 @@ public enum StorageType {
         this.className = className;
     }
 
-    public void checkDependencies(SkyblockPlugin main) {
+    public void checkDependencies(DependencyDownloader downloader) {
         if (className == null)
             return;
 
-        main.getDependencyDownloader().dependOn(className, "https://www.illusionthe.dev/dependencies/Skyblock.html", "SkyblockDependencies.html");
+        downloader.dependOn(className, "https://www.illusionthe.dev/dependencies/Skyblock.html", "SkyblockDependencies.html");
     }
 
     public Class<? extends StorageHandler> getHandlerClass() {

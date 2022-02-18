@@ -190,23 +190,15 @@ public class SkyblockPlugin extends JavaPlugin {
     private CompletableFuture<Boolean> setupStorage() {
         FileConfiguration config = settings.getConfiguration();
         StorageType type = StorageType.valueOf(config.getString("database.type").toUpperCase(Locale.ROOT));
-        type.checkDependencies(this);
+        type.checkDependencies(dependencyDownloader);
 
         Class<? extends StorageHandler> clazz = type.getHandlerClass();
         try {
             storageHandler = clazz.newInstance();
 
-            if (storageHandler.isFileBased())
-                return storageHandler.setup(getDataFolder());
-
-            String host = config.getString("database.host", "");
-            String database = config.getString("database.database", "");
-            String username = config.getString("database.username", "");
-            String password = config.getString("database.password", "");
-            int port = config.getInt("database.port");
 
             System.out.println("Created handler of type " + clazz.getSimpleName());
-            return storageHandler.setup(host, port, database, username, password);
+            return storageHandler.setup(getDataFolder(), config.getConfigurationSection("database").getValues(false));
 
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

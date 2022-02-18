@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.bungee.handler.MessagePacketHandler;
 import me.illusion.skyblockcore.bungee.listener.ConnectListener;
 import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.listener.SpigotListener;
+import me.illusion.skyblockcore.bungee.utilities.StorageUtils;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
 import me.illusion.skyblockcore.shared.dependency.JedisUtil;
@@ -94,17 +95,8 @@ public class SkyblockBungeePlugin extends Plugin {
         try {
             storageHandler = clazz.newInstance();
 
-            if (storageHandler.isFileBased())
-                return storageHandler.setup(getDataFolder());
-
-            String host = config.getString("database.host", "");
-            String database = config.getString("database.database", "");
-            String username = config.getString("database.username", "");
-            String password = config.getString("database.password", "");
-            int port = config.getInt("database.port");
-
             System.out.println("Created handler of type " + clazz.getSimpleName());
-            return storageHandler.setup(host, port, database, username, password);
+            return storageHandler.setup(getDataFolder(), StorageUtils.asMap(config.getSection("database")));
 
         } catch (InstantiationException | IllegalAccessException e) {
             ExceptionLogger.log(e);

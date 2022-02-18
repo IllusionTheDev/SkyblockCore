@@ -19,7 +19,7 @@ public class SerializedFile implements Serializable {
         setFile(file);
     }
 
-    private SerializedFile(File file, byte[] contents) {
+    public SerializedFile(File file, byte[] contents) {
         this.file = file;
         this.contents = contents;
     }

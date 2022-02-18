@@ -13,6 +13,7 @@ public class FullFitComparator implements Comparator<ServerInfo> {
             return 0;
         }
 
+
         return serverInfo.getIslandCount() > t1.getIslandCount() ? -1 : 1;
     }
 }

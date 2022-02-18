@@ -1,12 +1,9 @@
 package me.illusion.skyblockcore.shared.sql;
 
 import lombok.SneakyThrows;
+import me.illusion.skyblockcore.shared.storage.StorageUtils;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,7 +35,7 @@ public final class SQLSerializer {
 
             statement.setString(1, table);
             statement.setString(2, uuid.toString());
-            statement.setBytes(3, getBytes(objectToSerialize));
+            statement.setBytes(3, StorageUtils.getBytes(objectToSerialize));
             statement.executeUpdate();
 
         } catch (Exception e) {
@@ -70,7 +67,7 @@ public final class SQLSerializer {
                 if (!result.next())
                     return null;
 
-                deSerializedObject = getObject(result.getBytes(1));
+                deSerializedObject = StorageUtils.getObject(result.getBytes(1));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -90,26 +87,4 @@ public final class SQLSerializer {
         });
     }
 
-    private static byte[] getBytes(Object object) {
-        try (ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-             ObjectOutputStream objectOutput = new ObjectOutputStream(byteOutput)) {
-
-            objectOutput.writeObject(object);
-            return byteOutput.toByteArray();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static Object getObject(byte[] bytes) {
-        try (ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
-             ObjectInputStream objectIn = new ObjectInputStream(byteIn)) {
-
-            return objectIn.readObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

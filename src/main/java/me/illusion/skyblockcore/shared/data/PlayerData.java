@@ -13,6 +13,8 @@ import java.util.UUID;
 @ToString
 public class PlayerData implements Serializable {
 
+    private UUID playerId;
+
     private UUID islandId;
     private double money = 0;
     private float experience = 0;
