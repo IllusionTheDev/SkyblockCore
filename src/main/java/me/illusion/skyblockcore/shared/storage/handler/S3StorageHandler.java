@@ -31,11 +31,11 @@ public class S3StorageHandler extends FileStorageHandler {
         super.setup(folder, data);
 
         return CompletableFuture.supplyAsync(() -> {
-            String accessKey = data.get("accessKey").toString();
-            String secretKey = data.get("secretKey").toString();
+            String accessKey = data.get("access-key").toString();
+            String secretKey = data.get("secret-key").toString();
 
             region = Regions.fromName(data.get("region").toString());
-            bucketName = data.getOrDefault("bucketName", "skyblock-storage").toString();
+            bucketName = data.getOrDefault("bucket", "skyblock-storage").toString();
 
             credentials = new BasicAWSCredentials(accessKey, secretKey);
 
