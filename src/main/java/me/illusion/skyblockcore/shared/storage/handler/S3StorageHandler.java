@@ -6,10 +6,12 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import me.illusion.skyblockcore.shared.storage.StorageUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
@@ -99,21 +101,19 @@ public class S3StorageHandler extends FileStorageHandler {
 
     @Override
     public CompletableFuture<Void> save(UUID uuid, Object object, String category) {
-        return super.save(uuid, object, category).thenRun(() -> {
+        return CompletableFuture.runAsync(() -> {
             Class<?> clazz = getClassByCategory(category);
 
             if (clazz == null) {
                 return;
             }
 
-            File file = new File(dataFolder, category + "-" + uuid + "." + category.toLowerCase(Locale.ROOT));
-
-            if (!file.exists()) {
-                return; // data didn't save properly
-            }
-            
-            s3client.putObject(bucketName,
-                    file.getName(), file);
+            s3client.putObject(
+                    bucketName,
+                    category + "-" + uuid + "." + category.toLowerCase(Locale.ROOT),
+                    new ByteArrayInputStream(StorageUtils.getBytes(object)),
+                    new ObjectMetadata()
+            );
         });
 
     }
