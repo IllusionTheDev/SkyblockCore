@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.command.island.invite;
 
 import me.illusion.skyblockcore.shared.data.IslandInvite;
+import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketInvitePlayer;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketInviteResponse;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
@@ -70,7 +71,7 @@ public class IslandInviteCommand implements SkyblockCommand {
             UUID inviteID = UUID.randomUUID();
 
             PacketInvitePlayer packet = new PacketInvitePlayer(
-                    main.getBungeeMessaging().getServerIdentifier(),
+                    PacketManager.getServerIdentifier(),
                     new IslandInvite(inviteID, origin.getUniqueId(), targetName));
 
             main.getPacketManager().send(packet);

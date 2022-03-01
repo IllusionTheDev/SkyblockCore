@@ -23,24 +23,32 @@ database:
 
 # Server communication (proxy <-> server)
 communication:
-  # Available types: Bungee, Redis
-  type: Bungee
+  # Available types: Redis
+  type: Redis
 
   # Specific to Redis
 
-  # host: localhost
-  # port: 6379
-  # password: password
-
-  # Specific to Bungee
-
-  # PLEASE CHANGE THIS TO SOMETHING UNIQUE, OTHERWISE PEOPLE WILL BE ABLE TO SPY INTO SOME ISLAND DATA
-  channel: skyblock:communication
-
-
-redis:
-  enable: false # Set to true if using multiple proxies
-
   host: localhost
-  port: 0 # Set to 0 or remove this line for default port
-  password: "" # Set empty or remove this line for no password
+  port: 6379
+  password: password
+
+
+island-allocation:
+  # Available types: EMPTY, EMPTY_PERCENTAGE, FULL, FULL_PERCENTAGE
+  # EMPTY - The server with the least amount of islands loaded will be selected.
+  # EMPTY_PERCENTAGE - The server with the least amount of islands, as a percentage of the total amount of total capacity.
+  # FULL - The server with the most amount of islands loaded will be selected.
+  # FULL_PERCENTAGE - The server with the most amount of islands, as a percentage of the total amount of total capacity.
+
+  # Example:
+  # server1 - 2 islands loaded, 10 islands available,
+  # server2 - 3 island loaded, 25 islands available
+  # server3 - 6 islands loaded, 25 islands available
+  # server4 - 5 islands loaded, 10 islands available
+
+  # EMPTY would select server1, as it has the least amount of islands loaded.
+  # EMPTY_PERCENTAGE would select server2, as it has the least amount of islands loaded out of the total capacity (12%, instead of server1's 20%).
+  # FULL would select server3, as it has the most amount of islands loaded.
+  # FULL_PERCENTAGE would select server4, as it has the most amount of islands loaded out of the total capacity (50% instead of server3's 24%).
+  type: EMPTY_PERCENTAGE
+

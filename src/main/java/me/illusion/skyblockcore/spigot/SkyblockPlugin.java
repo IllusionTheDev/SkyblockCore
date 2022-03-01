@@ -33,6 +33,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.spigotmc.SpigotConfig;
 
 import java.io.File;
 import java.util.Locale;
@@ -156,14 +157,17 @@ public class SkyblockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
-        
+
         System.out.println("Registering possible hooks");
         if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
             new VaultHook(this);
 
-        System.out.println("Registering bungeecord messaging listener");
-        packetManager = new PacketManager();
-        packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
+        if (SpigotConfig.bungee) {
+            System.out.println("Registering bungeecord messaging listener");
+            packetManager = new PacketManager(settings.getConfiguration().getString("communication.server-id"));
+            packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
+        }
+
 
         System.out.println("Loaded");
 

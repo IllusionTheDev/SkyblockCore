@@ -4,9 +4,7 @@ import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SkyblockCommand;
 import me.illusion.skyblockcore.bungee.data.PlayerFinder;
 import me.illusion.skyblockcore.bungee.handler.MessagePacketHandler;
-import me.illusion.skyblockcore.bungee.listener.ConnectListener;
 import me.illusion.skyblockcore.bungee.listener.RedisListener;
-import me.illusion.skyblockcore.bungee.listener.SpigotListener;
 import me.illusion.skyblockcore.bungee.utilities.StorageUtils;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
@@ -59,8 +57,7 @@ public class SkyblockBungeePlugin extends Plugin {
             setupJedis();
 
             getProxy().getPluginManager().registerCommand(this, new SkyblockCommand(this));
-            getProxy().getPluginManager().registerListener(this, new ConnectListener());
-            packetManager = new PacketManager();
+            packetManager = new PacketManager(getProxy().getName());
             playerFinder = new PlayerFinder(this);
 
             setupPackets();
@@ -69,8 +66,10 @@ public class SkyblockBungeePlugin extends Plugin {
     }
 
     private void setupPackets() {
-        packetManager.registerProcessor(PacketDirection.PROXY_TO_PROXY, new RedisListener(this));
-        packetManager.registerProcessor(PacketDirection.PROXY_TO_INSTANCE, new SpigotListener(this));
+        RedisListener redis = new RedisListener(this);
+
+        packetManager.registerProcessor(PacketDirection.PROXY_TO_PROXY, redis);
+        packetManager.registerProcessor(PacketDirection.PROXY_TO_INSTANCE, redis);
 
         packetManager.subscribe(PacketRequestMessageSend.class, new MessagePacketHandler());
     }

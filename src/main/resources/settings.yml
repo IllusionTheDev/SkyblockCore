@@ -24,22 +24,26 @@ database:
   # secret-key: secret-key
 
 
+# ------------------------------------------------------------------------------
+# This block only applies if you're using a bungee server.
+# This block will be ignored if you're not using a bungee server.
+# The database connection must be the same as all the proxies you're using,
+# or you will get an error.
+
 communication:
-  # Available types: Bungee, Redis
-  type: Bungee
+  # Available types: Redis
+  type: Redis
 
   # Specific to Redis
 
-  # host: localhost
-  # port: 6379
-  # password: password
-  # ---------------------
+  host: localhost
+  port: 6379
+  password: password
 
-  # Specific to Bungee
+  # This value must correspond to the server name in the BungeeCord config.
+  server-id: "skyblock"
 
-  # PLEASE CHANGE THIS TO SOMETHING UNIQUE, OTHERWISE PEOPLE WILL BE ABLE TO SPY INTO SOME ISLAND DATA
-  channel: skyblock:communication
-  # ---------------------
+# ------------------------------------------------------------------------------
 
 
 delay: # All delays in ticks

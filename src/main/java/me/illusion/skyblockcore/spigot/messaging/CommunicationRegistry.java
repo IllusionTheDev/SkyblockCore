@@ -28,16 +28,13 @@ public class CommunicationRegistry {
 
         CommunicationType communicationType = type.get();
 
-        switch (communicationType) {
-            case BUNGEE:
-                return new BungeeMessaging(main);
-            case REDIS:
-                main.getDependencyDownloader().dependOn(
-                        "redis.clients.Jedis",
-                        "https://www.illusionthe.dev/dependencies/Skyblock.html",
-                        "SkyblockDependencies.jar"
-                );
-                return new RedisMessaging(main);
+        if (communicationType == CommunicationType.REDIS) {
+            main.getDependencyDownloader().dependOn(
+                    "redis.clients.Jedis",
+                    "https://www.illusionthe.dev/dependencies/Skyblock.html",
+                    "SkyblockDependencies.jar"
+            );
+            return new RedisMessaging(main);
         }
 
         return null;

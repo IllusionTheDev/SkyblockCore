@@ -81,6 +81,11 @@ public class RedisMessaging extends BinaryJedisPubSub implements PacketProcessor
 
     @Override
     public void send(Packet packet) {
-        jedis.publish(KEY, packet.getAllBytes());
+        try {
+            jedis.publish(KEY, packet.getAllBytes());
+        } catch (Exception e) {
+            jedis = jedisUtil.getJedis();
+            jedis.publish(KEY, packet.getAllBytes());
+        }
     }
 }

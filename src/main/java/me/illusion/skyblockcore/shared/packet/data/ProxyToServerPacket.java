@@ -13,7 +13,12 @@ public class ProxyToServerPacket extends Packet {
         super(bytes);
 
         originProxy = readString();
-        targetServer = readString();
+        String targetServer = readString();
+
+        if (targetServer.equalsIgnoreCase("null"))
+            targetServer = null;
+
+        this.targetServer = targetServer;
     }
 
     public ProxyToServerPacket(String proxyId, String targetServer) {
@@ -23,6 +28,10 @@ public class ProxyToServerPacket extends Packet {
         this.targetServer = targetServer;
 
         writeString(originProxy);
-        writeString(targetServer);
+
+        if (targetServer == null)
+            writeString("null");
+        else
+            writeString(targetServer);
     }
 }
