@@ -27,7 +27,7 @@ I am aware of both issues, and aim to release fixes soon, please do not annoy me
 
 ### Setup instructions:
 - Load the plugin into an empty server
-- Set the SQL / MongoDB database info into the config.yml file (if not SQLite)
+- Set the storage database info into the config.yml file (Available types: Amazon S3, MySQL, SQLite, MongoDB, Flat-file (creates multiple files on a folder))
 - Restart
 - Configure to your liking
 
@@ -39,14 +39,14 @@ I am aware of both issues, and aim to release fixes soon, please do not annoy me
 
 #### If on a proxy:
 - Put the plugin on the proxy's plugins folder, as well as set-up each instance with the steps above.
-- Set the SQL / MongoDB database info into the bungee-config.yml file (note that instances should also be running on the same database)
+- Set the storage info into the bungee-config.yml file (note that instances should also be running on the same database, file-based databases are naturally unsupported in bungee mode)
 - Restart
 
 #### If you're running multiple proxies (Requires Redis):
 - Put the plugin on each proxy and instance
 - Set them all to use the same database
-- On each proxy, also set the Redis database details
-- Restart all proxies (If you don't have jedis, you're going to have to restart twice)
+- On each proxy, also set the communication database details (Redis by default, RabbitMQ and a native Socket-based system coming soon)
+- Restart all proxies (If you don't have database drivers, you're going to have to restart twice)
 
 ------------
 
