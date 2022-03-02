@@ -4,6 +4,7 @@ import com.google.common.base.Enums;
 import com.google.common.base.Optional;
 import me.illusion.skyblockcore.shared.packet.PacketProcessor;
 import me.illusion.skyblockcore.shared.packet.communication.CommunicationType;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,8 +24,10 @@ public class CommunicationRegistry {
 
         Optional<CommunicationType> type = Enums.getIfPresent(CommunicationType.class, section.getString("type").toUpperCase(Locale.ENGLISH));
 
-        if (!type.isPresent())
-            throw new IllegalArgumentException("Invalid communication type");
+        if (!type.isPresent()) {
+            ExceptionLogger.log(new IllegalArgumentException("Invalid communication type: " + section.getString("type")));
+            return null;
+        }
 
         CommunicationType communicationType = type.get();
 
@@ -34,7 +37,13 @@ public class CommunicationRegistry {
                     "https://www.illusionthe.dev/dependencies/Skyblock.html",
                     "SkyblockDependencies.jar"
             );
-            return new RedisMessaging(main);
+
+            try {
+                return new RedisMessaging(main);
+            } catch (Exception e) {
+                ExceptionLogger.log(e);
+                return null;
+            }
         }
 
         return null;
