@@ -52,19 +52,7 @@ I am aware of both issues, and aim to release fixes soon, please do not annoy me
 
 ## Technical Aspects:
 
-Each player currently occupies ~32.5KB max, with each island occupying ~4MB max on the SQL / MongoDB database. This means that group islands are heavily optimized, as each player stores an Island UUID, which is then referenced to get the Island itself.
-
-All storage operations are done async (Island saving, pasting and regenerating) when possible.
-
-~~Player inventories are stored via SQL aswell, meaning you can have 20 servers hosting this same plugin connected to the same database and it will seem as one.~~ Please use my [DataSync Plugin](https://github.com/IllusionTheDev/DataSync) mentioned above. 
-
-Now for RAM / DISK usage on the instance itself, I'd say around 2GB DISK and 2GB RAM per instance
-
-The islands are either saved in .mca (Mojang's format) or in .schematic (FAWE), format set in island-config.yml
-
-Islands have their own worlds, which are loaded on demand
-
-Servers communicate using the Plugin Messaging API, when doing any proxy <-> instance communication, or Redis when doing any proxy <-> proxy communication. The communication is done via a Packet system, that is implemented in the `shared` package
+Now available on the [Wiki](https://github.com/IllusionTheDev/SkyblockCore/wiki#technical-aspects)!
 
 
 ------------
