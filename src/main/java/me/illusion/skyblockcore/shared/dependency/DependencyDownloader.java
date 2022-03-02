@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.shared.dependency;
 
 import me.illusion.skyblockcore.shared.updating.Updater;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.File;
 
@@ -33,7 +34,7 @@ public class DependencyDownloader {
             try {
                 file.createNewFile();
             } catch (Exception e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
         }
 

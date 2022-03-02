@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.bungee.utilities;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
@@ -33,7 +34,7 @@ public class YMLBase {
                 } else
                     file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
 
@@ -42,7 +43,7 @@ public class YMLBase {
         try {
             this.configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -50,7 +51,7 @@ public class YMLBase {
         try {
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, file);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 }

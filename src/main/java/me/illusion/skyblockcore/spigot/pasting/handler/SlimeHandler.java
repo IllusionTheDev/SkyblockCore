@@ -7,6 +7,7 @@ import com.grinderwolf.swm.nms.CraftSlimeWorld;
 import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.grinderwolf.swm.plugin.loaders.file.FileLoader;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
@@ -60,7 +61,7 @@ public class SlimeHandler implements PastingHandler {
 
                 fileLoader.loadWorld(worldName, false);
             } catch (IllegalAccessException | WorldInUseException | UnknownWorldException | IOException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
         });
@@ -92,7 +93,7 @@ public class SlimeHandler implements PastingHandler {
             File worldFile = new File(worldFolder, world.getName() + ".slime");
             action.accept(SerializedFile.loadArray(worldFile));
         } catch (Exception e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
     }

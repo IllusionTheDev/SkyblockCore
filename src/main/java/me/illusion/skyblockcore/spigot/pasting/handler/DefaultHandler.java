@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot.pasting.handler;
 
 import com.google.common.io.Files;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
@@ -54,7 +55,7 @@ public class DefaultHandler implements PastingHandler {
             // Copy the file
             Files.copy(finalFile, newFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -118,7 +119,7 @@ public class DefaultHandler implements PastingHandler {
             WorldUtils.assertAsync();
             latch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 

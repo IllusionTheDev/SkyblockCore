@@ -1,5 +1,7 @@
 package me.illusion.skyblockcore.shared.storage;
 
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -15,7 +17,7 @@ public class StorageUtils {
             objectOutput.writeObject(object);
             return byteOutput.toByteArray();
         } catch (Exception e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
             return null;
         }
     }
@@ -26,7 +28,7 @@ public class StorageUtils {
 
             return objectIn.readObject();
         } catch (Exception e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
             return null;
         }
     }

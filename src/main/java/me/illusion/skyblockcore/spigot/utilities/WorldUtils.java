@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.utilities;
 
 import me.illusion.skyblockcore.shared.exceptions.UnsafeSyncOperationException;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
@@ -29,7 +30,7 @@ public final class WorldUtils {
             try {
                 latch.await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
         });
 
@@ -85,7 +86,7 @@ public final class WorldUtils {
             try {
                 latch.await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
             return Bukkit.getWorld(worldName);

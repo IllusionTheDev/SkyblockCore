@@ -110,7 +110,7 @@ public class SkyblockPlugin extends JavaPlugin {
         emptyWorldGenerator = new EmptyWorldGenerator(this);
         commandManager = new CommandManager(this);
 
-        dependencyDownloader = new DependencyDownloader(getDataFolder());
+        dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
         dependencyDownloader.onDownload(() -> {
             System.err.println("[SkyblockCore] Dependencies downloaded!");
             System.err.println("[SkyblockCore] Since you have downloaded dependencies, you will need to restart the server.");
@@ -133,7 +133,7 @@ public class SkyblockPlugin extends JavaPlugin {
             try {
                 sync(this::load);
             } catch (Exception e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
         });
 
@@ -205,7 +205,7 @@ public class SkyblockPlugin extends JavaPlugin {
             return storageHandler.setup(getDataFolder(), config.getConfigurationSection("database").getValues(false));
 
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
         return CompletableFuture.supplyAsync(() -> false);

@@ -4,6 +4,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import org.bson.Document;
 
 import java.io.File;
@@ -27,7 +28,7 @@ public class MongoDBHandler implements StorageHandler {
             try {
                 mongoClient = new MongoClient(ip, port);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                ExceptionLogger.log(exception);
                 return false;
             }
 

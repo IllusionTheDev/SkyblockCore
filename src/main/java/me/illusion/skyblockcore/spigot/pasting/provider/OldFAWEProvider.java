@@ -5,6 +5,7 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import org.bukkit.Location;
 
 import java.io.File;
@@ -36,7 +37,7 @@ public class OldFAWEProvider implements FAWEProvider {
         try {
             schem.save(file, (ClipboardFormat) getFormat(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -45,13 +46,13 @@ public class OldFAWEProvider implements FAWEProvider {
             try {
                 constructor = CuboidRegion.class.getDeclaredConstructor(Vector.class, Vector.class);
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
         try {
             return constructor.newInstance(one, two);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
         return null;
@@ -63,7 +64,7 @@ public class OldFAWEProvider implements FAWEProvider {
             Object format = getFormat(file);
             return (Schematic) loadMethod.invoke(format, file);
         } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
         return null;
@@ -76,21 +77,21 @@ public class OldFAWEProvider implements FAWEProvider {
             try {
                 clazz = Class.forName("com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
             try {
                 formatMethod = clazz.getDeclaredMethod("findByFile", File.class);
                 loadMethod = clazz.getDeclaredMethod("load", File.class);
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
         }
 
         try {
             return formatMethod.invoke(null, file);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
         return null;

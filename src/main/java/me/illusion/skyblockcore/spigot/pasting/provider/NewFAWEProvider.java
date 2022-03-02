@@ -6,6 +6,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import org.bukkit.Location;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class NewFAWEProvider implements FAWEProvider {
             Clipboard clipboard = ClipboardFormats.findByFile(file).load(file);
             clipboard.paste(FaweAPI.getWorld(location.getWorld().getName()), BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -34,7 +35,7 @@ public class NewFAWEProvider implements FAWEProvider {
         try {
             clipboard.save(file, ClipboardFormats.findByFile(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 }

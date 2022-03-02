@@ -131,7 +131,7 @@ public class IslandManager {
                     try {
                         return loadIsland(islandData).get();
                     } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
+                        ExceptionLogger.log(e);
                     }
 
                     return null;
@@ -338,7 +338,7 @@ public class IslandManager {
                             .whenComplete((realFile, throwable) -> { // Which is then used to change internal data
                                 try {
                                     if (throwable != null)
-                                        throwable.printStackTrace();
+                                        ExceptionLogger.log(throwable);
 
 
                                     file.setFile(new File(folder, realFile.getName())); // Change the file to the new location
@@ -346,7 +346,7 @@ public class IslandManager {
 
                                     copyArray[finalI] = file; // Add the file to the copy array
                                 } catch (Exception exception) {
-                                    exception.printStackTrace();
+                                    ExceptionLogger.log(exception);
                                 }
 
                             });
@@ -355,19 +355,19 @@ public class IslandManager {
                 WorldUtils.assertAsync();
                 CompletableFuture.allOf(futures).whenComplete((v, throwable) -> { // Waits for all the files to be written
                     if (throwable != null) // If there was an error
-                        throwable.printStackTrace(); // Prints the error
+                        ExceptionLogger.log(throwable); // Prints the error
 
                 }).join();
 
 
             } catch (Exception exception) {
-                exception.printStackTrace();
+                ExceptionLogger.log(exception);
             }
 
 
             return copyArray; // Returns the copy array
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            ExceptionLogger.log(throwable);
             return null;
         });
     }
@@ -390,7 +390,7 @@ public class IslandManager {
             WorldUtils.assertAsync();
             latch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 

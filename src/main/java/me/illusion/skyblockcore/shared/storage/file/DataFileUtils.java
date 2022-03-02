@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.shared.storage.file;
 
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.storage.StorageUtils;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class DataFileUtils {
                 Object data = StorageUtils.getObject(file.getBytes());
                 return clazz.cast(data);
             } catch (Exception e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
             return null;
@@ -35,7 +36,7 @@ public class DataFileUtils {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
         }
     }

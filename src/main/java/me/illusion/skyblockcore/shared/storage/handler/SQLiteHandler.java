@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.shared.storage.handler;
 
 import me.illusion.skyblockcore.shared.sql.SQLUtil;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class SQLiteHandler extends MySQLHandler {
         try {
             file.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
 

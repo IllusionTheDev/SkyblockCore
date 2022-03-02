@@ -4,6 +4,7 @@ import me.illusion.skyblockcore.shared.data.IslandInvite;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketInvitePlayer;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketInviteResponse;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import org.bukkit.Bukkit;
@@ -45,7 +46,7 @@ public class IslandInviteCommand implements SkyblockCommand {
                     player.sendMessage("Response: " + response);
                 })
                 .exceptionally((thr) -> {
-                    thr.printStackTrace();
+                    ExceptionLogger.log(thr);
                     return null;
                 });
 

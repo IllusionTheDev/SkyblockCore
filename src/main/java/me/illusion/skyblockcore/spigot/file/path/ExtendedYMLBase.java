@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.file.path;
 
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.utilities.storage.YMLBase;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,7 +52,7 @@ public class ExtendedYMLBase extends YMLBase {
 
                 field.set(t, cast);
             } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
             field.setAccessible(!accessible);

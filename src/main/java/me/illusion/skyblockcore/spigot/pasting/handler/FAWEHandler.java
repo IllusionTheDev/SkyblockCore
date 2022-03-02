@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot.pasting.handler;
 
 import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
@@ -59,7 +60,7 @@ public class FAWEHandler implements PastingHandler {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
         }
 

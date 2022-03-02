@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.shared.packet;
 
 import me.illusion.skyblockcore.shared.packet.data.PacketWaitData;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,7 +85,7 @@ public class PacketWaiter {
             if (!result)
                 return null;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
         return (T) results.remove(waitData);

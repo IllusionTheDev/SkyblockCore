@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.utilities.storage;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -35,7 +36,7 @@ public class YMLBase {
         try {
             configuration.save(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -50,7 +51,7 @@ public class YMLBase {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    ExceptionLogger.log(e);
                 }
             }
         }
@@ -58,7 +59,7 @@ public class YMLBase {
         try {
             cfg.load(file);
         } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
 

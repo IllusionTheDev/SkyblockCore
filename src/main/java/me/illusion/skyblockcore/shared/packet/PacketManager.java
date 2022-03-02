@@ -6,6 +6,7 @@ import me.illusion.skyblockcore.shared.packet.data.ProxyToProxyPacket;
 import me.illusion.skyblockcore.shared.packet.data.ProxyToServerPacket;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.response.PacketRespondServer;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -188,7 +189,7 @@ public class PacketManager {
 
             return packet;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
         return null;

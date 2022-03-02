@@ -12,6 +12,7 @@ import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketRespondIslandServer;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketRequestIslandServer;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import redis.clients.jedis.Jedis;
@@ -102,7 +103,7 @@ public class PlayerFinder {
             try {
                 return future.get(3, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
 

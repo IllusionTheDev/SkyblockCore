@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.spigot.command.impl;
 
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.BaseCommand;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
@@ -31,14 +32,14 @@ public class CommandManager {
 
             commandMap = (CommandMap) commandMapField.get(server);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
 
         try {
             pluginCommandConstructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             pluginCommandConstructor.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -76,7 +77,7 @@ public class CommandManager {
                 commandMap.register(base, pluginCommand);
 
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
             System.out.println(base + " was registered as a command");

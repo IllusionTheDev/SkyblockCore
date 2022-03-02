@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.shared.storage;
 
 import lombok.EqualsAndHashCode;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class SerializedFile implements Serializable {
         try {
             getFile().get();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -54,7 +55,7 @@ public class SerializedFile implements Serializable {
 
                 Files.write(file.toPath(), contents);
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
             return file;
         });
@@ -73,7 +74,7 @@ public class SerializedFile implements Serializable {
         try {
             this.contents = Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 

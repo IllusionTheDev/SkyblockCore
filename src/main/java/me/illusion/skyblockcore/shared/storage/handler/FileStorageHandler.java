@@ -5,6 +5,7 @@ import me.illusion.skyblockcore.shared.data.PlayerData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.file.DataFileUtils;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class FileStorageHandler implements StorageHandler {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    ExceptionLogger.log(e);
                 }
             }
 

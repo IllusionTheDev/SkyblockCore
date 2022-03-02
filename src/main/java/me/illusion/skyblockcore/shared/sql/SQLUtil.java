@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.shared.sql;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.File;
 import java.sql.Connection;
@@ -58,7 +59,7 @@ public class SQLUtil {
 
             connection.setAutoCommit(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
             return false;
         }
         return true;
@@ -70,7 +71,7 @@ public class SQLUtil {
                 try {
                     connection.createStatement().execute(query);
                 } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    ExceptionLogger.log(throwables);
                 }
             }
         });

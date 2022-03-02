@@ -39,7 +39,7 @@ public final class SQLSerializer {
             statement.executeUpdate();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            ExceptionLogger.log(e);
         }
     }
 
@@ -69,7 +69,7 @@ public final class SQLSerializer {
 
                 deSerializedObject = StorageUtils.getObject(result.getBytes(1));
             } catch (Exception e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
 
             try {
@@ -78,7 +78,7 @@ public final class SQLSerializer {
                 if (result != null)
                     result.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                ExceptionLogger.log(e);
             }
             return deSerializedObject;
         }).exceptionally(throwable -> {
