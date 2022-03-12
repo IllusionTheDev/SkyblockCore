@@ -16,7 +16,6 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 /*
@@ -45,6 +44,7 @@ import java.util.concurrent.ExecutionException;
 public class IslandManager {
 
     private final Map<UUID, Island> islands = new HashMap<>();
+    private final Map<UUID, CompletableFuture<Island>> loadingIslands = new HashMap<>();
 
     private final SkyblockPlugin main;
 
@@ -143,7 +143,10 @@ public class IslandManager {
 
 
     public CompletableFuture<Island> loadIsland(IslandData data) {
-        return CompletableFuture.supplyAsync(() -> {
+        if (loadingIslands.containsKey(data.getId()))
+            return loadingIslands.get(data.getId());
+
+        CompletableFuture<Island> future = CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
             UUID islandId = data.getId();
 
@@ -157,9 +160,6 @@ public class IslandManager {
             File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
 
             final Reference<Island> islandReference = new Reference<>();
-
-            // If we need to paste, we make a latch with 1 use, used for the island loading
-            CountDownLatch latch = new CountDownLatch(1);
 
             // Pastes island if required
             SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
@@ -177,14 +177,10 @@ public class IslandManager {
                         String world = main.getWorldManager().assignWorld(islandId); // Assigns world
 
                         islandReference.set(loadIsland(data, world)); // Creates island
-                        latch.countDown();
                     }).exceptionally(throwable -> {
                         ExceptionLogger.log(throwable);
                         return null;
-                    });
-
-
-            wait(latch);
+                    }).join();
 
             long end = System.currentTimeMillis();
 
@@ -223,7 +219,8 @@ public class IslandManager {
             return null;
         });
 
-
+        loadingIslands.put(data.getId(), future);
+        return future;
     }
 
     /**
@@ -244,8 +241,6 @@ public class IslandManager {
      */
     private Island loadIslandLoadedWorld(IslandData data, World world) {
         try {
-            CountDownLatch latch = new CountDownLatch(1);
-
             Location center = world.getSpawnLocation();
 
             System.out.println(world.getName() + " spawn location: " + center);
@@ -266,8 +261,6 @@ public class IslandManager {
 
     private Island loadIslandUnloadedWorld(IslandData data, String worldName) {
         try {
-            CountDownLatch latch = new CountDownLatch(1);
-
             Vector centerPoint = main.getIslandConfig().getSpawnPoint();
 
             System.out.println(worldName + " spawn location: " + centerPoint);
@@ -277,11 +270,11 @@ public class IslandManager {
                     .getPastingHandler()
                     .paste(data.getIslandSchematic(), worldName, centerPoint)
                     .thenRun(() ->
-                            WorldUtils.load(main, worldName))
-                    .thenRun(latch::countDown);
+                            WorldUtils.load(main, worldName)
+                    )
+                    .join();
 
             WorldUtils.assertAsync();
-            latch.await();
 
             World world = Bukkit.getWorld(worldName);
             Location center = centerPoint.toLocation(world);
@@ -325,7 +318,6 @@ public class IslandManager {
                 folder.getParentFile().mkdirs(); // Create parent folder if it doesn't exist
                 folder.mkdir(); // Create folder if it doesn't exist
 
-                CountDownLatch latch = new CountDownLatch(1); // Used to wait for the files to be written async
 
                 CompletableFuture[] futures = new CompletableFuture[files.length]; // Used to manage all the files being written
 
@@ -353,17 +345,17 @@ public class IslandManager {
                 }
 
                 WorldUtils.assertAsync();
-                CompletableFuture.allOf(futures).whenComplete((v, throwable) -> { // Waits for all the files to be written
+                CompletableFuture.allOf(futures).exceptionally((throwable) -> { // Waits for all the files to be written
                     if (throwable != null) // If there was an error
                         ExceptionLogger.log(throwable); // Prints the error
 
+                    return null;
                 }).join();
 
 
             } catch (Exception exception) {
                 ExceptionLogger.log(exception);
             }
-
 
             return copyArray; // Returns the copy array
         }).exceptionally(throwable -> {
@@ -383,15 +375,6 @@ public class IslandManager {
         System.out.println("Attempting to delete island files");
 
         FileUtils.delete(folder); // Delete the folder
-    }
-
-    private void wait(CountDownLatch latch) {
-        try {
-            WorldUtils.assertAsync();
-            latch.await();
-        } catch (InterruptedException e) {
-            ExceptionLogger.log(e);
-        }
     }
 
 

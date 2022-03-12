@@ -62,7 +62,6 @@ public class DefaultHandler implements PastingHandler {
     @Override
     public CompletableFuture<Void> paste(SerializedFile[] file, String name, Vector point) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
-        CountDownLatch mainLatch = new CountDownLatch(file.length);
 
         File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + name + File.separator + "region");
 
@@ -72,14 +71,13 @@ public class DefaultHandler implements PastingHandler {
         for (SerializedFile f : file)
             futures.add(paste(f, name));
 
-        allOf(futures).thenRun(() -> {
-            System.out.println("Done pasting");
-            mainLatch.countDown();
+
+        return CompletableFuture.runAsync(() -> {
+            allOf(futures).exceptionally((thr) -> {
+                ExceptionLogger.log(thr);
+                return null;
+            }).join();
         });
-
-        return CompletableFuture.runAsync(() -> wait(mainLatch));
-
-
     }
 
     @Override

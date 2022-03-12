@@ -81,7 +81,6 @@ public class WorldManager implements Listener {
 
     @EventHandler
     private void onSave(WorldSaveEvent event) {
-        System.out.println("SAVED WORLD " + event.getWorld().getName());
         World world = event.getWorld();
         String name = world.getName();
 
@@ -93,7 +92,6 @@ public class WorldManager implements Listener {
 
     @EventHandler
     private void onLoad(WorldLoadEvent event) {
-        System.out.println("LOADED WORLD " + event.getWorld().getName());
         World world = event.getWorld();
         String name = world.getName().toLowerCase(Locale.ROOT);
 
@@ -105,7 +103,6 @@ public class WorldManager implements Listener {
 
     @EventHandler
     private void onUnload(WorldUnloadEvent event) {
-        System.out.println("UNLOADED WORLD " + event.getWorld().getName());
         World world = event.getWorld();
         String name = world.getName().toLowerCase(Locale.ROOT);
 

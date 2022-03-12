@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.spigot.utilities;
 import me.illusion.skyblockcore.shared.exceptions.UnsafeSyncOperationException;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
+import me.illusion.skyblockcore.shared.utilities.Latch;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
@@ -12,7 +13,6 @@ import org.bukkit.WorldCreator;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 public final class WorldUtils {
@@ -24,7 +24,7 @@ public final class WorldUtils {
     }
 
     public static CompletableFuture<Void> unload(SkyblockPlugin main, String worldName, boolean save) {
-        CountDownLatch latch = new CountDownLatch(1);
+        Latch latch = new Latch();
 
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             try {
@@ -80,7 +80,7 @@ public final class WorldUtils {
             return CompletableFuture.completedFuture(world);
         }
 
-        CountDownLatch latch = new CountDownLatch(1);
+        Latch latch = new Latch();
 
         CompletableFuture<World> future = CompletableFuture.supplyAsync(() -> {
             try {
