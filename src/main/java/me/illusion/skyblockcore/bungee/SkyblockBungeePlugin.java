@@ -113,7 +113,7 @@ public class SkyblockBungeePlugin extends Plugin {
 
         dependencyDownloader.dependOn(
                 "redis.clients.Jedis",
-                "https://www.illusionthe.dev/dependencies/Skyblock.html",
+                "https://www.illusionthe.dev/dependencies/SkyblockDependencies.jar",
                 "SkyblockDependencies.jar"
         );
 

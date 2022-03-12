@@ -27,7 +27,7 @@ public enum StorageType {
         if (className == null)
             return;
 
-        downloader.dependOn(className, "https://www.illusionthe.dev/dependencies/Skyblock.html", "SkyblockDependencies.html");
+        downloader.dependOn(className, "https://www.illusionthe.dev/dependencies/SkyblockDependencies.jar", "SkyblockDependencies.jar");
     }
 
     public Class<? extends StorageHandler> getHandlerClass() {

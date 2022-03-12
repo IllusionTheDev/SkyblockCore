@@ -116,7 +116,7 @@ public class PlayerFinder {
             StorageHandler handler = main.getStorageHandler();
             PlayerData data;
             try {
-                data = (PlayerData) handler.get(uuid, "PLAYER").get(3, TimeUnit.SECONDS);
+                data = (PlayerData) handler.get(uuid, "PLAYER").exceptionally((thr) -> null).get(3, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 data = null;
             }

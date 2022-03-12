@@ -1,10 +1,8 @@
 package me.illusion.skyblockcore.shared.updating;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 
 
 /*
@@ -41,11 +39,16 @@ public class Updater {
         try {
             URL url = new URL(downloadLink);
 
-            try (InputStream in = new BufferedInputStream(url.openStream()); FileOutputStream fout = new FileOutputStream(new File(updateFolder, file.getName()))) {
-                final byte[] data = new byte[4096];
-                int count;
-                while ((count = in.read(data, 0, 4096)) != -1) {
-                    fout.write(data, 0, count);
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
+                URLConnection conn = url.openConnection();
+
+                try (InputStream in = conn.getInputStream()) {
+                    byte[] buffer = new byte[1024];
+
+                    int numRead;
+                    while ((numRead = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, numRead);
+                    }
                 }
             }
 
