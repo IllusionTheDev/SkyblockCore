@@ -14,7 +14,6 @@ import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
 import me.illusion.skyblockcore.spigot.file.SettingsFile;
-import me.illusion.skyblockcore.spigot.hook.VaultHook;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.spigot.listener.DeathListener;
@@ -107,6 +106,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
         emptyWorldGenerator = new EmptyWorldGenerator(this);
         commandManager = new CommandManager(this);
 
@@ -157,10 +157,6 @@ public class SkyblockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new LeaveListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
-
-        System.out.println("Registering possible hooks");
-        if (Bukkit.getPluginManager().isPluginEnabled("Vault"))
-            new VaultHook(this);
 
         if (SpigotConfig.bungee) {
             System.out.println("Registering bungeecord messaging listener");

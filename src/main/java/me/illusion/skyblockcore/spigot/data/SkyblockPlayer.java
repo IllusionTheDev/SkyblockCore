@@ -4,14 +4,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
+import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.spigot.event.IslandCreateEvent;
+import me.illusion.skyblockcore.spigot.event.IslandLoadEvent;
 import me.illusion.skyblockcore.spigot.island.Island;
-import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -76,6 +77,8 @@ public class SkyblockPlayer {
                 islandData.addUser(uuid);
                 sync(() -> main.getIslandManager().loadIsland(islandData)
                         .thenAccept(island -> {
+                            Bukkit.getPluginManager().callEvent(new IslandCreateEvent(island));
+                            Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
                             this.island = island;
                             this.islandCenter = island.getCenter();
 
@@ -93,6 +96,8 @@ public class SkyblockPlayer {
                     .thenAccept(island -> {
                         this.island = island;
                         this.islandCenter = island.getCenter();
+                        Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
+
                         System.out.println("Loaded island data");
 
 
@@ -126,22 +131,7 @@ public class SkyblockPlayer {
             return;
         }
 
-        World world = islandCenter.getWorld();
-
-        if (world == null) {
-            System.out.println("Teleporting - World is null");
-            islandCenter.setWorld(Bukkit.getWorld(island.getWorld()));
-        }
-
-        System.out.println("Teleporting to island");
-        System.out.println(islandCenter);
-
-        if (!islandCenter.getChunk().isLoaded())
-            islandCenter.getChunk().load();
-
-        Player player = getPlayer();
-        player.teleport(islandCenter);
-        data.getIslandLocation().update(islandCenter);
+        island.teleport(getPlayer());
 
     }
 
@@ -183,8 +173,6 @@ public class SkyblockPlayer {
         Player player = getPlayer();
         Location loc = player.getLocation();
 
-        data.setExperience(player.getExp());
-        data.setExperienceLevel(player.getLevel());
         data.getLastLocation().update(loc);
         data.getIslandLocation().update(loc);
 

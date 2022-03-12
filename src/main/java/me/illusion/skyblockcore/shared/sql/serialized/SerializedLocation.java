@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.spigot.sql.serialized;
+package me.illusion.skyblockcore.shared.sql.serialized;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.spigot.utilities.BukkitConverter;

@@ -10,7 +10,7 @@ import java.util.Map;
 public interface SkyblockCommand {
 
     /**
-     * The command identifier, use a . to separate subcommands
+     * The command identifier, use a '.' to separate subcommands
      * Example: island.teleport
      *
      * @return identifier

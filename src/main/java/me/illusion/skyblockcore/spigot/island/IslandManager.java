@@ -6,6 +6,7 @@ import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.shared.utilities.Reference;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.spigot.event.IslandUnloadEvent;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import org.bukkit.Bukkit;
@@ -366,6 +367,8 @@ public class IslandManager {
 
     public void deleteIsland(UUID islandId) {
         Island island = getIsland(islandId);
+
+        Bukkit.getPluginManager().callEvent(new IslandUnloadEvent(island));
 
         File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
 

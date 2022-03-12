@@ -2,10 +2,14 @@ package me.illusion.skyblockcore.spigot.island;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
+import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.spigot.event.IslandSaveEvent;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -30,6 +34,11 @@ public class Island {
         this.data = data;
         this.world = world;
 
+        if (data.getSpawnPointRelativeToCenter() == null) {
+            data.setSpawnPointRelativeToCenter(new SerializedLocation());
+            setSpawnPoint(center);
+        }
+
         main.getIslandManager().register(this);
     }
 
@@ -40,6 +49,7 @@ public class Island {
         main.getPastingHandler().save(this, schem -> {
             data.setIslandSchematic(schem);
 
+            Bukkit.getPluginManager().callEvent(new IslandSaveEvent(this));
             saveData().thenRun(afterSave);
         });
     }
@@ -65,6 +75,20 @@ public class Island {
                 });
 
 
+    }
+
+    public Location getSpawnPoint() {
+        return center.add(data.getSpawnPointRelativeToCenter().getLocation());
+    }
+
+    public void setSpawnPoint(Location location) {
+        Location relative = location.subtract(center);
+
+        data.getSpawnPointRelativeToCenter().update(relative);
+    }
+
+    public void teleport(Player player) {
+        player.teleport(getSpawnPoint());
     }
 
     /**

@@ -3,7 +3,6 @@ package me.illusion.skyblockcore.spigot.command.island.movement;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import me.illusion.skyblockcore.spigot.island.Island;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -32,9 +31,7 @@ public class IslandGoCommand implements SkyblockCommand {
         Player player = (Player) sender;
 
         Island island = main.getPlayerManager().get(player).getIsland();
-        Location center = island.getCenter();
-
-        player.teleport(center);
+        island.teleport(player);
         main.getMessages().sendMessage(sender, "command.island-teleport");
     }
 }

@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.spigot.utilities;
 
+import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
-import me.illusion.skyblockcore.spigot.sql.serialized.SerializedLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
