@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class IslandEvent extends Event {
+public abstract class IslandEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
