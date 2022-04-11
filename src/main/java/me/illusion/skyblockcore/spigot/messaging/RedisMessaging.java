@@ -17,7 +17,6 @@ public class RedisMessaging extends BinaryJedisPubSub implements PacketProcessor
 
     private final SkyblockPlugin main;
     private final JedisUtil jedisUtil;
-    private Jedis jedis;
 
     public RedisMessaging(SkyblockPlugin main) {
         this.main = main;
@@ -32,17 +31,22 @@ public class RedisMessaging extends BinaryJedisPubSub implements PacketProcessor
             return;
         }
 
-        jedis = jedisUtil.getJedis();
+        Jedis jedis = jedisUtil.getJedis();
 
         new Thread(() -> jedis.subscribe(this, KEY)).start();
     }
 
     public void updatePlayer(UUID uuid, String proxy) {
+        Jedis jedis = jedisUtil.getJedis();
         jedis.set(uuid.toString().getBytes(StandardCharsets.UTF_8), proxy.getBytes(StandardCharsets.UTF_8));
+        jedisUtil.getPool().returnResource(jedis);
     }
 
     public String getProxy(UUID uuid) {
+        Jedis jedis = jedisUtil.getJedis();
         byte[] bytes = jedis.get(uuid.toString().getBytes(StandardCharsets.UTF_8));
+        jedisUtil.getPool().returnResource(jedis);
+
         return new String(bytes);
     }
 
@@ -81,11 +85,14 @@ public class RedisMessaging extends BinaryJedisPubSub implements PacketProcessor
 
     @Override
     public void send(Packet packet) {
+        Jedis jedis = jedisUtil.getJedis();
         try {
             jedis.publish(KEY, packet.getAllBytes());
         } catch (Exception e) {
             jedis = jedisUtil.getJedis();
             jedis.publish(KEY, packet.getAllBytes());
+        } finally {
+            jedisUtil.getPool().returnResource(jedis);
         }
     }
 }

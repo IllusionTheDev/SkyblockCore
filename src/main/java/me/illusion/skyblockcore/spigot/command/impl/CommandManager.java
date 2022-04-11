@@ -98,32 +98,7 @@ public class CommandManager {
 
     public List<String> tabComplete(String identifier) {
         ComparisonResult result = new ComparisonResult(commands);
-        List<String> results = result.match(identifier);
-
-        System.out.println(identifier);
-        // Extra processing
-        List<String> toReturn = new ArrayList<>();
-
-        for (String str : results) {
-            int index = str.lastIndexOf('.');
-
-            if (index == -1 || str.equalsIgnoreCase(identifier)) {
-                toReturn.add("");
-                continue;
-            }
-
-            String sub = str.substring(index + 1);
-
-            // Remove dots
-            sub = sub.replace(".", "");
-
-            toReturn.add(sub);
-        }
-
-        // island.invite.* -> [SkyblockCommand#tabComplete().get(1)]
-        // island.invite.*.* -> [SkyblockCommand#tabComplete().get(2)]
-
-        return toReturn;
+        return result.tabComplete(identifier);
     }
 
     public SkyblockCommand get(String name, String... args) {
