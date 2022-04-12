@@ -14,7 +14,7 @@ import java.util.Locale;
 public class CommunicationRegistry {
 
     public static PacketProcessor getChosenProcessor(SkyblockPlugin main) {
-        FileConfiguration config = main.getSettings().getConfiguration();
+        FileConfiguration config = main.getFiles().getSettings().getConfiguration();
 
         ConfigurationSection section = config.getConfigurationSection("communication");
 

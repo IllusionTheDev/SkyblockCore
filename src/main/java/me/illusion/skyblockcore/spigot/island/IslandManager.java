@@ -176,7 +176,7 @@ public class IslandManager {
             if (islandFiles == null) {
                 // Assigns default if not found
                 System.out.println("No schematic found for island " + islandId);
-                islandFiles = SerializedFile.loadArray(main.getStartSchematic());
+                islandFiles = SerializedFile.loadArray(main.getIslandDependencies().getStartSchematic());
             }
 
             createFiles(folder, islandFiles) // Creates cache files
@@ -259,7 +259,7 @@ public class IslandManager {
             Location two = center.clone().add(offset, 128, offset);
 
             WorldUtils.assertAsync();
-            main.getPastingHandler().paste(data.getIslandSchematic(), center).join();
+            main.getIslandDependencies().getPastingHandler().paste(data.getIslandSchematic(), center).join();
 
             return new LoadedIsland(main, one, two, center, data, world.getName());
         } catch (Exception e) {
@@ -276,6 +276,7 @@ public class IslandManager {
             int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             main
+                    .getIslandDependencies()
                     .getPastingHandler()
                     .paste(data.getIslandSchematic(), worldName, centerPoint)
                     .thenRun(() ->
@@ -300,7 +301,7 @@ public class IslandManager {
     }
 
     private LoadedIsland loadIsland(IslandData data, String worldName) {
-        boolean requiresLoad = main.getPastingHandler().requiresLoadedWorld();
+        boolean requiresLoad = main.getIslandDependencies().getPastingHandler().requiresLoadedWorld();
 
         if (requiresLoad) {
             return loadIslandLoadedWorld(data, Bukkit.getWorld(worldName));
@@ -394,7 +395,7 @@ public class IslandManager {
                         main.getIslandManager().unregister(island);
 
                         new ScheduleBuilder(main) // Intentional delay so we don't corrupt worlds by loading and unloading very fast
-                                .in(main.getSettings().getReleaseDelay()).ticks()
+                                .in(main.getFiles().getSettings().getReleaseDelay()).ticks()
                                 .run(() -> main.getWorldManager().unregister(worldName))
                                 .sync()
                                 .start();

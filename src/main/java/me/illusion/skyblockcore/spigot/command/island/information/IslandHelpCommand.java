@@ -19,6 +19,6 @@ public class IslandHelpCommand implements SkyblockCommand {
 
     @Override
     public void execute(CommandSender sender, String... args) {
-        main.getMessages().sendMessage(sender, "commands.island-help");
+        main.getFiles().getMessages().sendMessage(sender, "commands.island-help");
     }
 }

@@ -22,7 +22,7 @@ public class IslandVisitCommand implements SkyblockCommand {
         String targetPlayer = args[0];
 
         if (sender.getName().equalsIgnoreCase(targetPlayer)) {
-            main.getMessages().sendMessage(sender, "command.visit-self");
+            main.getFiles().getMessages().sendMessage(sender, "command.visit-self");
             return;
         }
 

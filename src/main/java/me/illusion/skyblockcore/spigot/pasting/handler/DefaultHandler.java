@@ -90,7 +90,7 @@ public class DefaultHandler implements PastingHandler {
                 Location two = island.getPointTwo();
 
                 new ScheduleBuilder(main)
-                        .in(main.getSettings().getSaveDelay()).ticks()
+                        .in(main.getFiles().getSettings().getSaveDelay()).ticks()
                         .run(() -> {
                             File[] worldFiles = WorldUtils.getAllFilesBetween(regionFolder, one, two);
                             SerializedFile[] files = SerializedFile.loadArray(worldFiles);

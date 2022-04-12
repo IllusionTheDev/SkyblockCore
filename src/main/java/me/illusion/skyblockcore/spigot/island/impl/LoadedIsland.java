@@ -47,7 +47,7 @@ public class LoadedIsland implements Island {
      */
     @Override
     public CompletableFuture<Void> save() {
-        return main.getPastingHandler().save(this, schem -> {
+        return main.getIslandDependencies().getPastingHandler().save(this, schem -> {
             data.setIslandSchematic(schem);
 
             Bukkit.getPluginManager().callEvent(new IslandSaveEvent(this));

@@ -22,7 +22,7 @@ public class RedisMessaging extends BinaryJedisPubSub implements PacketProcessor
         this.main = main;
         jedisUtil = new JedisUtil();
 
-        FileConfiguration config = main.getSettings().getConfiguration();
+        FileConfiguration config = main.getFiles().getSettings().getConfiguration();
         String ip = config.getString("communication.host");
         String port = config.getString("communication.port", "");
         String password = config.getString("communication.password", "");

@@ -12,9 +12,11 @@ import me.illusion.skyblockcore.spigot.command.island.information.IslandHelpComm
 import me.illusion.skyblockcore.spigot.command.island.invite.IslandInviteCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
+import me.illusion.skyblockcore.spigot.file.ConfigurationStore;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
 import me.illusion.skyblockcore.spigot.file.SettingsFile;
 import me.illusion.skyblockcore.spigot.file.SetupData;
+import me.illusion.skyblockcore.spigot.island.IslandDependencies;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.spigot.listener.DeathListener;
@@ -22,7 +24,6 @@ import me.illusion.skyblockcore.spigot.listener.DebugListener;
 import me.illusion.skyblockcore.spigot.listener.JoinListener;
 import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.CommunicationRegistry;
-import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
@@ -42,81 +43,22 @@ import java.util.concurrent.CompletableFuture;
 @Getter
 public class SkyblockPlugin extends JavaPlugin {
 
-    /*
-        The handler used for player and island data storage
-     */
     private StorageHandler storageHandler;
-
-    /*
-        The island configuration
-     */
     private IslandConfig islandConfig;
-
-    /*
-        The island manager, used to obtain islands
-     */
     private IslandManager islandManager;
-
-    /*
-        The player manager, used to obtain SkyblockPlayers
-     */
     private PlayerManager playerManager;
-
-    /*
-        The command manager, used to register and handle commands
-     */
     private CommandManager commandManager;
-
-    /*
-        The world manager, used to assign worlds to islands
-     */
     private WorldManager worldManager;
-
-    /*
-        The pasting handler, used to save / load islands from files
-     */
-    private PastingHandler pastingHandler;
-
-    /*
-        The empty world generator, seems obvious
-     */
-    private EmptyWorldGenerator emptyWorldGenerator;
-
-    /*
-        Message file, used to send and obtain messages
-     */
-    private MessagesFile messages;
-
-    /*
-        Settings file, contains essential info that are crucial for the plugin,
-        such as world anti-corruption delays and database information
-     */
-    private SettingsFile settings;
-
-    /*
-        Start schematics, default island on selected format
-     */
-    private File[] startSchematic;
-
-    /*
-        Dependency downloader, used to automatically download required drivers
-     */
     private DependencyDownloader dependencyDownloader;
-
-    /*
-        Packet manager, used to send packets to other servers
-     */
     private PacketManager packetManager;
-
-    /*
-        Setup data, used to store data about what type of server this instance is, on the overall cluster
-     */
     private SetupData setupData;
+
+    private IslandDependencies islandDependencies;
+    private ConfigurationStore files;
 
     @Override
     public void onEnable() {
 
-        emptyWorldGenerator = new EmptyWorldGenerator(this);
         commandManager = new CommandManager(this);
 
         dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
@@ -128,9 +70,11 @@ public class SkyblockPlugin extends JavaPlugin {
         registerDefaultCommands();
 
         System.out.println("Registering configuration files");
-        messages = new MessagesFile(this);
-        islandConfig = new IslandConfig(this);
-        settings = new SettingsFile(this);
+        files = new ConfigurationStore(
+                new MessagesFile(this),
+                new SettingsFile(this),
+                new IslandConfig(this));
+
         setupData = new SetupData(this);
 
 
@@ -157,11 +101,9 @@ public class SkyblockPlugin extends JavaPlugin {
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
-        System.out.println("Setting up pasting handler");
-        pastingHandler = PastingType.enable(this, islandConfig.getPastingSelection());
+        System.out.println("Setting up island dependencies");
+        islandDependencies = new IslandDependencies(new EmptyWorldGenerator(this), PastingType.enable(this, islandConfig.getPastingSelection()), startFiles());
 
-        System.out.println("Registering start files");
-        startSchematic = startFiles();
 
         System.out.println("Registering listeners");
         Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
@@ -171,7 +113,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
         if (SpigotConfig.bungee) {
             System.out.println("Registering bungeecord messaging listener");
-            packetManager = new PacketManager(settings.getConfiguration().getString("communication.server-id"));
+            packetManager = new PacketManager(files.getSettings().getConfiguration().getString("communication.server-id"));
             packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
         }
 
@@ -199,7 +141,7 @@ public class SkyblockPlugin extends JavaPlugin {
      * Opens the SQL connection async
      */
     private CompletableFuture<Boolean> setupStorage() {
-        FileConfiguration config = settings.getConfiguration();
+        FileConfiguration config = files.getSettings().getConfiguration();
         StorageType type = StorageType.valueOf(config.getString("database.type").toUpperCase(Locale.ROOT));
         type.checkDependencies(dependencyDownloader);
 
@@ -232,7 +174,7 @@ public class SkyblockPlugin extends JavaPlugin {
             playerManager.get(player).save();
     }
 
-    private File[] startFiles() {
+    public File[] startFiles() {
         File startSchematicFolder = new File(getDataFolder() + File.separator + "start-schematic");
 
         if (!startSchematicFolder.exists())
@@ -241,7 +183,7 @@ public class SkyblockPlugin extends JavaPlugin {
         File[] files = startSchematicFolder.listFiles();
 
         if (files == null || files.length == 0) {
-            if (pastingHandler.getType() == PastingType.FAWE)
+            if (islandDependencies.getPastingHandler().getType() == PastingType.FAWE)
                 saveResource("start-schematic" + File.separator + "skyblock-schematic.schematic", false);
             else
                 saveResource("start-schematic" + File.separator + "r.0.0.mca", false);
@@ -256,6 +198,6 @@ public class SkyblockPlugin extends JavaPlugin {
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        return emptyWorldGenerator;
+        return islandDependencies.getEmptyWorldGenerator();
     }
 }

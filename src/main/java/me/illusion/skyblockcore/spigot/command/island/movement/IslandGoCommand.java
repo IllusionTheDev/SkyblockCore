@@ -32,6 +32,6 @@ public class IslandGoCommand implements SkyblockCommand {
 
         Island island = main.getPlayerManager().get(player).getIsland();
         island.teleport(player);
-        main.getMessages().sendMessage(sender, "command.island-teleport");
+        main.getFiles().getMessages().sendMessage(sender, "command.island-teleport");
     }
 }

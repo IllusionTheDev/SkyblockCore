@@ -44,19 +44,19 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
         SkyblockCommand command = main.getCommandManager().get(identifier);
 
         if (command == null) {
-            main.getMessages().sendMessage(sender, "invalid-args");
+            main.getFiles().getMessages().sendMessage(sender, "invalid-args");
             return true;
         }
 
         String permission = command.getPermission();
 
         if (!command.canExecute(sender)) {
-            main.getMessages().sendMessage(sender, "command.cannot-use", (str) -> str.replace("%permission%", permission).replace("%command%", name));
+            main.getFiles().getMessages().sendMessage(sender, "command.cannot-use", (str) -> str.replace("%permission%", permission).replace("%command%", name));
             return true;
         }
 
         if (command.hasPermission() && !sender.hasPermission(command.getPermission())) {
-            main.getMessages().sendMessage(sender, "command.no-permission", (str) -> str.replace("%permission%", permission).replace("%command%", name));
+            main.getFiles().getMessages().sendMessage(sender, "command.no-permission", (str) -> str.replace("%permission%", permission).replace("%command%", name));
             return true;
         }
 
