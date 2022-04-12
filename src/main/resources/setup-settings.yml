@@ -1,0 +1,1 @@
+server-type: ISLAND  # Available types: ISLAND (holds your islands), GENERIC (holds your other data, won't load island)

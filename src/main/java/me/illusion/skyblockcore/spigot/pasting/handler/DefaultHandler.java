@@ -4,7 +4,7 @@ import com.google.common.io.Files;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
-import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.spigot.island.impl.LoadedIsland;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
@@ -81,24 +81,26 @@ public class DefaultHandler implements PastingHandler {
     }
 
     @Override
-    public void save(Island island, Consumer<SerializedFile[]> action) {
-        WorldUtils.save(main, island.getWorld(), (world) -> {
-            File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + island.getWorld() + File.separator + "region");
+    public CompletableFuture<Void> save(LoadedIsland island, Consumer<SerializedFile[]> action) {
+        return CompletableFuture.runAsync(() -> {
+            WorldUtils.save(main, island.getWorld(), (world) -> {
+                File regionFolder = new File(Bukkit.getWorldContainer() + File.separator + island.getWorld() + File.separator + "region");
 
-            Location one = island.getPointOne();
-            Location two = island.getPointTwo();
+                Location one = island.getPointOne();
+                Location two = island.getPointTwo();
 
-            new ScheduleBuilder(main)
-                    .in(main.getSettings().getSaveDelay()).ticks()
-                    .run(() -> {
-                        File[] worldFiles = WorldUtils.getAllFilesBetween(regionFolder, one, two);
-                        SerializedFile[] files = SerializedFile.loadArray(worldFiles);
+                new ScheduleBuilder(main)
+                        .in(main.getSettings().getSaveDelay()).ticks()
+                        .run(() -> {
+                            File[] worldFiles = WorldUtils.getAllFilesBetween(regionFolder, one, two);
+                            SerializedFile[] files = SerializedFile.loadArray(worldFiles);
 
-                        action.accept(files);
-                    })
-                    .sync()
-                    .start();
+                            action.accept(files);
+                        })
+                        .sync()
+                        .start();
 
+            });
         });
     }
 

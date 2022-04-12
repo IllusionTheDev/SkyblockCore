@@ -109,13 +109,3 @@ public class ComparisonResultFull {
 
 
 }
-
-/*
-island.go
-island.go
-island.go
-island.go
-island.go
-island.go
-island.invite.imillusion //island.go
- */

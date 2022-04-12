@@ -15,8 +15,8 @@ public class PacketInvitePlayer extends ServerToProxyPacket {
         invite = new IslandInvite(readUUID(), readUUID(), readString());
     }
 
-    public PacketInvitePlayer(String serverName, IslandInvite invite) {
-        super(serverName);
+    public PacketInvitePlayer(IslandInvite invite) {
+        super();
 
         this.invite = invite;
 

@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.shared.packet.data;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.packet.Packet;
+import me.illusion.skyblockcore.shared.packet.PacketManager;
 
 @Getter
 public class ServerToProxyPacket extends Packet {
@@ -14,10 +15,10 @@ public class ServerToProxyPacket extends Packet {
         serverName = readString();
     }
 
-    public ServerToProxyPacket(String serverName) {
+    public ServerToProxyPacket() {
         super(PacketDirection.INSTANCE_TO_PROXY);
 
-        this.serverName = serverName;
+        this.serverName = PacketManager.getServerIdentifier();
         writeString(serverName);
 
 

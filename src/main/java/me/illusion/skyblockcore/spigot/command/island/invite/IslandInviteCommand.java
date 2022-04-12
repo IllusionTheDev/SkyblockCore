@@ -1,7 +1,6 @@
 package me.illusion.skyblockcore.spigot.command.island.invite;
 
 import me.illusion.skyblockcore.shared.data.IslandInvite;
-import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketInvitePlayer;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketInviteResponse;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
@@ -71,9 +70,7 @@ public class IslandInviteCommand implements SkyblockCommand {
         return CompletableFuture.supplyAsync(() -> {
             UUID inviteID = UUID.randomUUID();
 
-            PacketInvitePlayer packet = new PacketInvitePlayer(
-                    PacketManager.getServerIdentifier(),
-                    new IslandInvite(inviteID, origin.getUniqueId(), targetName));
+            PacketInvitePlayer packet = new PacketInvitePlayer(new IslandInvite(inviteID, origin.getUniqueId(), targetName));
 
             main.getPacketManager().send(packet);
 

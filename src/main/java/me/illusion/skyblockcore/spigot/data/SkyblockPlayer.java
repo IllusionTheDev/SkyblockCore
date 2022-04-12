@@ -9,6 +9,7 @@ import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandCreateEvent;
 import me.illusion.skyblockcore.spigot.event.IslandLoadEvent;
+import me.illusion.skyblockcore.spigot.file.SetupData;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
@@ -33,7 +34,6 @@ public class SkyblockPlayer {
     public SkyblockPlayer(SkyblockPlugin main, UUID uuid) {
         this.main = main;
         this.uuid = uuid;
-
         load();
 
         main.getPlayerManager().register(uuid, this);
@@ -75,52 +75,65 @@ public class SkyblockPlayer {
                 data.setPlayerId(uuid);
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid);
                 islandData.addUser(uuid);
-                sync(() -> main.getIslandManager().loadIsland(islandData)
-                        .thenAccept(island -> {
-                            Bukkit.getPluginManager().callEvent(new IslandCreateEvent(island));
-                            Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
-                            this.island = island;
-                            this.islandCenter = island.getCenter();
+                data.setIslandId(island.getData().getId());
 
-                            data.setIslandId(island.getData().getId());
+                if (main.getSetupData().getServerType() == SetupData.ServerType.ISLAND) {
+                    loadIsland(islandData);
+                }
 
-                            new ScheduleBuilder(main)
-                                    .in(1).seconds()
-                                    .run(this::teleportToIsland).sync().start();
-                        }));
                 return;
             }
 
             System.out.println("Loaded player data, loading island data");
-            main.getIslandManager().pasteIsland(data.getIslandId(), uuid)
-                    .thenAccept(island -> {
-                        this.island = island;
-                        this.islandCenter = island.getCenter();
-                        Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
 
-                        System.out.println("Loaded island data");
-
-
-                        sync(() -> {
-                            SerializedLocation last = data.getLastLocation(); // Obtains last location
-
-                            // Assign player location if not found
-                            if (last.getLocation() == null) {
-                                teleportToIsland();
-                                return;
-                            }
-
-                            // Teleports
-                            checkTeleport();
-                        });
-
-                    });
+            if (main.getSetupData().getServerType() == SetupData.ServerType.ISLAND) {
+                pasteIsland();
+            }
 
         }).exceptionally(throwable -> {
             System.out.println("Failed to load data for " + getPlayer().getName());
             ExceptionLogger.log(throwable);
             return null;
         });
+    }
+
+    private void pasteIsland() {
+        main.getIslandManager().pasteIsland(data.getIslandId(), uuid)
+                .thenAccept(island -> {
+                    this.island = island;
+                    this.islandCenter = island.getCenter();
+                    Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
+
+                    System.out.println("Loaded island data");
+
+                    sync(() -> {
+                        SerializedLocation last = data.getLastLocation(); // Obtains last location
+
+                        // Assign player location if not found
+                        if (last.getLocation() == null) {
+                            teleportToIsland();
+                            return;
+                        }
+
+                        // Teleports
+                        checkTeleport();
+                    });
+
+                });
+    }
+
+    private void loadIsland(IslandData islandData) {
+        sync(() -> main.getIslandManager().loadIsland(islandData)
+                .thenAccept(island -> {
+                    Bukkit.getPluginManager().callEvent(new IslandCreateEvent(island));
+                    Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
+                    this.island = island;
+                    this.islandCenter = island.getCenter();
+
+                    new ScheduleBuilder(main)
+                            .in(1).seconds()
+                            .run(this::teleportToIsland).sync().start();
+                }));
     }
 
 
@@ -176,8 +189,7 @@ public class SkyblockPlayer {
         data.getLastLocation().update(loc);
         data.getIslandLocation().update(loc);
 
-        island.save(() -> {
-            System.out.println("Saved island data");
+        island.save().thenRun(() -> {
             saveObject(uuid, data);
             main.getIslandManager().deleteIsland(island.getData().getId());
         });

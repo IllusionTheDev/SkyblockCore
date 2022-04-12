@@ -8,7 +8,7 @@ import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.grinderwolf.swm.plugin.loaders.file.FileLoader;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
-import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.spigot.island.impl.LoadedIsland;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import org.bukkit.Bukkit;
@@ -68,7 +68,7 @@ public class SlimeHandler implements PastingHandler {
     }
 
     @Override
-    public void save(Island island, Consumer<SerializedFile[]> action) {
+    public CompletableFuture<Void> save(LoadedIsland island, Consumer<SerializedFile[]> action) {
         SWMPlugin plugin = SWMPlugin.getInstance();
         World world = Bukkit.getWorld(island.getWorld());
 
@@ -83,7 +83,7 @@ public class SlimeHandler implements PastingHandler {
             RandomAccessFile file = files.get(world.getName());
 
             if (file == null) {
-                return;
+                return CompletableFuture.completedFuture(null);
             }
 
             fileLoader.saveWorld(world.getName(), craftSlimeWorld.serialize(), true);
@@ -95,6 +95,8 @@ public class SlimeHandler implements PastingHandler {
         } catch (Exception e) {
             ExceptionLogger.log(e);
         }
+
+        return CompletableFuture.completedFuture(null);
 
     }
 

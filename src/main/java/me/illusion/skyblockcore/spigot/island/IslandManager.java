@@ -7,8 +7,9 @@ import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.shared.utilities.Reference;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandUnloadEvent;
-import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
+import me.illusion.skyblockcore.spigot.island.impl.LoadedIsland;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -45,7 +46,7 @@ import java.util.concurrent.ExecutionException;
 public class IslandManager {
 
     private final Map<UUID, Island> islands = new HashMap<>();
-    private final Map<UUID, CompletableFuture<Island>> loadingIslands = new HashMap<>();
+    private final Map<UUID, CompletableFuture<LoadedIsland>> loadingIslands = new HashMap<>();
 
     private final SkyblockPlugin main;
 
@@ -59,7 +60,7 @@ public class IslandManager {
     }
 
 
-    void register(Island island) {
+    public void register(Island island) {
         islands.put(island.getData().getId(), island);
     }
 
@@ -87,8 +88,9 @@ public class IslandManager {
      */
     public Island getIslandAt(Location location) {
         for (Island island : islands.values())
-            if (LocationUtil.locationBelongs(location, island.getPointOne(), island.getPointTwo()))
+            if (island.locationBelongs(location))
                 return island;
+
         return null;
     }
 
@@ -120,7 +122,7 @@ public class IslandManager {
         return onlinePlayers <= 1;
     }
 
-    public CompletableFuture<Island> pasteIsland(UUID islandId, UUID ownerId) {
+    public CompletableFuture<LoadedIsland> pasteIsland(UUID islandId, UUID ownerId) {
         return load(islandId)
                 .thenApply(data -> {
                     System.out.println("Pasting island " + islandId);
@@ -142,12 +144,18 @@ public class IslandManager {
                 });
     }
 
+    private LoadedIsland getLoadedIsland(Island island) {
+        if (island instanceof LoadedIsland)
+            return (LoadedIsland) island;
 
-    public CompletableFuture<Island> loadIsland(IslandData data) {
+        return null;
+    }
+
+    public CompletableFuture<LoadedIsland> loadIsland(IslandData data) {
         if (loadingIslands.containsKey(data.getId()))
             return loadingIslands.get(data.getId());
 
-        CompletableFuture<Island> future = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<LoadedIsland> future = CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
             UUID islandId = data.getId();
 
@@ -155,12 +163,12 @@ public class IslandManager {
             boolean paste = shouldRemoveIsland(data.getUsers()); // variable to store pasting
 
             if (!paste) {
-                return main.getIslandManager().getIsland(islandId);
+                return getLoadedIsland(islands.get(islandId));
             }
 
             File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
 
-            final Reference<Island> islandReference = new Reference<>();
+            final Reference<LoadedIsland> islandReference = new Reference<>();
 
             // Pastes island if required
             SerializedFile[] islandFiles = data.getIslandSchematic(); // Obtains original files
@@ -185,7 +193,7 @@ public class IslandManager {
 
             long end = System.currentTimeMillis();
 
-            Island result = islandReference.get();
+            LoadedIsland result = islandReference.get();
             data.setIsland(result); // Updates island in the island data
 
             if (result == null) {
@@ -193,19 +201,19 @@ public class IslandManager {
                 return null;
             }
 
-            World islandWorld = Bukkit.getWorld(result.getWorld());
+            World islandWorld = Bukkit.getWorld(result.getWorldName());
 
             System.out.println("After action report");
             System.out.println("----------------------------------------");
             System.out.println("Time taken: " + (end - start) + "ms");
-            System.out.println("Island world: " + result.getWorld());
+            System.out.println("Island world: " + result.getWorldName());
             System.out.println("Island world loaded: " + (islandWorld != null));
             System.out.println("----------------------------------------");
 
             // --- ENSURE WORLD IS PROPERLY LOADED ---
             if (islandWorld == null) {
                 System.out.println("Loading world");
-                islandWorld = WorldUtils.load(main, result.getWorld()).join();
+                islandWorld = WorldUtils.load(main, result.getWorldName()).join();
             }
 
             result.getCenter().setWorld(islandWorld);
@@ -240,7 +248,7 @@ public class IslandManager {
      * @param world - The world to paste the island on
      * @return island object
      */
-    private Island loadIslandLoadedWorld(IslandData data, World world) {
+    private LoadedIsland loadIslandLoadedWorld(IslandData data, World world) {
         try {
             Location center = world.getSpawnLocation();
 
@@ -253,14 +261,14 @@ public class IslandManager {
             WorldUtils.assertAsync();
             main.getPastingHandler().paste(data.getIslandSchematic(), center).join();
 
-            return new Island(main, one, two, center, data, world.getName());
+            return new LoadedIsland(main, one, two, center, data, world.getName());
         } catch (Exception e) {
             ExceptionLogger.log(e);
             return null;
         }
     }
 
-    private Island loadIslandUnloadedWorld(IslandData data, String worldName) {
+    private LoadedIsland loadIslandUnloadedWorld(IslandData data, String worldName) {
         try {
             Vector centerPoint = main.getIslandConfig().getSpawnPoint();
 
@@ -283,7 +291,7 @@ public class IslandManager {
             Location one = center.clone().add(-offset, -128, -offset);
             Location two = center.clone().add(offset, 128, offset);
 
-            return new Island(main, one, two, center, data, worldName);
+            return new LoadedIsland(main, one, two, center, data, worldName);
 
         } catch (Exception e) {
             ExceptionLogger.log(e);
@@ -291,7 +299,7 @@ public class IslandManager {
         }
     }
 
-    private Island loadIsland(IslandData data, String worldName) {
+    private LoadedIsland loadIsland(IslandData data, String worldName) {
         boolean requiresLoad = main.getPastingHandler().requiresLoadedWorld();
 
         if (requiresLoad) {
@@ -368,12 +376,32 @@ public class IslandManager {
     public void deleteIsland(UUID islandId) {
         Island island = getIsland(islandId);
 
+        if (!(island instanceof LoadedIsland))
+            return;
+
+        LoadedIsland loadedIsland = (LoadedIsland) island;
+        String worldName = loadedIsland.getWorldName();
+
         Bukkit.getPluginManager().callEvent(new IslandUnloadEvent(island));
 
         File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
 
-        if (shouldRemoveIsland(island))
-            island.cleanIsland();
+        if (shouldRemoveIsland(island)) {
+            WorldUtils
+                    .unload(main, worldName)
+                    .thenRun(() -> {
+                        WorldUtils.deleteRegionFolder(main, worldName);
+                        main.getIslandManager().unregister(island);
+
+                        new ScheduleBuilder(main) // Intentional delay so we don't corrupt worlds by loading and unloading very fast
+                                .in(main.getSettings().getReleaseDelay()).ticks()
+                                .run(() -> main.getWorldManager().unregister(worldName))
+                                .sync()
+                                .start();
+
+                    });
+
+        }
 
         System.out.println("Attempting to delete island files");
 

@@ -14,6 +14,7 @@ import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
 import me.illusion.skyblockcore.spigot.file.SettingsFile;
+import me.illusion.skyblockcore.spigot.file.SetupData;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.spigot.listener.DeathListener;
@@ -102,7 +103,15 @@ public class SkyblockPlugin extends JavaPlugin {
      */
     private DependencyDownloader dependencyDownloader;
 
+    /*
+        Packet manager, used to send packets to other servers
+     */
     private PacketManager packetManager;
+
+    /*
+        Setup data, used to store data about what type of server this instance is, on the overall cluster
+     */
+    private SetupData setupData;
 
     @Override
     public void onEnable() {
@@ -122,6 +131,8 @@ public class SkyblockPlugin extends JavaPlugin {
         messages = new MessagesFile(this);
         islandConfig = new IslandConfig(this);
         settings = new SettingsFile(this);
+        setupData = new SetupData(this);
+
 
         System.out.println("Creating worlds");
         worldManager = new WorldManager(this);

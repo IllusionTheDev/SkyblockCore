@@ -25,8 +25,7 @@ public class PacketRespondIslandServer extends ServerToProxyPacket {
         islandCapacity = readByte();
     }
 
-    public PacketRespondIslandServer(String serverName, UUID islandId, boolean found, byte islandCount, byte islandCapacity) {
-        super(serverName);
+    public PacketRespondIslandServer(UUID islandId, boolean found, byte islandCount, byte islandCapacity) {
         this.islandId = islandId;
         this.found = found;
         this.islandCount = islandCount;

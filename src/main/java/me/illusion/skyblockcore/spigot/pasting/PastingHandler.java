@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.spigot.pasting;
 
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
-import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.spigot.island.impl.LoadedIsland;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -18,7 +18,7 @@ public interface PastingHandler {
         return null; // Used when requiresLoadedWorld() is false
     }
 
-    void save(Island island, Consumer<SerializedFile[]> action);
+    CompletableFuture<Void> save(LoadedIsland island, Consumer<SerializedFile[]> action);
 
     PastingType getType();
 

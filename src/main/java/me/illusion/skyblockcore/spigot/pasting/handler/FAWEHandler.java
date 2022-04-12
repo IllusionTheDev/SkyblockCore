@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
-import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.spigot.island.impl.LoadedIsland;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.pasting.provider.FAWEProvider;
@@ -53,7 +53,7 @@ public class FAWEHandler implements PastingHandler {
     }
 
     @Override
-    public void save(Island island, Consumer<SerializedFile[]> action) {
+    public CompletableFuture<Void> save(LoadedIsland island, Consumer<SerializedFile[]> action) {
         File file = new File(main.getDataFolder() + File.separator + "cache", island.getData().getId() + ".schematic");
 
         if (!file.exists()) {
@@ -69,6 +69,8 @@ public class FAWEHandler implements PastingHandler {
 
         provider.save(file, p1, p2);
         action.accept(array(new SerializedFile(file)));
+
+        return CompletableFuture.completedFuture(null);
     }
 
     @SafeVarargs
