@@ -258,7 +258,6 @@ public class IslandManager {
             Location one = center.clone().add(-offset, -128, -offset);
             Location two = center.clone().add(offset, 128, offset);
 
-            WorldUtils.assertAsync();
             main.getIslandDependencies().getPastingHandler().paste(data.getIslandSchematic(), center).join();
 
             return new LoadedIsland(main, one, two, center, data, world.getName());
@@ -283,8 +282,6 @@ public class IslandManager {
                             WorldUtils.load(main, worldName)
                     )
                     .join();
-
-            WorldUtils.assertAsync();
 
             World world = Bukkit.getWorld(worldName);
             Location center = centerPoint.toLocation(world);
@@ -354,7 +351,6 @@ public class IslandManager {
                             });
                 }
 
-                WorldUtils.assertAsync();
                 CompletableFuture.allOf(futures).exceptionally((throwable) -> { // Waits for all the files to be written
                     if (throwable != null) // If there was an error
                         ExceptionLogger.log(throwable); // Prints the error

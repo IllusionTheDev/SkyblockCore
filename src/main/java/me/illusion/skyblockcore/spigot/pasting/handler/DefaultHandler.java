@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 import static me.illusion.skyblockcore.shared.utilities.CollectionUtils.allOf;
@@ -112,15 +111,6 @@ public class DefaultHandler implements PastingHandler {
     private String getExtension(String filename) {
         int index = filename.lastIndexOf(".");
         return filename.substring(index + 1);
-    }
-
-    private void wait(CountDownLatch latch) {
-        try {
-            WorldUtils.assertAsync();
-            latch.await();
-        } catch (InterruptedException e) {
-            ExceptionLogger.log(e);
-        }
     }
 
     @Override

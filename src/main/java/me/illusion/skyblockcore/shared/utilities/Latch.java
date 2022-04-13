@@ -1,6 +1,9 @@
 package me.illusion.skyblockcore.shared.utilities;
 
+import me.illusion.skyblockcore.shared.exceptions.UnsafeSyncOperationException;
+
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class Latch extends CountDownLatch {
 
@@ -17,5 +20,21 @@ public class Latch extends CountDownLatch {
      */
     public Latch(int count) {
         super(count);
+    }
+
+    @Override
+    public void await() throws InterruptedException {
+        if (SoftwareDetectionUtil.isMainThread())
+            throw new UnsafeSyncOperationException();
+
+        super.await();
+    }
+
+    @Override
+    public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
+        if (SoftwareDetectionUtil.isMainThread())
+            throw new UnsafeSyncOperationException();
+
+        return super.await(timeout, unit);
     }
 }

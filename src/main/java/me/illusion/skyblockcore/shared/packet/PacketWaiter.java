@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.shared.packet;
 
 import me.illusion.skyblockcore.shared.packet.data.PacketWaitData;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
+import me.illusion.skyblockcore.shared.utilities.Latch;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +15,7 @@ import java.util.function.Predicate;
 public class PacketWaiter {
 
     private final PacketManager manager;
-    private final Map<PacketWaitData<?>, CountDownLatch> data = new HashMap<>();
+    private final Map<PacketWaitData<?>, Latch> data = new HashMap<>();
     private final Map<PacketWaitData<?>, Object> results = new HashMap<>();
     private final Set<String> registeredClasses = new HashSet<>();
 
@@ -47,7 +48,7 @@ public class PacketWaiter {
         //if (Bukkit.isPrimaryThread())
         //    throw new UnsafeSyncOperationException();
 
-        CountDownLatch latch = new CountDownLatch(1);
+        Latch latch = new Latch();
         PacketWaitData<?> waitData = new PacketWaitData<>(packetClass, returnIf);
         data.put(waitData, latch);
 
@@ -56,7 +57,7 @@ public class PacketWaiter {
             manager.subscribe(packetClass, new PacketHandler<T>() {
                 @Override
                 public void onReceive(T packet) {
-                    for (Map.Entry<PacketWaitData<?>, CountDownLatch> entry : data.entrySet()) {
+                    for (Map.Entry<PacketWaitData<?>, Latch> entry : data.entrySet()) {
                         PacketWaitData<?> data = entry.getKey();
                         CountDownLatch latch = entry.getValue();
 
