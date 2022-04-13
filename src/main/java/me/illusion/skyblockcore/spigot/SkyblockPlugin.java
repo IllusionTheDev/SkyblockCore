@@ -110,6 +110,7 @@ public class SkyblockPlugin extends JavaPlugin {
             System.out.println("Registering bungeecord messaging listener");
             packetManager = new PacketManager(files.getSettings().getConfiguration().getString("communication.server-id"));
             packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
+
         }
 
 

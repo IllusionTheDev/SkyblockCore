@@ -22,6 +22,6 @@ public class EmptyWorldGenerator extends ChunkGenerator {
 
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
-        return main.getIslandConfig().getSpawnPoint().toLocation(world);
+        return main.getFiles().getIslandConfig().getSpawnPoint().toLocation(world);
     }
 }

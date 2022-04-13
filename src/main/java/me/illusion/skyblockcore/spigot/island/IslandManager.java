@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.shared.utilities.FileUtils;
 import me.illusion.skyblockcore.shared.utilities.Reference;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandUnloadEvent;
+import me.illusion.skyblockcore.spigot.file.SetupData;
 import me.illusion.skyblockcore.spigot.island.impl.LoadedIsland;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
@@ -72,12 +73,41 @@ public class IslandManager {
         return Optional.ofNullable(islands.get(islandId));
     }
 
+    public Optional<LoadedIsland> getLoadedIslandFromId(UUID islandId) {
+        Optional<Island> island = getIslandFromId(islandId);
+
+        if (!island.isPresent())
+            return Optional.empty();
+
+        Island island1 = island.get();
+
+        if (!(island1 instanceof LoadedIsland))
+            return Optional.empty();
+
+        return Optional.of((LoadedIsland) island1);
+    }
+
     public Collection<UUID> getLoadedIslandIds() {
         return islands.keySet();
     }
 
+    public byte getIslandCount() {
+        byte count = 0;
+
+        for (Island island : islands.values()) {
+            if (island instanceof LoadedIsland)
+                count++;
+        }
+
+        return count;
+    }
+
+    public byte getMaxCapacity() {
+        return main.getSetupData().getServerType() == SetupData.ServerType.ISLAND ? (byte) main.getFiles().getIslandConfig().getWorldCount() : getIslandCount();
+    }
+
     public boolean isMaxCapacity() {
-        return islands.size() <= main.getIslandConfig().getWorldCount();
+        return islands.size() <= main.getFiles().getIslandConfig().getWorldCount();
     }
 
     /**
@@ -253,7 +283,7 @@ public class IslandManager {
             Location center = world.getSpawnLocation();
 
             System.out.println(world.getName() + " spawn location: " + center);
-            int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
+            int offset = main.getFiles().getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             Location one = center.clone().add(-offset, -128, -offset);
             Location two = center.clone().add(offset, 128, offset);
@@ -269,10 +299,10 @@ public class IslandManager {
 
     private LoadedIsland loadIslandUnloadedWorld(IslandData data, String worldName) {
         try {
-            Vector centerPoint = main.getIslandConfig().getSpawnPoint();
+            Vector centerPoint = main.getFiles().getIslandConfig().getSpawnPoint();
 
             System.out.println(worldName + " spawn location: " + centerPoint);
-            int offset = main.getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
+            int offset = main.getFiles().getIslandConfig().getOverworldSettings().getMaxSize() >> 1;
 
             main
                     .getIslandDependencies()

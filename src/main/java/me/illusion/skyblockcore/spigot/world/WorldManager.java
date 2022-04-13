@@ -30,7 +30,7 @@ public class WorldManager implements Listener {
     public WorldManager(SkyblockPlugin main) {
         this.main = main;
 
-        for (int index = 1; index <= main.getIslandConfig().getWorldCount(); index++) {
+        for (int index = 1; index <= main.getFiles().getIslandConfig().getWorldCount(); index++) {
             loadedIslands.put("skyblockworld" + index, null);
 
             if (new File(Bukkit.getWorldContainer() + File.separator + "skyblockworld" + index).exists())
