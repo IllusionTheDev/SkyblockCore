@@ -58,10 +58,19 @@ public final class SQLSerializer {
             Object deSerializedObject = null;
 
             try {
-                statement = connection.prepareStatement(SQL_DESERIALIZE_OBJECT);
+                String query = SQL_DESERIALIZE_OBJECT;
+
+                query = query.replaceFirst("\\?", "'" + table + "'"); // sqlite doesn't like setString, but I also don't like sql injection
+                query = query.replaceFirst("\\?", "'" + uuid.toString() + "'");
+
+                System.out.println(query);
+                statement = connection.prepareStatement(query);
+                /*
                 statement.setString(1, table);
                 statement.setString(2, uuid.toString());
 
+
+                 */
                 result = statement.executeQuery();
 
                 if (!result.next())

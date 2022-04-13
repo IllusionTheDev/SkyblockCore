@@ -21,18 +21,22 @@ public class SerializedLocation implements Serializable {
         return BukkitConverter.convertLocation(this);
     }
 
+
+    public void update(Location location) {
+        update(location, location.getWorld().getName());
+    }
+
     /**
      * Updates its internal location
      *
      * @param location - The new location to update to
      */
-    public void update(Location location) {
+    public void update(Location location, String world) {
         double x = location.getX();
         double y = location.getY();
         double z = location.getZ();
         float yaw = location.getYaw();
         float pitch = location.getPitch();
-        String world = location.getWorld().getName();
 
         this.format = x + " " + y + " " + z + " " + yaw + " " + pitch + " " + world; // Not using String.format because it is awfully slow
     }

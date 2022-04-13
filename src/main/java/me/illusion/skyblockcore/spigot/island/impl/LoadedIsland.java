@@ -62,7 +62,7 @@ public class LoadedIsland implements Island {
     public void setSpawnPoint(Location location) {
         Location relative = location.subtract(center);
 
-        data.getSpawnPointRelativeToCenter().update(relative);
+        data.getSpawnPointRelativeToCenter().update(relative, world);
     }
 
     public void teleport(Player player) {

@@ -24,22 +24,29 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0)
             return Collections.emptyList();
 
-        String identifier = String.join(".", name, String.join(".", args));
+        String identifier = String.join(".", name, String.join(".", args)).replace(" ", ".");
 
+        /*
         // Remove trailing dots
         while (identifier.endsWith("."))
             identifier = identifier.substring(0, identifier.length() - 1);
 
+         */
+
+        System.out.println(identifier);
         return main.getCommandManager().tabComplete(identifier);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String name, String[] args) {
-        String identifier = String.join(".", name, String.join(".", args));
+        String identifier = String.join(".", name, String.join(".", args)).replace(" ", ".");
 
-        // Remove trailing dots
+
+        /*// Remove trailing dots
         while (identifier.endsWith("."))
             identifier = identifier.substring(0, identifier.length() - 1);
+
+         */
 
         SkyblockCommand command = main.getCommandManager().get(identifier);
 

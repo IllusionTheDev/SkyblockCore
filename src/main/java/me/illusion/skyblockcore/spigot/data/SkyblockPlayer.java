@@ -75,7 +75,7 @@ public class SkyblockPlayer {
                 data.setPlayerId(uuid);
                 IslandData islandData = new IslandData(UUID.randomUUID(), uuid);
                 islandData.addUser(uuid);
-                data.setIslandId(island.getData().getId());
+                data.setIslandId(islandData.getId());
 
                 if (main.getSetupData().getServerType() == SetupData.ServerType.ISLAND) {
                     loadIsland(islandData);
