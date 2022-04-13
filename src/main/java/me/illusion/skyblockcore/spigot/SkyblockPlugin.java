@@ -44,7 +44,6 @@ import java.util.concurrent.CompletableFuture;
 public class SkyblockPlugin extends JavaPlugin {
 
     private StorageHandler storageHandler;
-    private IslandConfig islandConfig;
     private IslandManager islandManager;
     private PlayerManager playerManager;
     private CommandManager commandManager;
@@ -85,11 +84,7 @@ public class SkyblockPlugin extends JavaPlugin {
             if (!val) // if the setup is incorrect, don't load
                 return;
 
-            try {
-                sync(this::load);
-            } catch (Exception e) {
-                ExceptionLogger.log(e);
-            }
+            sync(this::load);
         });
 
         ExceptionLogger.setFolder(new File(getDataFolder() + File.separator + "log"));
@@ -102,7 +97,7 @@ public class SkyblockPlugin extends JavaPlugin {
         playerManager = new PlayerManager();
 
         System.out.println("Setting up island dependencies");
-        islandDependencies = new IslandDependencies(new EmptyWorldGenerator(this), PastingType.enable(this, islandConfig.getPastingSelection()), startFiles());
+        islandDependencies = new IslandDependencies(new EmptyWorldGenerator(this), PastingType.enable(this, files.getIslandConfig().getPastingSelection()), startFiles());
 
 
         System.out.println("Registering listeners");
