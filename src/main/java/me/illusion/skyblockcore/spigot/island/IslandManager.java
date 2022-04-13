@@ -9,6 +9,7 @@ import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandUnloadEvent;
 import me.illusion.skyblockcore.spigot.file.SetupData;
 import me.illusion.skyblockcore.spigot.island.impl.LoadedIsland;
+import me.illusion.skyblockcore.spigot.island.impl.RemoteIsland;
 import me.illusion.skyblockcore.spigot.utilities.WorldUtils;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
@@ -150,6 +151,13 @@ public class IslandManager {
         }
 
         return onlinePlayers <= 1;
+    }
+
+    public RemoteIsland loadRemoteIsland(IslandData islandData) {
+        RemoteIsland island = new RemoteIsland(main, islandData);
+        islands.put(islandData.getId(), island);
+
+        return island;
     }
 
     public CompletableFuture<LoadedIsland> pasteIsland(UUID islandId, UUID ownerId) {

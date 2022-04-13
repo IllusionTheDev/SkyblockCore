@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SkyblockCommand;
 import me.illusion.skyblockcore.bungee.data.PlayerFinder;
 import me.illusion.skyblockcore.bungee.handler.MessagePacketHandler;
+import me.illusion.skyblockcore.bungee.handler.SendPlayerToIslandPacketHandler;
 import me.illusion.skyblockcore.bungee.listener.RedisListener;
 import me.illusion.skyblockcore.bungee.utilities.StorageUtils;
 import me.illusion.skyblockcore.bungee.utilities.YMLBase;
@@ -11,6 +12,7 @@ import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
 import me.illusion.skyblockcore.shared.dependency.JedisUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
+import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketTeleportPlayerToIsland;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
@@ -72,6 +74,7 @@ public class SkyblockBungeePlugin extends Plugin {
         packetManager.registerProcessor(PacketDirection.PROXY_TO_INSTANCE, redis);
 
         packetManager.subscribe(PacketRequestMessageSend.class, new MessagePacketHandler());
+        packetManager.subscribe(PacketTeleportPlayerToIsland.class, new SendPlayerToIslandPacketHandler(this));
     }
 
     @Override

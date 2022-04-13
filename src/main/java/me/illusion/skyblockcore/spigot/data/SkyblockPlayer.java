@@ -79,6 +79,8 @@ public class SkyblockPlayer {
 
                 if (main.getSetupData().getServerType() == SetupData.ServerType.ISLAND) {
                     loadIsland(islandData);
+                } else {
+                    assignRemoteIsland(islandData);
                 }
 
                 return;
@@ -88,6 +90,26 @@ public class SkyblockPlayer {
 
             if (main.getSetupData().getServerType() == SetupData.ServerType.ISLAND) {
                 pasteIsland();
+            } else {
+                load("ISLAND", data.getIslandId()).thenAccept((obj) -> {
+                    if (obj != null && !(obj instanceof IslandData)) {
+                        System.err.println("Object is not an island data, send the message below to the developer");
+                        System.err.println(obj.getClass().getName());
+                        System.err.println(obj);
+                        return;
+                    }
+
+                    IslandData islandData = (IslandData) obj;
+
+                    if (islandData == null) {
+                        System.out.println("No IslandData has been found, creating new data");
+                        islandData = new IslandData(UUID.randomUUID(), uuid);
+                        islandData.addUser(uuid);
+                        data.setIslandId(islandData.getId());
+                    }
+
+                    assignRemoteIsland(islandData);
+                });
             }
 
         }).exceptionally(throwable -> {
@@ -95,6 +117,10 @@ public class SkyblockPlayer {
             ExceptionLogger.log(throwable);
             return null;
         });
+    }
+
+    private void assignRemoteIsland(IslandData islandData) {
+        island = main.getIslandManager().loadRemoteIsland(islandData);
     }
 
     private void pasteIsland() {
