@@ -317,12 +317,14 @@ public class IslandManager {
                     .getPastingHandler()
                     .paste(data.getIslandSchematic(), worldName, centerPoint)
                     .thenRun(() ->
-                            WorldUtils.load(main, worldName)
+                            WorldUtils.load(main, worldName).join()
                     )
                     .join();
 
             World world = Bukkit.getWorld(worldName);
             Location center = centerPoint.toLocation(world);
+
+            System.out.println(world.getName() + " spawn location: " + center);
 
             Location one = center.clone().add(-offset, -128, -offset);
             Location two = center.clone().add(offset, 128, offset);

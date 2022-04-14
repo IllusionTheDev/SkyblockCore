@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.shared.storage.handler;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
@@ -25,8 +26,11 @@ public class MongoDBHandler implements StorageHandler {
             int port = Integer.parseInt(map.get("port").toString());
             String database = map.get("database").toString();
 
+            String username = map.getOrDefault("username", "").toString();
+            String password = map.getOrDefault("password", "").toString();
+
             try {
-                mongoClient = new MongoClient(ip, port);
+                mongoClient = new MongoClient(new MongoClientURI("mongodb://" + username + ":" + password + "@" + ip + ":" + port + "/" + database));
             } catch (Exception exception) {
                 ExceptionLogger.log(exception);
                 return false;

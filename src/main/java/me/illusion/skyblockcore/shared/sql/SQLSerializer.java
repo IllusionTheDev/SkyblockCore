@@ -30,12 +30,12 @@ public final class SQLSerializer {
         // there is only 1 sqlite but 20 different types of sql serveresult, so we check for sqlite firesultt
         String operation = !connection.getMetaData().getDatabaseProductName().contains("SQLite") ? SQL_SERIALIZE_OBJECT : SQLITE_SERIALIZE_OBJECT;
 
+        operation = operation.replaceFirst("\\?", "'" + table + "'"); // sqlite doesn't like setString, but I also don't like sql injection
         try (PreparedStatement statement = connection
                 .prepareStatement(operation)) {
 
-            statement.setString(1, table);
-            statement.setString(2, uuid.toString());
-            statement.setBytes(3, StorageUtils.getBytes(objectToSerialize));
+            statement.setString(1, uuid.toString());
+            statement.setBytes(2, StorageUtils.getBytes(objectToSerialize));
             statement.executeUpdate();
 
         } catch (Exception e) {

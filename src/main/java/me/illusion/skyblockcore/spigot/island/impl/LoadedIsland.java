@@ -56,12 +56,15 @@ public class LoadedIsland implements Island {
     }
 
     public Location getSpawnPoint() {
-        return center.add(data.getSpawnPointRelativeToCenter().getLocation());
+        Location loc = center.add(data.getSpawnPointRelativeToCenter().getLocation());
+
+        System.out.println(loc);
+
+        return loc;
     }
 
     public void setSpawnPoint(Location location) {
-        Location relative = location.subtract(center);
-
+        Location relative = location.clone().subtract(center);
         data.getSpawnPointRelativeToCenter().update(relative, world);
     }
 

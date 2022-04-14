@@ -29,5 +29,6 @@ public class IslandConfig extends ExtendedYMLBase {
         double z = getConfiguration().getDouble("island.spawn-point.z", 256.5);
 
         spawnPoint = new Vector(x, y, z);
+        System.out.println(spawnPoint);
     }
 }

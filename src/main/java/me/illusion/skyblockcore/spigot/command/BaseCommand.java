@@ -19,21 +19,10 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String name, String[] args) throws IllegalArgumentException {
-        System.out.println("tab completing this shit");
-
         if (args.length == 0)
             return Collections.emptyList();
 
         String identifier = String.join(".", name, String.join(".", args)).replace(" ", ".");
-
-        /*
-        // Remove trailing dots
-        while (identifier.endsWith("."))
-            identifier = identifier.substring(0, identifier.length() - 1);
-
-         */
-
-        System.out.println(identifier);
         return main.getCommandManager().tabComplete(identifier);
     }
 
@@ -41,12 +30,10 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String name, String[] args) {
         String identifier = String.join(".", name, String.join(".", args)).replace(" ", ".");
 
-
-        /*// Remove trailing dots
-        while (identifier.endsWith("."))
+        // remove trailing dots, this is not tab completion
+        while (identifier.endsWith(".")) {
             identifier = identifier.substring(0, identifier.length() - 1);
-
-         */
+        }
 
         SkyblockCommand command = main.getCommandManager().get(identifier);
 

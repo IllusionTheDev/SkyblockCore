@@ -10,7 +10,6 @@ import java.util.Map;
 public class ComparisonResultFull {
     private final Map<String, SkyblockCommand> commands;
     private final LinkedList<Integer> wildCards;
-    private SkyblockCommand storedCommand;
 
     public ComparisonResultFull(Map<String, SkyblockCommand> commands) {
         this.commands = commands;
@@ -28,7 +27,7 @@ public class ComparisonResultFull {
         //first take out the alias
         for (SkyblockCommand command : commands.values()) {
             if (inputs.length == 1) {
-                if (command.getIdentifier().equals(input) || searchAliases(input, command)) {
+                if (command.getIdentifier().equalsIgnoreCase(input) || searchAliases(input, command)) {
                     return command;
                 }
             }

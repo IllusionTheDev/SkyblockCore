@@ -11,6 +11,7 @@ import me.illusion.skyblockcore.spigot.command.impl.CommandManager;
 import me.illusion.skyblockcore.spigot.command.island.information.IslandHelpCommand;
 import me.illusion.skyblockcore.spigot.command.island.invite.IslandInviteCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
+import me.illusion.skyblockcore.spigot.command.island.movement.IslandSetSpawnCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
 import me.illusion.skyblockcore.spigot.file.ConfigurationStore;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
@@ -123,11 +124,12 @@ public class SkyblockPlugin extends JavaPlugin {
      */
     public void setupWorld(String name) {
         World world = new WorldCreator(name)
-                .generator("Skyblock")
+                .generator(islandDependencies.getEmptyWorldGenerator())
                 .generateStructures(false)
                 .seed(0)
                 .createWorld();
 
+        world.save();
         world.setAutoSave(false); // Disable auto-saving
         world.setKeepSpawnInMemory(false); // Disable spawn chunk loading
         world.setPVP(false); // Disable PVP
@@ -160,6 +162,8 @@ public class SkyblockPlugin extends JavaPlugin {
     private void registerDefaultCommands() {
         commandManager.register(new IslandGoCommand(this, "island"));
         commandManager.register(new IslandGoCommand(this, "island.go"));
+        commandManager.register(new IslandGoCommand(this, "island.spawn"));
+        commandManager.register(new IslandSetSpawnCommand(this));
         commandManager.register(new IslandInviteCommand(this));
         commandManager.register(new IslandHelpCommand(this));
     }
