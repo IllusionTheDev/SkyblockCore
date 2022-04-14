@@ -75,6 +75,9 @@ public class SkyblockPlugin extends JavaPlugin {
                 new SettingsFile(this),
                 new IslandConfig(this));
 
+        islandDependencies = new IslandDependencies(new EmptyWorldGenerator(this), PastingType.enable(this, files.getIslandConfig().getPastingSelection()), startFiles());
+
+
         setupData = new SetupData(this);
 
 
@@ -98,7 +101,6 @@ public class SkyblockPlugin extends JavaPlugin {
         playerManager = new PlayerManager();
 
         System.out.println("Setting up island dependencies");
-        islandDependencies = new IslandDependencies(new EmptyWorldGenerator(this), PastingType.enable(this, files.getIslandConfig().getPastingSelection()), startFiles());
 
 
         System.out.println("Registering listeners");
