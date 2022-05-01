@@ -36,7 +36,7 @@ public class FileStorageHandler implements StorageHandler {
             return CompletableFuture.completedFuture(null);
         }
 
-        return CompletableFuture.supplyAsync(() -> DataFileUtils.getData(new SerializedFile(file), clazz));
+        return DataFileUtils.getData(new SerializedFile(file), clazz);
     }
 
     @Override

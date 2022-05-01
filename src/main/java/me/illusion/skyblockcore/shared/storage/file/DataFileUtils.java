@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DataFileUtils {
 
-    public static <T> CompletableFuture<T> getData(SerializedFile file, Class<T> clazz) {
+    public static CompletableFuture<Object> getData(SerializedFile file, Class<?> clazz) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Object data = StorageUtils.getObject(file.getBytes());

@@ -8,6 +8,6 @@ public class WorldSettings {
 
     @TargetPath(path = "max-size")
     private int maxSize;
-    @TargetPath(path = "inicial-size")
-    private int inicialSize;
+    @TargetPath(path = "initial-size")
+    private int initialSize;
 }

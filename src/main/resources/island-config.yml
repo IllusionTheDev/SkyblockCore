@@ -20,7 +20,7 @@ island:
     # The max island size, used for storage
     max-size: 500
     # The inicial size of the island, used for upgrades
-    inicial-size: 100
+    initial-size: 100
 
     # The settings that will be applicable to each island
     settings:
