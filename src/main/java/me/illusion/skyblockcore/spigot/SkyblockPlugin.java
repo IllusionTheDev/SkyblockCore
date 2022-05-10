@@ -27,6 +27,7 @@ import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.CommunicationRegistry;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
+import me.illusion.skyblockcore.spigot.utilities.storage.YMLBase;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -135,6 +136,13 @@ public class SkyblockPlugin extends JavaPlugin {
         world.setAutoSave(false); // Disable auto-saving
         world.setKeepSpawnInMemory(false); // Disable spawn chunk loading
         world.setPVP(false); // Disable PVP
+
+        CompletableFuture.runAsync(() -> {
+            YMLBase yml = new YMLBase(this, new File(getDataFolder().getParentFile().getParentFile(), "bukkit.yml"), false);
+
+            yml.getConfiguration().set("worlds." + name + ".generator", "Skyblock");
+            yml.save();
+        });
     }
 
     /**

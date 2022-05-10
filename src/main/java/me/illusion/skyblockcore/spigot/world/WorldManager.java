@@ -40,6 +40,7 @@ public class WorldManager implements Listener {
             Bukkit.unloadWorld("skyblockworld" + index, true);
         }
 
+
         Bukkit.getPluginManager().registerEvents(this, main);
 
     }

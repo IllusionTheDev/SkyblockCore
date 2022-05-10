@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -97,6 +98,7 @@ public final class WorldUtils {
             Bukkit.createWorld(new WorldCreator(worldName));
         else
             Bukkit.getScheduler().runTask(main, () -> Bukkit.createWorld(new WorldCreator(worldName)));
+        CraftServer
 
         return future;
     }

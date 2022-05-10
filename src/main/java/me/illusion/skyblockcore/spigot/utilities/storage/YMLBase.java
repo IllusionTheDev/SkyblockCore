@@ -32,7 +32,7 @@ public class YMLBase {
         this.configuration = loadConfiguration();
     }
 
-    protected void save() {
+    public void save() {
         try {
             configuration.save(file);
         } catch (IOException e) {
