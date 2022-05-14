@@ -38,8 +38,8 @@ dependencies {
     implementation group: 'net.md-5', name: 'bungeecord-api', version: '1.16-R0.5-SNAPSHOT'
     implementation 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
 
-    implementation 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor('org.projectlombok:lombok:1.18.22')
+    implementation 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor('org.projectlombok:lombok:1.18.24')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'de.tr7zw:item-nbt-api-plugin:2.1.0'

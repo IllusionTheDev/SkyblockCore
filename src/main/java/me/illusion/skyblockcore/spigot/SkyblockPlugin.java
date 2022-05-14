@@ -110,6 +110,7 @@ public class SkyblockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new DeathListener(this), this);
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
 
+
         if (SpigotConfig.bungee) {
             System.out.println("Registering bungeecord messaging listener");
             packetManager = new PacketManager(files.getSettings().getConfiguration().getString("communication.server-id"));

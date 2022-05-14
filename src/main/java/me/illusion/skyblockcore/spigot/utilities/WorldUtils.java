@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -80,25 +79,12 @@ public final class WorldUtils {
             return CompletableFuture.completedFuture(world);
         }
 
-        Latch latch = new Latch();
-
-        CompletableFuture<World> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                ExceptionLogger.log(e);
-            }
-
-            return Bukkit.getWorld(worldName);
-        });
-
-        main.getWorldManager().whenNextLoad(($) -> latch.countDown(), worldName);
+        CompletableFuture<World> future = new CompletableFuture<>();
 
         if (Bukkit.isPrimaryThread())
-            Bukkit.createWorld(new WorldCreator(worldName));
+            future.complete(Bukkit.createWorld(new WorldCreator(worldName)));
         else
-            Bukkit.getScheduler().runTask(main, () -> Bukkit.createWorld(new WorldCreator(worldName)));
-        CraftServer
+            Bukkit.getScheduler().runTask(main, () -> future.complete(Bukkit.createWorld(new WorldCreator(worldName))));
 
         return future;
     }
