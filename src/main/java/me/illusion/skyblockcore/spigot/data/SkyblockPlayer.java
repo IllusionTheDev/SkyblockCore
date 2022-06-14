@@ -217,7 +217,9 @@ public class SkyblockPlayer {
 
         island.save().thenRun(() -> {
             saveObject(uuid, data);
-            main.getIslandManager().deleteIsland(island.getData().getId());
+
+            if (main.getIslandManager().shouldRemoveIsland(island))
+                main.getIslandManager().deleteIsland(island.getData().getId());
         });
 
 

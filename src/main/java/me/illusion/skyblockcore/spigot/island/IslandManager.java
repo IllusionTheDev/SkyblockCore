@@ -49,6 +49,7 @@ public class IslandManager {
 
     private final Map<UUID, Island> islands = new HashMap<>();
     private final Map<UUID, CompletableFuture<LoadedIsland>> loadingIslands = new HashMap<>();
+    private final Set<LoadedIsland> unloadingIslands = new HashSet<>();
 
     private final SkyblockPlugin main;
 
@@ -192,6 +193,13 @@ public class IslandManager {
     public CompletableFuture<LoadedIsland> loadIsland(IslandData data) {
         if (loadingIslands.containsKey(data.getId()))
             return loadingIslands.get(data.getId());
+
+        for (LoadedIsland island : unloadingIslands) {
+            if (island.getData().getId().equals(data.getId())) {
+                unloadingIslands.remove(island);
+                return CompletableFuture.completedFuture(island);
+            }
+        }
 
         CompletableFuture<LoadedIsland> future = CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
