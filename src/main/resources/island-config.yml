@@ -2,7 +2,7 @@
 island:
 
   # The spawn point of the island
-  spawn-location:
+  spawn-point:
     x: 256
     y: 128
     z: 256
@@ -15,6 +15,7 @@ island:
   # Max number of loaded islands at once
   # Worlds will be loaded and cleaned on demand
   island-worlds: 25
+
   # Overworld settings
   overworld:
     # The max island size, used for storage
