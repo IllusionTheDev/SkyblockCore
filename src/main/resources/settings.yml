@@ -1,6 +1,6 @@
 database:
   # Available types: MySQL, MONGODB, FILE, S3, SQLITE
-  type: MySQL
+  type: SQLITE
 
   # MYSQL -
   host: localhost
