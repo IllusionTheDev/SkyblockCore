@@ -60,3 +60,7 @@ delay: # All delays in ticks
   # Some servers experience corrupted data when reloading worlds too fast, so increase
   # this delay if you're experiencing corruption issues when people join and leave too often.
   release-world: 200
+
+  # Delay between starting a world load, and recognizing it as loaded.
+  # On 1.18+ servers, this can be a lifesaver.
+  world-load: 5

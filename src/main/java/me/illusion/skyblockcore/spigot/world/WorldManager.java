@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.world;
 
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
+import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -92,14 +93,21 @@ public class WorldManager implements Listener {
     }
 
     @EventHandler
-    private void onLoad(WorldLoadEvent event) {
+    private void onLoad(WorldLoadEvent event) { // According to https://www.spigotmc.org/threads/server-timing-out-crashing-after-creating-custom-world.560791/, on 1.18.1+, seems like worlds aren't being fully loaded
         World world = event.getWorld();
         String name = world.getName().toLowerCase(Locale.ROOT);
 
-        Consumer<World> action = loadEvents.remove(name);
+        new ScheduleBuilder(main)
+                .in(main.getFiles().getSettings().getWorldLoadDelay())
+                .ticks()
+                .run(() -> {
+                    Consumer<World> action = loadEvents.remove(name);
 
-        if (action != null)
-            action.accept(world);
+                    if (action != null)
+                        action.accept(world);
+                })
+                .sync()
+                .start();
     }
 
     @EventHandler
