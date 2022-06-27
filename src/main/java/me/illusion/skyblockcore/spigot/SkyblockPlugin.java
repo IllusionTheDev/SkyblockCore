@@ -25,6 +25,7 @@ import me.illusion.skyblockcore.spigot.listener.DebugListener;
 import me.illusion.skyblockcore.spigot.listener.JoinListener;
 import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.CommunicationRegistry;
+import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.utilities.storage.YMLBase;
@@ -76,7 +77,10 @@ public class SkyblockPlugin extends JavaPlugin {
                 new SettingsFile(this),
                 new IslandConfig(this));
 
-        islandDependencies = new IslandDependencies(new EmptyWorldGenerator(this), PastingType.enable(this, files.getIslandConfig().getPastingSelection()), startFiles());
+        PastingHandler pastingHandler = PastingType.enable(this, files.getIslandConfig().getPastingSelection());
+        PastingType type = pastingHandler.getType();
+
+        islandDependencies = new IslandDependencies(new EmptyWorldGenerator(this), pastingHandler, startFiles(type));
 
 
         setupData = new SetupData(this);
@@ -185,7 +189,7 @@ public class SkyblockPlugin extends JavaPlugin {
             playerManager.get(player).save();
     }
 
-    public File[] startFiles() {
+    public File[] startFiles(PastingType type) {
         File startSchematicFolder = new File(getDataFolder() + File.separator + "start-schematic");
 
         if (!startSchematicFolder.exists())
@@ -194,7 +198,7 @@ public class SkyblockPlugin extends JavaPlugin {
         File[] files = startSchematicFolder.listFiles();
 
         if (files == null || files.length == 0) {
-            if (islandDependencies.getPastingHandler().getType() == PastingType.FAWE)
+            if (type == PastingType.FAWE)
                 saveResource("start-schematic" + File.separator + "skyblock-schematic.schematic", false);
             else
                 saveResource("start-schematic" + File.separator + "r.0.0.mca", false);
