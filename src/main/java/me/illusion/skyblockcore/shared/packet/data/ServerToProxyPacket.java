@@ -5,7 +5,7 @@ import me.illusion.skyblockcore.shared.packet.Packet;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 
 @Getter
-public class ServerToProxyPacket extends Packet {
+public abstract class ServerToProxyPacket extends Packet {
 
     private final String serverName;
 

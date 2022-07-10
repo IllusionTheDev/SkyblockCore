@@ -17,12 +17,17 @@ public class PacketInviteResponse extends ProxyToServerPacket {
         response = Response.getResponse(readInt());
     }
 
-    public PacketInviteResponse(String proxyId, String targetServer, IslandInvite invite, Response response) {
-        super(proxyId, targetServer);
+    public PacketInviteResponse(String targetServer, IslandInvite invite, Response response) {
+        super(targetServer);
 
         this.invite = invite;
         this.response = response;
 
+        write();
+    }
+
+    @Override
+    public void write() {
         writeUUID(invite.getInviteId());
         writeUUID(invite.getSender());
         writeString(invite.getTarget());

@@ -16,11 +16,15 @@ public class PacketRequestServer extends ProxyToProxyPacket {
         this.uuid = readUUID();
     }
 
-    public PacketRequestServer(UUID uuid, String proxyId, String targetProxy) {
-        super(proxyId, targetProxy);
+    public PacketRequestServer(UUID uuid, String targetProxy) {
+        super(targetProxy);
 
         this.uuid = uuid;
+        write();
+    }
 
+    @Override
+    public void write() {
         writeUUID(uuid);
     }
 }

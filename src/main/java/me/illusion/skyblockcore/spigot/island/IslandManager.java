@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.island;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
+import me.illusion.skyblockcore.shared.data.PlayerData;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
@@ -73,6 +74,44 @@ public class IslandManager {
 
     public Optional<Island> getIslandFromId(UUID islandId) {
         return Optional.ofNullable(islands.get(islandId));
+    }
+
+    public CompletableFuture<IslandData> getIslandData(UUID playerId) {
+        return getPlayerIslandId(playerId).thenApply(islandId -> {
+            if (islandId == null)
+                return null;
+
+            try {
+                return main.getStorageHandler().get(islandId, "ISLAND").thenApply(islandData -> {
+                    if (islandData == null)
+                        return null;
+
+                    return (IslandData) islandData;
+                }).get();
+            } catch (InterruptedException | ExecutionException e) {
+                ExceptionLogger.log(e);
+            }
+
+            return null;
+        });
+    }
+
+    public CompletableFuture<UUID> getPlayerIslandId(UUID playerId) {
+        for (Island island : islands.values())
+            if (island.getData().getUsers().contains(playerId))
+                return CompletableFuture.completedFuture(island.getData().getId());
+
+        return main.getStorageHandler().get(playerId, "PLAYER").thenApply((playerData) -> {
+            if (playerData == null)
+                return null;
+
+            PlayerData data = (PlayerData) playerData;
+
+            return data.getIslandId();
+        }).exceptionally((ex) -> {
+            ExceptionLogger.log(ex);
+            return null;
+        });
     }
 
     public Optional<LoadedIsland> getLoadedIslandFromId(UUID islandId) {

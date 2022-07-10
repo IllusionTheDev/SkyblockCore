@@ -8,7 +8,6 @@ import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
 import me.illusion.skyblockcore.shared.data.ServerInfo;
 import me.illusion.skyblockcore.shared.packet.PacketHandler;
-import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketRespondIslandServer;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketRequestIslandServer;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
@@ -84,7 +83,7 @@ public class PlayerFinder {
                 if (!skyblockServerNames.contains(playerServer))
                     continue;
 
-                PacketRequestIslandServer packet = new PacketRequestIslandServer(PacketManager.getServerIdentifier(), playerServer, islandId);
+                PacketRequestIslandServer packet = new PacketRequestIslandServer(playerServer, islandId);
                 main.getPacketManager().send(packet);
 
                 CompletableFuture.runAsync(() -> {
@@ -110,6 +109,52 @@ public class PlayerFinder {
             return getAvailableServer();
         });
     }
+
+    public CompletableFuture<String> getLoadedIslandServer(UUID houseId) {
+        if (houseId == null)
+            return CompletableFuture.completedFuture(null);
+
+        return CompletableFuture.supplyAsync(() -> {
+            Collection<UUID> members = getIslandMembers(houseId).join();
+            CompletableFuture<String> future = new CompletableFuture<>();
+
+            for (UUID member : members) {
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(member);
+
+                if (player == null)
+                    continue;
+
+                String playerServer = player.getServer().getInfo().getName();
+
+                if (!skyblockServerNames.contains(playerServer))
+                    continue;
+
+                PacketRequestIslandServer packet = new PacketRequestIslandServer(playerServer, houseId);
+                main.getPacketManager().send(packet);
+
+                CompletableFuture.runAsync(() -> {
+                    PacketRespondIslandServer response = main.getPacketManager().await(PacketRespondIslandServer.class,
+                            responsePacket -> responsePacket.getIslandId().equals(houseId) && responsePacket.isFound(),
+                            3);
+
+                    if (response == null || !response.isFound()) {
+                        return;
+                    }
+
+                    future.complete(response.getServerName());
+                });
+            }
+
+            try {
+                return future.get(3, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                ExceptionLogger.log(e);
+            }
+
+            return null;
+        });
+    }
+
 
     private CompletableFuture<UUID> getIslandId(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {

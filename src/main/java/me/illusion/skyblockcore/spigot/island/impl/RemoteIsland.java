@@ -31,7 +31,10 @@ public class RemoteIsland implements Island {
 
     @Override
     public void teleport(Player player) {
-        main.getPacketManager().send(new PacketTeleportPlayerToIsland(player.getUniqueId(), islandData.getId()));
+        main.getIslandManager().getIslandData(player.getUniqueId())
+                .thenAccept((islandData) -> {
+                    main.getPacketManager().send(new PacketTeleportPlayerToIsland(player.getUniqueId(), islandData, this.islandData.getId()));
+                });
     }
 
     @Override

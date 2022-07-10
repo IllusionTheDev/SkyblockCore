@@ -25,12 +25,17 @@ public class PacketRespondIslandServer extends ServerToProxyPacket {
         islandCapacity = readByte();
     }
 
-    public PacketRespondIslandServer(UUID islandId, boolean found, byte islandCount, byte islandCapacity) {
-        this.islandId = islandId;
+    public PacketRespondIslandServer(UUID IslandId, boolean found, byte IslandCount, byte IslandCapacity) {
+        this.islandId = IslandId;
         this.found = found;
-        this.islandCount = islandCount;
-        this.islandCapacity = islandCapacity;
+        this.islandCount = IslandCount;
+        this.islandCapacity = IslandCapacity;
 
+        write();
+    }
+
+    @Override
+    public void write() {
         writeUUID(islandId);
         writeBoolean(found);
         writeByte(islandCount);

@@ -19,7 +19,11 @@ public class PacketInvitePlayer extends ServerToProxyPacket {
         super();
 
         this.invite = invite;
+        write();
+    }
 
+    @Override
+    public void write() {
         writeUUID(invite.getInviteId());
         writeUUID(invite.getSender());
         writeString(invite.getTarget());

@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.response;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.ProxyToProxyPacket;
 
 import java.util.UUID;
@@ -20,13 +21,18 @@ public class PacketRespondServer extends ProxyToProxyPacket {
         resultServer = readString();
     }
 
-    public PacketRespondServer(UUID player, String proxyId, String targetProxy, String resultServer) {
-        super(proxyId, targetProxy);
+    public PacketRespondServer(UUID player, String targetProxy, String resultServer) {
+        super(targetProxy);
 
         this.uuid = player;
-        this.proxyId = proxyId;
+        this.proxyId = PacketManager.getServerIdentifier();
         this.resultServer = resultServer;
 
+        write();
+    }
+
+    @Override
+    public void write() {
         writeUUID(uuid);
         writeString(proxyId);
         writeString(resultServer);

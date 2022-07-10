@@ -15,9 +15,15 @@ public class PacketRequestIslandServer extends ProxyToServerPacket {
         islandId = readUUID();
     }
 
-    public PacketRequestIslandServer(String proxyId, String targetServer, UUID islandId) {
-        super(proxyId, targetServer);
+    public PacketRequestIslandServer(String targetServer, UUID islandId) {
+        super(targetServer);
         this.islandId = islandId;
+
+        write();
+    }
+
+    @Override
+    public void write() {
         writeUUID(islandId);
     }
 }

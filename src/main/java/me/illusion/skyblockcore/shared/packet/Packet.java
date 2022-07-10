@@ -36,6 +36,8 @@ public abstract class Packet {
         writeByte(direction.getIndex());
     }
 
+    public abstract void write();
+
     protected byte getIdentifier() {
         return identifier;
     }

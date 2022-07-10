@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
+import me.illusion.skyblockcore.shared.packet.DummyPacketManager;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
@@ -119,8 +120,8 @@ public class SkyblockPlugin extends JavaPlugin {
             System.out.println("Registering bungeecord messaging listener");
             packetManager = new PacketManager(files.getSettings().getConfiguration().getString("communication.server-id"));
             packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
-
-        }
+        } else
+            packetManager = new DummyPacketManager("");
 
 
         System.out.println("Loaded");
