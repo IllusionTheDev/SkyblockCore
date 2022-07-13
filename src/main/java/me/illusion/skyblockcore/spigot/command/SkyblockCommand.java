@@ -46,7 +46,7 @@ public interface SkyblockCommand {
     }
 
     default boolean hasPermission() {
-        return getPermission().isEmpty();
+        return !getPermission().isEmpty();
     }
 
     default Map<Integer, List<String>> tabCompleteWildcards() {

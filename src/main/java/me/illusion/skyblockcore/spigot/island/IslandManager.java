@@ -279,7 +279,6 @@ public class IslandManager {
             long end = System.currentTimeMillis();
 
             LoadedIsland result = islandReference.get();
-            data.setIsland(result); // Updates island in the island data
 
             if (result == null) {
                 System.out.println("Island " + islandId + " failed to load");

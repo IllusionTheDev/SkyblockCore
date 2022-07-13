@@ -6,7 +6,6 @@ import lombok.Setter;
 import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
-import me.illusion.skyblockcore.spigot.island.Island;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,8 +22,6 @@ public class IslandData implements Serializable {
     private transient List<UUID> users = new ArrayList<>();
     private final UUID owner;
 
-    @Setter
-    private transient Island island;
     private String serialized;
 
     @Setter
