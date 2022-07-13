@@ -66,15 +66,15 @@ public class TeleportIslandResponder implements PacketHandler<PacketRequestTelep
     }
 
     @EventHandler
-    private void onIslandLoad(IslandLoadEvent event) {
+    private void onislandLoad(IslandLoadEvent event) {
         Island island = event.getIsland();
         UUID islandId = island.getData().getId();
 
         for (Map.Entry<UUID, UUID> entry : teleportCache.asMap().entrySet()) {
             UUID playerId = entry.getKey();
-            UUID targetIsland = entry.getValue();
+            UUID targetisland = entry.getValue();
 
-            if (!islandId.equals(targetIsland))
+            if (!islandId.equals(targetisland))
                 continue;
 
             Player player = Bukkit.getPlayer(playerId);

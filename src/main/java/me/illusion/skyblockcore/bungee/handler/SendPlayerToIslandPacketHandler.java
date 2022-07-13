@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.bungee.handler;
 
-
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
 import me.illusion.skyblockcore.bungee.data.PlayerFinder;
 import me.illusion.skyblockcore.shared.packet.PacketHandler;

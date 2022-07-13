@@ -4,9 +4,14 @@ import lombok.Getter;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.packet.data.ProxyToProxyPacket;
 import me.illusion.skyblockcore.shared.packet.data.ProxyToServerPacket;
+import me.illusion.skyblockcore.shared.packet.data.ServerToProxyPacket;
+import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.*;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.*;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.PacketRedirectPacket;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
-import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.response.PacketRespondServer;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestServer;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
+import me.illusion.skyblockcore.shared.utilities.SoftwareDetectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -79,9 +84,28 @@ public class PacketManager {
      * Registers the built-in packets
      */
     private void registerIds() {
-        registerPacket(0x01, PacketRespondServer.class);
-        registerPacket(0x02, PacketRespondServer.class);
-        registerPacket(0x03, PacketRequestMessageSend.class);
+        registerPacket(0, PacketInvitePlayer.class);
+        registerPacket(1, PacketModifyLoadedIslandData.class);
+        registerPacket(2, PacketRegisterLoadedIsland.class);
+        registerPacket(3, PacketUnregisterLoadedIsland.class);
+        registerPacket(4, PacketRespondIslandServer.class);
+        registerPacket(5, PacketTeleportPlayer.class);
+        registerPacket(6, PacketRequestTeleportPlayerToIsland.class);
+
+        registerPacket(7, PacketInviteResponse.class);
+        registerPacket(8, PacketRegisterRemoteIsland.class);
+        registerPacket(9, PacketRequestIslandServer.class);
+        registerPacket(10, PacketRequestIslandUnload.class);
+        registerPacket(11, PacketRequestTeleportPlayerToIsland.class);
+        registerPacket(12, PacketUnregisterRemoteIsland.class);
+        registerPacket(13, PacketTeleportPlayerInstance.class);
+
+        registerPacket(14, PacketRequestMessageSend.class);
+        registerPacket(15, PacketRequestServer.class);
+        registerPacket(16, PacketRedirectPacket.class);
+
+        registerPacket(17, PacketPing.class);
+        registerPacket(18, PacketPong.class);
     }
 
     /**
@@ -165,17 +189,27 @@ public class PacketManager {
         try {
             Packet packet = type.getConstructor(byte[].class).newInstance(bytes);
 
+            if (packet instanceof ServerToProxyPacket && SoftwareDetectionUtil.isBukkit())
+                return null;
+
             if (packet instanceof ProxyToServerPacket) {
+                if (!SoftwareDetectionUtil.isBukkit())
+                    return null;
+
                 ProxyToServerPacket proxyToServerPacket = (ProxyToServerPacket) packet;
 
-                if (!proxyToServerPacket.getTargetServer().equalsIgnoreCase("null") &&
+                if (proxyToServerPacket.getTargetServer() != null &&
                         !proxyToServerPacket.getTargetServer().equalsIgnoreCase(serverIdentifier))
                     return null;
             }
 
             if (packet instanceof ProxyToProxyPacket) {
                 ProxyToProxyPacket proxyToProxyPacket = (ProxyToProxyPacket) packet;
-                if (!proxyToProxyPacket.getTargetProxy().equalsIgnoreCase("null") &&
+
+                if (SoftwareDetectionUtil.isBukkit())
+                    return null;
+
+                if (proxyToProxyPacket.getTargetProxy() != null &&
                         !proxyToProxyPacket.getTargetProxy().equalsIgnoreCase(serverIdentifier))
                     return null;
             }

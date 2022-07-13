@@ -5,6 +5,7 @@ import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
 import me.illusion.skyblockcore.shared.packet.DummyPacketManager;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
+import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketUnregisterServer;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
@@ -188,6 +189,9 @@ public class SkyblockPlugin extends JavaPlugin {
     public void onDisable() {
         for (Player player : Bukkit.getOnlinePlayers())
             playerManager.get(player).save();
+
+        PacketUnregisterServer unregister = new PacketUnregisterServer();
+        packetManager.send(unregister);
     }
 
     public File[] startFiles(PastingType type) {

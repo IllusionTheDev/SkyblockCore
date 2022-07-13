@@ -21,6 +21,13 @@ public class PacketRespondServer extends ProxyToProxyPacket {
         resultServer = readString();
     }
 
+    @Override
+    public void write() {
+        writeUUID(uuid);
+        writeString(proxyId);
+        writeString(resultServer);
+    }
+
     public PacketRespondServer(UUID player, String targetProxy, String resultServer) {
         super(targetProxy);
 
@@ -29,12 +36,5 @@ public class PacketRespondServer extends ProxyToProxyPacket {
         this.resultServer = resultServer;
 
         write();
-    }
-
-    @Override
-    public void write() {
-        writeUUID(uuid);
-        writeString(proxyId);
-        writeString(resultServer);
     }
 }

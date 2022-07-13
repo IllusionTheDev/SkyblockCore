@@ -19,6 +19,12 @@ public class PacketRequestMessageSend extends ProxyToProxyPacket {
         message = readBungeeText();
     }
 
+    @Override
+    public void write() {
+        writeUUID(uuid);
+        writeBungeeText(message);
+    }
+
     public PacketRequestMessageSend(String targetProxy, UUID uuid, BaseComponent[] message) {
         super(targetProxy);
 
@@ -26,11 +32,5 @@ public class PacketRequestMessageSend extends ProxyToProxyPacket {
         this.message = message;
 
         write();
-    }
-
-    @Override
-    public void write() {
-        writeUUID(uuid);
-        writeBungeeText(message);
     }
 }

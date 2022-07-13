@@ -84,6 +84,10 @@ public class ComparisonResult {
         String id = command.getIdentifier().split("\\.")[0];
 
         SkyblockCommand it = commands.get(id);
+
+        if (it == null)
+            return false;
+
         if (it.getIdentifier().equals(id))
             for (String alias : it.getAliases()) {
                 if (alias.equals(input)) {

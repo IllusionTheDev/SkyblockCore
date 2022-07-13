@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.shared.packet.impl.proxytoinstance;
 
-
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.packet.data.ProxyToServerPacket;
 import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;

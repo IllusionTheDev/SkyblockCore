@@ -21,6 +21,13 @@ public class PacketTeleportPlayerToIsland extends ServerToProxyPacket {
         islandId = readUUID();
     }
 
+    @Override
+    public void write() {
+        writeUUID(playerId);
+        writeObject(originalPlayerData);
+        writeUUID(islandId);
+    }
+
     public PacketTeleportPlayerToIsland(UUID playerId, IslandData originalPlayerData, UUID islandId) {
         super();
 
@@ -30,12 +37,5 @@ public class PacketTeleportPlayerToIsland extends ServerToProxyPacket {
         this.islandId = islandId;
 
         write();
-    }
-
-    @Override
-    public void write() {
-        writeUUID(playerId);
-        writeObject(originalPlayerData);
-        writeUUID(islandId);
     }
 }

@@ -492,5 +492,18 @@ public class IslandManager {
         FileUtils.delete(folder); // Delete the folder
     }
 
+    public void unregisterRemoteIsland(UUID islandId) {
+        Island island = getIsland(islandId);
+
+        if (!(island instanceof RemoteIsland))
+            return;
+
+        islands.remove(islandId);
+    }
+
+    public Collection<Island> getAllIslands() {
+        return islands.values();
+    }
+
 
 }

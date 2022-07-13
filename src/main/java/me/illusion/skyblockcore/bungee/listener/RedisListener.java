@@ -8,6 +8,7 @@ import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class RedisListener extends BinaryJedisPubSub implements PacketProcessor {
@@ -42,7 +43,7 @@ public class RedisListener extends BinaryJedisPubSub implements PacketProcessor 
 
     @Override
     public void onMessage(byte[] channel, byte[] message) {
-        if (channel != KEY)
+        if (!Arrays.equals(channel, KEY))
             return;
 
         main.getPacketManager().read(message);

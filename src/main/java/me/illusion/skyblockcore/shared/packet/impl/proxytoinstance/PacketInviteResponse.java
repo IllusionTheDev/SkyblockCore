@@ -17,6 +17,14 @@ public class PacketInviteResponse extends ProxyToServerPacket {
         response = Response.getResponse(readInt());
     }
 
+    @Override
+    public void write() {
+        writeUUID(invite.getInviteId());
+        writeUUID(invite.getSender());
+        writeString(invite.getTarget());
+        writeInt(response.ordinal());
+    }
+
     public PacketInviteResponse(String targetServer, IslandInvite invite, Response response) {
         super(targetServer);
 
@@ -24,14 +32,6 @@ public class PacketInviteResponse extends ProxyToServerPacket {
         this.response = response;
 
         write();
-    }
-
-    @Override
-    public void write() {
-        writeUUID(invite.getInviteId());
-        writeUUID(invite.getSender());
-        writeString(invite.getTarget());
-        writeInt(response.ordinal());
     }
 
     public enum Response {

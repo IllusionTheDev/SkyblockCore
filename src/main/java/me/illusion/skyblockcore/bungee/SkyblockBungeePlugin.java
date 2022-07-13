@@ -11,9 +11,8 @@ import me.illusion.skyblockcore.shared.dependency.DependencyDownloader;
 import me.illusion.skyblockcore.shared.dependency.JedisUtil;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
-import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketRequestVisitorIsland;
-import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketTeleportPlayer;
-import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketTeleportPlayerToIsland;
+import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.*;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketPing;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.PacketRedirectPacket;
 import me.illusion.skyblockcore.shared.packet.impl.proxytoproxy.request.PacketRequestMessageSend;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
@@ -79,7 +78,12 @@ public class SkyblockBungeePlugin extends Plugin {
         packetManager.subscribe(PacketTeleportPlayerToIsland.class, new SendPlayerToIslandPacketHandler(this));
         packetManager.subscribe(PacketTeleportPlayer.class, new TeleportPlayerPacketHandler(this));
         packetManager.subscribe(PacketRedirectPacket.class, new RedirectPacketHandler(this));
-        packetManager.subscribe(PacketRequestVisitorIsland.class, new IslandVisitationPacketHandler(this));
+        packetManager.subscribe(PacketRegisterLoadedIsland.class, new LoadIslandPacketHandler(this));
+        packetManager.subscribe(PacketPong.class, new PongPacketHandler(this));
+        packetManager.subscribe(PacketUnregisterServer.class, new UnregisterPacketHandler(this));
+
+        System.out.println("[SkyblockCore] Packet handlers registered!");
+        packetManager.send(new PacketPing());
 
     }
 
@@ -133,10 +137,13 @@ public class SkyblockBungeePlugin extends Plugin {
         String password = config.getString("jedis.password", "");
 
 
-        if (!jedisUtil.connect(ip, port, password))
-            disable();
-        else
+        if (jedisUtil.connect(ip, port, password))
             redisListener = new RedisListener(this);
+        else {
+            System.err.println("[SkyblockCore] Failed to connect to Redis!");
+            System.err.println("[SkyblockCore] Disabling SkyblockCore!");
+            disable();
+        }
     }
 
     private void disable() {

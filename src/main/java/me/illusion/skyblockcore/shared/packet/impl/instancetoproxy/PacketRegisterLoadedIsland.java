@@ -1,37 +1,34 @@
 package me.illusion.skyblockcore.shared.packet.impl.instancetoproxy;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.packet.data.ServerToProxyPacket;
 
 import java.util.UUID;
 
 @Getter
-public class PacketRequestVisitorIsland extends ServerToProxyPacket {
+public class PacketRegisterLoadedIsland extends ServerToProxyPacket {
 
     private final UUID islandId;
-    private final UUID packetId;
+    private final IslandData islandData;
 
-    public PacketRequestVisitorIsland(byte[] bytes) {
+    public PacketRegisterLoadedIsland(byte[] bytes) {
         super(bytes);
 
         islandId = readUUID();
-        packetId = readUUID();
+        islandData = (IslandData) readObject();
     }
 
-    public PacketRequestVisitorIsland(UUID islandId) {
-        super();
-
+    public PacketRegisterLoadedIsland(UUID islandId, IslandData islandData) {
         this.islandId = islandId;
-        this.packetId = UUID.randomUUID();
+        this.islandData = islandData;
 
         write();
-
     }
 
     @Override
     public void write() {
         writeUUID(islandId);
-        writeUUID(packetId);
+        writeObject(islandData);
     }
-
 }

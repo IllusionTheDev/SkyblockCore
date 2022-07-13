@@ -21,6 +21,13 @@ public class PacketTeleportPlayer extends ServerToProxyPacket {
         this.serializedLocation = (SerializedLocation) this.readObject();
     }
 
+    @Override
+    public void write() {
+        this.writeUUID(uuid);
+        this.writeString(targetServerId);
+        this.writeObject(serializedLocation);
+    }
+
     public PacketTeleportPlayer(UUID uuid, String targetServer, SerializedLocation serializedLocation) {
         super();
 
@@ -29,12 +36,5 @@ public class PacketTeleportPlayer extends ServerToProxyPacket {
         this.serializedLocation = serializedLocation;
 
         write();
-    }
-
-    @Override
-    public void write() {
-        this.writeUUID(uuid);
-        this.writeString(targetServerId);
-        this.writeObject(serializedLocation);
     }
 }

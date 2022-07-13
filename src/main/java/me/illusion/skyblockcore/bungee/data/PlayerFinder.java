@@ -110,12 +110,12 @@ public class PlayerFinder {
         });
     }
 
-    public CompletableFuture<String> getLoadedIslandServer(UUID houseId) {
-        if (houseId == null)
+    public CompletableFuture<String> getLoadedIslandServer(UUID islandId) {
+        if (islandId == null)
             return CompletableFuture.completedFuture(null);
 
         return CompletableFuture.supplyAsync(() -> {
-            Collection<UUID> members = getIslandMembers(houseId).join();
+            Collection<UUID> members = getIslandMembers(islandId).join();
             CompletableFuture<String> future = new CompletableFuture<>();
 
             for (UUID member : members) {
@@ -129,12 +129,12 @@ public class PlayerFinder {
                 if (!skyblockServerNames.contains(playerServer))
                     continue;
 
-                PacketRequestIslandServer packet = new PacketRequestIslandServer(playerServer, houseId);
+                PacketRequestIslandServer packet = new PacketRequestIslandServer(playerServer, islandId);
                 main.getPacketManager().send(packet);
 
                 CompletableFuture.runAsync(() -> {
                     PacketRespondIslandServer response = main.getPacketManager().await(PacketRespondIslandServer.class,
-                            responsePacket -> responsePacket.getIslandId().equals(houseId) && responsePacket.isFound(),
+                            responsePacket -> responsePacket.getIslandId().equals(islandId) && responsePacket.isFound(),
                             3);
 
                     if (response == null || !response.isFound()) {
@@ -213,7 +213,18 @@ public class PlayerFinder {
         return new String(bytes);
     }
 
-    public void registerServer(String name) {
+    public void unregisterServer(String name) {
+        skyblockServerNames.remove(name);
+        serverInfoMap.remove(name);
+    }
+
+    public void registerServer(String name, byte currentCount, byte maxCapacity) {
         skyblockServerNames.add(name);
+
+        serverInfoMap.put(name, new ServerInfo(currentCount, maxCapacity, name));
+    }
+
+    public Set<String> getSkyblockServerNames() {
+        return skyblockServerNames;
     }
 }

@@ -15,17 +15,17 @@ public class PacketInvitePlayer extends ServerToProxyPacket {
         invite = new IslandInvite(readUUID(), readUUID(), readString());
     }
 
-    public PacketInvitePlayer(IslandInvite invite) {
-        super();
-
-        this.invite = invite;
-        write();
-    }
-
     @Override
     public void write() {
         writeUUID(invite.getInviteId());
         writeUUID(invite.getSender());
         writeString(invite.getTarget());
+    }
+
+    public PacketInvitePlayer(IslandInvite invite) {
+        super();
+
+        this.invite = invite;
+        write();
     }
 }
