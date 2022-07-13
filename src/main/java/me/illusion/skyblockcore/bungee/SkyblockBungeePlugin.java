@@ -21,6 +21,7 @@ import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -44,6 +45,7 @@ public class SkyblockBungeePlugin extends Plugin {
         enabled = true;
         config = new YMLBase(this, "bungee-config.yml").getConfiguration();
 
+        ExceptionLogger.setFolder(new File(getDataFolder(), "exceptions"));
 
         dependencyDownloader = new DependencyDownloader(getDataFolder().getParentFile());
 

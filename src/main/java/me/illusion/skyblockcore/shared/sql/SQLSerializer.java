@@ -28,9 +28,10 @@ public final class SQLSerializer {
     @SneakyThrows
     public static void serialize(Connection connection, UUID uuid, Object objectToSerialize, String table) {
         // there is only 1 sqlite but 20 different types of sql serveresult, so we check for sqlite firesultt
+        System.out.println("Serializing " + objectToSerialize.getClass().getSimpleName() + " to SQL.");
         String operation = !connection.getMetaData().getDatabaseProductName().contains("SQLite") ? SQL_SERIALIZE_OBJECT : SQLITE_SERIALIZE_OBJECT;
 
-        operation = operation.replaceFirst("\\?", "'" + table + "'"); // sqlite doesn't like setString, but I also don't like sql injection
+        operation = operation.replaceFirst("\\?", table); // sqlite doesn't like setString, but I also don't like sql injection
         try (PreparedStatement statement = connection
                 .prepareStatement(operation)) {
 
@@ -60,7 +61,7 @@ public final class SQLSerializer {
             try {
                 String query = SQL_DESERIALIZE_OBJECT;
 
-                query = query.replaceFirst("\\?", "'" + table + "'"); // sqlite doesn't like setString, but I also don't like sql injection
+                query = query.replaceFirst("\\?", table); // sqlite doesn't like setString, but I also don't like sql injection
                 query = query.replaceFirst("\\?", "'" + uuid.toString() + "'");
 
                 System.out.println(query);
