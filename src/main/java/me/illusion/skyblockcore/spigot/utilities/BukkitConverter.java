@@ -23,4 +23,20 @@ public class BukkitConverter {
         String world = split[5];
         return new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
     }
+
+    public static Location getLocation(SerializedLocation location) {
+        return convertLocation(location);
+    }
+
+    public static void setLocation(SerializedLocation serialized, Location location) {
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+        float yaw = location.getYaw();
+        float pitch = location.getPitch();
+
+        String world = location.getWorld() == null ? "world" : location.getWorld().getName();
+
+        serialized.setFormat(x + " " + y + " " + z + " " + yaw + " " + pitch + " " + world);
+    }
 }

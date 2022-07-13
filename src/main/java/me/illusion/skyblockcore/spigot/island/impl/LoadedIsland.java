@@ -6,9 +6,11 @@ import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandSaveEvent;
 import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.spigot.utilities.BukkitConverter;
 import me.illusion.skyblockcore.spigot.utilities.LocationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
@@ -56,16 +58,31 @@ public class LoadedIsland implements Island {
     }
 
     public Location getSpawnPoint() {
-        Location loc = center.add(data.getSpawnPointRelativeToCenter().getLocation());
-
-        System.out.println(loc);
-
-        return loc;
+        return center.add(BukkitConverter.convertLocation(data.getSpawnPointRelativeToCenter()));
     }
 
     public void setSpawnPoint(Location location) {
+        location.setWorld(Bukkit.getWorld(world));
+
         Location relative = location.clone().subtract(center);
-        data.getSpawnPointRelativeToCenter().update(relative, world);
+
+        BukkitConverter.setLocation(data.getSpawnPointRelativeToCenter(), relative);
+
+        updateWorldBorder();
+    }
+
+    public void updateWorldBorder() {
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(main, this::updateWorldBorder);
+            return;
+        }
+
+        double range = pointOne.distance(pointTwo);
+
+        WorldBorder border = center.getWorld().getWorldBorder();
+        border.setCenter(center);
+        border.setSize(range);
+
     }
 
     public void teleport(Player player) {

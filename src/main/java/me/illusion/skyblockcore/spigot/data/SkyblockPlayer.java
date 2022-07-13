@@ -4,13 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
-import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandCreateEvent;
 import me.illusion.skyblockcore.spigot.event.IslandLoadEvent;
 import me.illusion.skyblockcore.spigot.file.SetupData;
 import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.spigot.utilities.BukkitConverter;
 import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.ScheduleBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -132,18 +132,7 @@ public class SkyblockPlayer {
 
                     System.out.println("Loaded island data");
 
-                    sync(() -> {
-                        SerializedLocation last = data.getLastLocation(); // Obtains last location
-
-                        // Assign player location if not found
-                        if (last.getLocation() == null) {
-                            teleportToIsland();
-                            return;
-                        }
-
-                        // Teleports
-                        checkTeleport();
-                    });
+                    sync(this::teleportToIsland);
 
                 });
     }
@@ -174,24 +163,6 @@ public class SkyblockPlayer {
 
     }
 
-    /**
-     * Teleports player to last position
-     */
-    private void checkTeleport() {
-        System.out.println("Teleporting to last location");
-
-        Player player = getPlayer();
-        SerializedLocation last = data.getLastLocation();
-
-        String worldName = last.getWorldName();
-        Location location = last.getLocation();
-
-        if (worldName.startsWith("skyblockworld"))
-            location.setWorld(islandCenter.getWorld());
-
-        player.teleport(location);
-    }
-
 
     /**
      * Obtains a serialized object
@@ -212,8 +183,8 @@ public class SkyblockPlayer {
         Player player = getPlayer();
         Location loc = player.getLocation();
 
-        data.getLastLocation().update(loc);
-        data.getIslandLocation().update(loc);
+        BukkitConverter.setLocation(data.getLastLocation(), loc);
+        BukkitConverter.setLocation(data.getIslandLocation(), loc);
 
         island.save().thenRun(() -> {
             saveObject(uuid, data);

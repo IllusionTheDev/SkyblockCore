@@ -19,7 +19,7 @@ public final class LocationUtil {
             try {
                 getSafeLocation = Class.forName("me.illusion.skyblockcore.v1_13.LocationGrabber").getMethod("getSafeLocation", Location.class);
             } catch (NoSuchMethodException | ClassNotFoundException e) {
-                e.printStackTrace();
+                getSafeLocation = null;
             }
         }
     }
