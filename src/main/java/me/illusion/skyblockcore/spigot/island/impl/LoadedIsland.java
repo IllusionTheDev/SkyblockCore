@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -97,6 +98,18 @@ public class LoadedIsland implements Island {
     @Override
     public boolean locationBelongs(Location location) {
         return LocationUtil.locationBelongs(location, pointOne, pointTwo);
+    }
+
+    @Override
+    public void removeMember(UUID playerId) {
+        data.removeUser(playerId);
+
+        if (!data.getUsers().isEmpty())
+            return;
+
+        main.getIslandManager().unregister(this);
+        main.getIslandManager().deleteIsland(this);
+
     }
 
     /**

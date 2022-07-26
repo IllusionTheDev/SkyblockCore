@@ -6,14 +6,15 @@ import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.File;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static me.illusion.skyblockcore.shared.sql.SQLOperation.CREATE_DATA_TABLE;
-import static me.illusion.skyblockcore.shared.sql.SQLOperation.CREATE_ISLAND_DATA_TABLE;
+import static me.illusion.skyblockcore.shared.sql.SQLOperation.*;
 
 public class MySQLHandler extends SQLConnectionProvider implements StorageHandler {
 
@@ -59,6 +60,23 @@ public class MySQLHandler extends SQLConnectionProvider implements StorageHandle
         return CompletableFuture.runAsync(() -> SQLSerializer.serialize(get(), uuid, object, category)).exceptionally(throwable -> {
             ExceptionLogger.log(throwable);
             return null;
+        });
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(UUID uuid, String category) {
+        return CompletableFuture.runAsync(() -> {
+            Connection con = get();
+
+            String operation = SQL_DELETE_OBJECT.replaceFirst("\\?", category);
+
+            try (PreparedStatement statement = con.prepareStatement(operation)) {
+                statement.setString(1, uuid.toString());
+
+                statement.execute();
+            } catch (SQLException exception) {
+                ExceptionLogger.log(exception);
+            }
         });
     }
 

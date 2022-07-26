@@ -7,6 +7,7 @@ public class SQLOperation {
 
     public static final String SQL_SERIALIZE_OBJECT = "INSERT INTO ? (serialized_id, serialized_object) VALUES (?, ?) ON DUPLICATE KEY UPDATE serialized_id=VALUES(serialized_id), serialized_object=VALUES(serialized_object)";
     public static final String SQL_DESERIALIZE_OBJECT = "SELECT serialized_object FROM ? WHERE serialized_id = ?";
+    public static final String SQL_DELETE_OBJECT = "DELETE FROM ? WHERE serialized_id = ?";
 
     public static final String SQLITE_SERIALIZE_OBJECT = "INSERT OR REPLACE INTO ? (serialized_id, serialized_object) VALUES (?, ?) ";
 

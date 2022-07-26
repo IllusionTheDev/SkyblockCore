@@ -4,6 +4,7 @@ import me.illusion.skyblockcore.shared.data.IslandData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface Island {
@@ -17,6 +18,8 @@ public interface Island {
     String getWorldName();
 
     IslandData getData();
+
+    void removeMember(UUID playerId);
 
     boolean locationBelongs(Location location);
 

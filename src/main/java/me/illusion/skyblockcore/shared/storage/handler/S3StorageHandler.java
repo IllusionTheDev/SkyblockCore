@@ -117,4 +117,17 @@ public class S3StorageHandler extends FileStorageHandler {
         });
 
     }
+
+    @Override
+    public CompletableFuture<Void> delete(UUID uuid, String category) {
+        return CompletableFuture.runAsync(() -> {
+            Class<?> clazz = getClassByCategory(category);
+
+            if (clazz == null) {
+                return;
+            }
+
+            s3client.deleteObject(bucketName, category + "-" + uuid + "." + category.toLowerCase(Locale.ROOT));
+        });
+    }
 }

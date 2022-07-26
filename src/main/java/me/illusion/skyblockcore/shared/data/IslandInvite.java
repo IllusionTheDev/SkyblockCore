@@ -11,5 +11,9 @@ public class IslandInvite {
 
     private final UUID inviteId;
     private final UUID sender;
-    private final String target;
+    private final String senderName;
+
+    private final UUID target;
+    private final String targetName;
+    private final long expirationEpoch;
 }

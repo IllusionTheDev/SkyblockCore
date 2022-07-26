@@ -2,8 +2,6 @@ package me.illusion.skyblockcore.spigot.command.island.invite;
 
 import me.illusion.skyblockcore.shared.data.IslandInvite;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketInvitePlayer;
-import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketInviteResponse;
-import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import org.bukkit.Bukkit;
@@ -11,6 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,14 +39,7 @@ public class IslandInviteCommand implements SkyblockCommand {
         // Check if the target is on the current instance
         OfflinePlayer target = Bukkit.getOfflinePlayer(targetPlayer);
 
-        sendInvite(player, target.getName())
-                .thenAccept(response -> {
-                    player.sendMessage("Response: " + response);
-                })
-                .exceptionally((thr) -> {
-                    ExceptionLogger.log(thr);
-                    return null;
-                });
+        sendInvite(player, target.getUniqueId(), targetPlayer);
 
     }
 
@@ -66,23 +58,18 @@ public class IslandInviteCommand implements SkyblockCommand {
         return results;
     }
 
-    private CompletableFuture<PacketInviteResponse.Response> sendInvite(Player origin, String targetName) {
-        return CompletableFuture.supplyAsync(() -> {
-            UUID inviteID = UUID.randomUUID();
+    private void sendInvite(Player origin, UUID targetId, String targetName) {
+        CompletableFuture.runAsync(() -> {
+            UUID inviteId = UUID.randomUUID();
+            String playerName = origin.getName();
 
-            PacketInvitePlayer packet = new PacketInvitePlayer(new IslandInvite(inviteID, origin.getUniqueId(), targetName));
+            IslandInvite invite = new IslandInvite(inviteId, origin.getUniqueId(), playerName, targetId, targetName, Instant.now().getEpochSecond() + 60);
+
+            main.getInviteCache().addInvite(invite);
+
+            PacketInvitePlayer packet = new PacketInvitePlayer(invite);
 
             main.getPacketManager().send(packet);
-
-            PacketInviteResponse response = main.getPacketManager()
-                    .await(PacketInviteResponse.class,
-                            (invite) -> invite.getInvite().getInviteId().equals(inviteID),
-                            5);
-
-            if (response == null)
-                return PacketInviteResponse.Response.RESPONSE_NOT_FOUND;
-
-            return response.getResponse();
         });
     }
 }

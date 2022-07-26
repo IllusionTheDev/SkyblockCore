@@ -62,6 +62,18 @@ public class FileStorageHandler implements StorageHandler {
         });
     }
 
+    @Override
+    public CompletableFuture<Void> delete(UUID uuid, String category) {
+        Class<?> clazz = getClassByCategory(category);
+        if (clazz == null) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        File file = new File(dataFolder, category + "-" + uuid + "." + category.toLowerCase(Locale.ROOT));
+
+        return CompletableFuture.runAsync(file::delete);
+    }
+
     protected Class<?> getClassByCategory(String category) {
         if (category.equalsIgnoreCase("player")) {
             return PlayerData.class;

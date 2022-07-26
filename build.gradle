@@ -31,6 +31,8 @@ repositories {
 
     maven { url = "https://libraries.minecraft.net" }
 
+    maven { url = "https://repo.velocitypowered.com/snapshots/" }
+
 }
 
 dependencies {
@@ -49,6 +51,8 @@ dependencies {
     implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.7'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.196'
     implementation 'com.grinderwolf:slimeworldmanager-plugin:2.2.1'
+
+    implementation 'com.velocitypowered:velocity-api:3.1.0'
 
 
     compileOnly project(':1_13')

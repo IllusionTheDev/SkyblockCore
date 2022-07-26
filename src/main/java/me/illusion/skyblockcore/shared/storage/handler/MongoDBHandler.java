@@ -67,4 +67,12 @@ public class MongoDBHandler implements StorageHandler {
         });
     }
 
+    @Override
+    public CompletableFuture<Void> delete(UUID uuid, String category) {
+        return CompletableFuture.runAsync(() -> {
+            Document document = new Document(category + "-uuid", uuid.toString());
+
+            islandStorage.deleteOne(document);
+        });
+    }
 }

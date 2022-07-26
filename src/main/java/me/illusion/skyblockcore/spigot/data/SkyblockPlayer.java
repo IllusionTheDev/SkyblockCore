@@ -70,19 +70,7 @@ public class SkyblockPlayer {
 
             if (data == null) {
                 System.out.println("No PlayerData has been found, creating new data");
-
-                data = new PlayerData();
-                data.setPlayerId(uuid);
-                IslandData islandData = new IslandData(UUID.randomUUID(), uuid);
-                islandData.addUser(uuid);
-                data.setIslandId(islandData.getId());
-
-                if (main.getSetupData().getServerType() == SetupData.ServerType.ISLAND) {
-                    loadIsland(islandData);
-                } else {
-                    assignRemoteIsland(islandData);
-                }
-
+                regenPlayerData(false);
                 return;
             }
 
@@ -117,6 +105,33 @@ public class SkyblockPlayer {
             ExceptionLogger.log(throwable);
             return null;
         });
+    }
+
+    public void setNewIsland(Island island) {
+        this.island = island;
+
+        regenPlayerData(true);
+    }
+
+    public void regenPlayerData(boolean keepIsland) {
+        data = new PlayerData();
+        data.setPlayerId(uuid);
+
+        if (keepIsland) {
+            data.setIslandId(island.getData().getId());
+            return;
+        }
+
+        IslandData islandData = new IslandData(UUID.randomUUID(), uuid);
+        islandData.addUser(uuid);
+        data.setIslandId(islandData.getId());
+
+        if (main.getSetupData().getServerType() == SetupData.ServerType.ISLAND) {
+            loadIsland(islandData);
+        } else {
+            assignRemoteIsland(islandData);
+        }
+
     }
 
     private void assignRemoteIsland(IslandData islandData) {
@@ -190,7 +205,7 @@ public class SkyblockPlayer {
             saveObject(uuid, data);
 
             if (main.getIslandManager().shouldRemoveIsland(island))
-                main.getIslandManager().deleteIsland(island.getData().getId());
+                main.getIslandManager().unloadIsland(island.getData().getId());
         });
 
 

@@ -18,6 +18,6 @@ public class UnloadIslandResponder implements PacketHandler<PacketRequestIslandU
     public void onReceive(PacketRequestIslandUnload packet) {
         UUID islandId = packet.getIslandId();
 
-        main.getIslandManager().deleteIsland(islandId);
+        main.getIslandManager().unloadIsland(islandId);
     }
 }

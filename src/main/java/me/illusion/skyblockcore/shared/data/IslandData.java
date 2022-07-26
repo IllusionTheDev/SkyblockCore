@@ -65,4 +65,14 @@ public class IslandData implements Serializable {
         users.addAll(list);
         return list;
     }
+
+    public void removeUser(UUID userId) {
+        users.remove(userId);
+        serialized = serialized.replace(userId.toString(), "");
+
+        // remove double spaces
+        while (serialized.contains("  ")) {
+            serialized = serialized.replace("  ", " ");
+        }
+    }
 }

@@ -6,11 +6,13 @@ import me.illusion.skyblockcore.shared.packet.DummyPacketManager;
 import me.illusion.skyblockcore.shared.packet.PacketManager;
 import me.illusion.skyblockcore.shared.packet.data.PacketDirection;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketUnregisterServer;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.*;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
 import me.illusion.skyblockcore.shared.storage.StorageType;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.command.impl.CommandManager;
 import me.illusion.skyblockcore.spigot.command.island.information.IslandHelpCommand;
+import me.illusion.skyblockcore.spigot.command.island.invite.IslandAcceptCommand;
 import me.illusion.skyblockcore.spigot.command.island.invite.IslandInviteCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandSetSpawnCommand;
@@ -21,12 +23,14 @@ import me.illusion.skyblockcore.spigot.file.SettingsFile;
 import me.illusion.skyblockcore.spigot.file.SetupData;
 import me.illusion.skyblockcore.spigot.island.IslandDependencies;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
+import me.illusion.skyblockcore.spigot.island.invite.InviteCache;
 import me.illusion.skyblockcore.spigot.island.world.EmptyWorldGenerator;
 import me.illusion.skyblockcore.spigot.listener.DeathListener;
 import me.illusion.skyblockcore.spigot.listener.DebugListener;
 import me.illusion.skyblockcore.spigot.listener.JoinListener;
 import me.illusion.skyblockcore.spigot.listener.LeaveListener;
 import me.illusion.skyblockcore.spigot.messaging.CommunicationRegistry;
+import me.illusion.skyblockcore.spigot.messaging.responder.*;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
@@ -47,6 +51,8 @@ import java.util.concurrent.CompletableFuture;
 
 @Getter
 public class SkyblockPlugin extends JavaPlugin {
+
+    private InviteCache inviteCache;
 
     private StorageHandler storageHandler;
     private IslandManager islandManager;
@@ -104,6 +110,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
     private void load() {
 
+        inviteCache = new InviteCache(this);
         islandManager = new IslandManager(this);
         playerManager = new PlayerManager();
 
@@ -121,6 +128,14 @@ public class SkyblockPlugin extends JavaPlugin {
             System.out.println("Registering bungeecord messaging listener");
             packetManager = new PacketManager(files.getSettings().getConfiguration().getString("communication.server-id"));
             packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
+
+            packetManager.subscribe(PacketRegisterRemoteIsland.class, new RemoteIslandResponder(this));
+            packetManager.subscribe(PacketRequestIslandServer.class, new RequestIslandServerResponder(this));
+            packetManager.subscribe(PacketRequestTeleportPlayerToIsland.class, new TeleportIslandResponder(this));
+            packetManager.subscribe(PacketRequestIslandUnload.class, new UnloadIslandResponder(this));
+            packetManager.subscribe(PacketUnregisterRemoteIsland.class, new UnloadRemoteIslandResponder(this));
+            packetManager.subscribe(PacketPing.class, new PingResponder(this));
+            packetManager.subscribe(PacketIndicateInvite.class, new InviteIndicationResponder(this));
         } else
             packetManager = new DummyPacketManager("");
 
@@ -183,6 +198,8 @@ public class SkyblockPlugin extends JavaPlugin {
         commandManager.register(new IslandSetSpawnCommand(this));
         commandManager.register(new IslandInviteCommand(this));
         commandManager.register(new IslandHelpCommand(this));
+        commandManager.register(new IslandInviteCommand(this));
+        commandManager.register(new IslandAcceptCommand(this));
     }
 
     @Override

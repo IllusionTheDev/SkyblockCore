@@ -1,25 +1,24 @@
-package me.illusion.skyblockcore.shared.packet.impl.proxytoinstance;
+package me.illusion.skyblockcore.shared.packet.impl.instancetoproxy;
 
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandInvite;
-import me.illusion.skyblockcore.shared.packet.data.ProxyToServerPacket;
+import me.illusion.skyblockcore.shared.packet.data.ServerToProxyPacket;
+import me.illusion.skyblockcore.shared.packet.impl.proxytoinstance.PacketInviteResponse;
 
 @Getter
-public class PacketInviteResponse extends ProxyToServerPacket {
+public class PacketRespondInvite extends ServerToProxyPacket {
 
     private final IslandInvite invite;
-    private final Response response;
+    private final PacketInviteResponse.Response response;
 
-    public PacketInviteResponse(byte[] bytes) {
+    public PacketRespondInvite(byte[] bytes) {
         super(bytes);
 
         invite = new IslandInvite(readUUID(), readUUID(), readString(), readUUID(), readString(), readLong());
-        response = Response.getResponse(readInt());
+        response = PacketInviteResponse.Response.getResponse(readInt());
     }
 
-    public PacketInviteResponse(IslandInvite invite, Response response) {
-        super((String) null);
-
+    public PacketRespondInvite(IslandInvite invite, PacketInviteResponse.Response response) {
         this.invite = invite;
         this.response = response;
 
@@ -36,17 +35,4 @@ public class PacketInviteResponse extends ProxyToServerPacket {
         writeLong(invite.getExpirationEpoch());
         writeInt(response.ordinal());
     }
-
-    public enum Response {
-        INVITE_ACCEPTED,
-        INVITE_DENIED;
-
-        private static final Response[] VALUES = values();
-
-        public static Response getResponse(int id) {
-            return VALUES[id];
-        }
-
-    }
 }
-

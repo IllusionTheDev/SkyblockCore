@@ -15,4 +15,6 @@ public interface StorageHandler {
 
     CompletableFuture<Void> save(UUID uuid, Object object, String category);
 
+    CompletableFuture<Void> delete(UUID uuid, String category);
+
 }

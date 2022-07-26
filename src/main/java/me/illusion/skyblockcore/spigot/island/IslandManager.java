@@ -16,6 +16,7 @@ import me.illusion.skyblockcore.spigot.utilities.schedulerutil.builders.Schedule
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -68,7 +69,7 @@ public class IslandManager {
         islands.put(island.getData().getId(), island);
     }
 
-    void unregister(Island island) {
+    public void unregister(Island island) {
         islands.remove(island.getData().getId());
     }
 
@@ -456,39 +457,71 @@ public class IslandManager {
         });
     }
 
-    public void deleteIsland(UUID islandId) {
+    public void unloadIsland(UUID IslandId) {
+        unloadIsland(IslandId, null);
+    }
+
+    public void unloadIsland(UUID islandId, UUID leavingPlayer) {
         Island island = getIsland(islandId);
 
         if (!(island instanceof LoadedIsland))
             return;
 
         LoadedIsland loadedIsland = (LoadedIsland) island;
+
+        Set<UUID> onlinePlayers = new HashSet<>();
+
+        World world = Bukkit.getWorld(loadedIsland.getWorldName());
+
+        for (Player player : world.getPlayers()) {
+            if (leavingPlayer != null && player.getUniqueId().equals(leavingPlayer))
+                continue;
+
+            onlinePlayers.add(player.getUniqueId());
+        }
+
+        if (!onlinePlayers.isEmpty())
+            return;
+
+        forceUnloadIsland(islandId);
+    }
+
+    public void forceUnloadIsland(UUID islandId) {
+        Island island = getIsland(islandId);
+
+        if (!(island instanceof LoadedIsland))
+            return;
+
+        LoadedIsland loadedIsland = (LoadedIsland) island;
+
+        System.out.println("Deleting Island");
+
         String worldName = loadedIsland.getWorldName();
 
         Bukkit.getPluginManager().callEvent(new IslandUnloadEvent(island));
+        unregister(island);
 
-        File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // Create cache folder
+        WorldUtils
+                .unload(main, worldName)
+                .thenRun(() -> {
 
-        if (shouldRemoveIsland(island)) {
-            WorldUtils
-                    .unload(main, worldName)
-                    .thenRun(() -> {
-                        WorldUtils.deleteRegionFolder(main, worldName);
-                        main.getIslandManager().unregister(island);
+                    new ScheduleBuilder(main) // Intentional delay so we don't corrupt worlds by loading and unloading very fast
+                            .in(main.getFiles().getSettings().getReleaseDelay()).ticks()
+                            .run(() -> {
+                                main.getWorldManager().unregister(worldName);
+                                WorldUtils.deleteRegionFolder(main, worldName);
+                            })
+                            .sync()
+                            .start();
 
-                        new ScheduleBuilder(main) // Intentional delay so we don't corrupt worlds by loading and unloading very fast
-                                .in(main.getFiles().getSettings().getReleaseDelay()).ticks()
-                                .run(() -> main.getWorldManager().unregister(worldName))
-                                .sync()
-                                .start();
+                });
 
-                    });
+        System.out.println("Attempting to delete Island files");
 
-        }
-
-        System.out.println("Attempting to delete island files");
-
+        File folder = new File(main.getDataFolder() + File.separator + "cache" + File.separator + islandId); // cache folder
         FileUtils.delete(folder); // Delete the folder
+
+
     }
 
     public void unregisterRemoteIsland(UUID islandId) {
@@ -498,6 +531,14 @@ public class IslandManager {
             return;
 
         islands.remove(islandId);
+    }
+
+    public void deleteIsland(LoadedIsland loadedIsland) {
+        UUID islandId = loadedIsland.getData().getId();
+
+        forceUnloadIsland(islandId);
+        main.getStorageHandler().delete(islandId, "ISLAND");
+
     }
 
     public Collection<Island> getAllIslands() {
