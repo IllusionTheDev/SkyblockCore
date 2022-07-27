@@ -1,0 +1,7 @@
+TODO:
+- Velocity support
+- Re-assinging members to remote islands
+- documenting and cleaning up remote island code
+- More commands
+- Island deny command
+- Command messages

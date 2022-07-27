@@ -1,12 +1,14 @@
 package me.illusion.skyblockcore.spigot.island.impl;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
+import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketRemovePlayerFromIsland;
 import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketTeleportPlayerToIsland;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.island.Island;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class RemoteIsland implements Island {
@@ -45,6 +47,12 @@ public class RemoteIsland implements Island {
     @Override
     public IslandData getData() {
         return islandData;
+    }
+
+    @Override
+    public void removeMember(UUID playerId) {
+        PacketRemovePlayerFromIsland packet = new PacketRemovePlayerFromIsland(playerId, islandData.getId());
+        main.getPacketManager().send(packet);
     }
 
     @Override

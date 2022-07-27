@@ -11,7 +11,6 @@ public class InviteIndicationResponder implements PacketHandler<PacketIndicateIn
     public InviteIndicationResponder(SkyblockPlugin main) {
         this.main = main;
     }
-
     @Override
     public void onReceive(PacketIndicateInvite packet) {
         main.getInviteCache().addInvite(packet.getInvite());

@@ -532,7 +532,6 @@ public class IslandManager {
 
         islands.remove(islandId);
     }
-
     public void deleteIsland(LoadedIsland loadedIsland) {
         UUID islandId = loadedIsland.getData().getId();
 

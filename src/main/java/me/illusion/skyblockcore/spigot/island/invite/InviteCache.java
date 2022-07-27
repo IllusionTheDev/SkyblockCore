@@ -39,7 +39,6 @@ public class InviteCache {
     public void removeInvite(IslandInvite invite) {
         invites.remove(invite.getInviteId());
     }
-
     public IslandInvite getInvite(UUID inviteId) {
         return invites.get(inviteId);
     }
