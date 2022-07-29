@@ -1,7 +1,6 @@
 package me.illusion.skyblockcore.spigot.command.island.movement;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
-import me.illusion.skyblockcore.shared.packet.impl.instancetoproxy.PacketTeleportPlayerToIsland;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
@@ -41,7 +40,7 @@ public class IslandVisitCommand implements SkyblockCommand {
         String targetPlayer = args[0];
 
         if (sender.getName().equalsIgnoreCase(targetPlayer)) {
-            main.getFiles().getMessages().sendMessage(sender, "command.visit-self");
+            main.getFiles().getMessages().sendMessage(sender, "commands.island-visit.self");
             return;
         }
 
@@ -59,7 +58,7 @@ public class IslandVisitCommand implements SkyblockCommand {
             }
 
             if (islandData == null) {
-                main.getFiles().getMessages().sendMessage(sender, "command.visit.player-not-have-Island");
+                main.getFiles().getMessages().sendMessage(sender, "commands.island-visit.not-have-island");
                 return;
             }
 
@@ -67,20 +66,15 @@ public class IslandVisitCommand implements SkyblockCommand {
 
             Island loadedIsland = main.getIslandManager().getIsland(IslandId);
 
-            if (loadedIsland != null) {
-                loadedIsland.teleport(player);
-                main.getFiles().getMessages().sendMessage(sender, "command.visit.success");
+            if (loadedIsland == null) {
+                main.getFiles().getMessages().sendMessage(sender, "commands.island-visit.island-not-loaded");
                 return;
             }
-
-            main.getIslandManager().getIslandData(player.getUniqueId()).thenAccept((playerIslandData) -> {
-                PacketTeleportPlayerToIsland packet = new PacketTeleportPlayerToIsland(player.getUniqueId(), playerIslandData, IslandId);
-                main.getPacketManager().send(packet);
-            });
-
+            loadedIsland.teleport(player);
+            main.getFiles().getMessages().sendMessage(sender, "commands.island-visit.success");
         }).exceptionally(ex -> {
             ExceptionLogger.log(ex);
-            main.getFiles().getMessages().sendMessage(sender, "command.visit.error");
+            main.getFiles().getMessages().sendMessage(sender, "command.island-visit.error");
             return null;
         });
 

@@ -63,7 +63,8 @@ public class IslandInviteCommand implements SkyblockCommand {
             UUID inviteId = UUID.randomUUID();
             String playerName = origin.getName();
 
-            IslandInvite invite = new IslandInvite(inviteId, origin.getUniqueId(), playerName, targetId, targetName, Instant.now().getEpochSecond() + 60);
+            IslandInvite invite = new IslandInvite(inviteId, origin.getUniqueId(), playerName,
+                    targetId, targetName, Instant.now().getEpochSecond() + main.getFiles().getIslandConfig().getInviteTimeoutSeconds());
 
             main.getInviteCache().addInvite(invite);
 

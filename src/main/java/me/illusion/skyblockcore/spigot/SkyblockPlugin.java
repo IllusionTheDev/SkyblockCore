@@ -13,7 +13,9 @@ import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.command.impl.CommandManager;
 import me.illusion.skyblockcore.spigot.command.island.information.IslandHelpCommand;
 import me.illusion.skyblockcore.spigot.command.island.invite.IslandAcceptCommand;
+import me.illusion.skyblockcore.spigot.command.island.invite.IslandDenyCommand;
 import me.illusion.skyblockcore.spigot.command.island.invite.IslandInviteCommand;
+import me.illusion.skyblockcore.spigot.command.island.movement.IslandExpelCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandSetSpawnCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
@@ -200,6 +202,8 @@ public class SkyblockPlugin extends JavaPlugin {
         commandManager.register(new IslandHelpCommand(this));
         commandManager.register(new IslandInviteCommand(this));
         commandManager.register(new IslandAcceptCommand(this));
+        commandManager.register(new IslandExpelCommand(this));
+        commandManager.register(new IslandDenyCommand(this));
     }
 
     @Override
