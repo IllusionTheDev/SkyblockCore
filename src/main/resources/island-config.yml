@@ -1,6 +1,6 @@
 # General island settings
 island:
-
+  invite-timeout: 60 # Time in seconds before an invite expires
   # The spawn point of the island
   spawn-point:
     x: 256

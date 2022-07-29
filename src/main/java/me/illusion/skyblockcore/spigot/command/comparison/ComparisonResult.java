@@ -131,8 +131,8 @@ public class ComparisonResult {
             //if it is an alias, stop from putting itself
             if (!isNextCommand &&
                     commands.containsKey(inputs2[inputs.length - 1]) &&
-                    findAliasingCommand(inputs[inputs.length - 1], commands.get(inputs2[inputs.length - 1]))
-            ) {
+                    findAliasingCommand(inputs[inputs.length - 1], commands.get(inputs2[inputs.length - 1])))
+            {
                 toReturn.add("");
                 continue;
             }

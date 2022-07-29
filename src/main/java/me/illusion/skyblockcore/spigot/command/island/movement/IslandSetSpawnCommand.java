@@ -31,13 +31,13 @@ public class IslandSetSpawnCommand implements SkyblockCommand {
         Island island = main.getPlayerManager().get(player).getIsland();
 
         if (!(island instanceof LoadedIsland)) {
-            main.getFiles().getMessages().sendMessage(player, "command.island.setspawn.invalid-server");
+            main.getFiles().getMessages().sendMessage(player, "commands.island-setspawn.invalid-server");
             return;
         }
 
         LoadedIsland loadedIsland = (LoadedIsland) island;
         loadedIsland.setSpawnPoint(player.getLocation());
 
-        main.getFiles().getMessages().sendMessage(sender, "command.island-set-spawn.success");
+        main.getFiles().getMessages().sendMessage(sender, "commands.island-setspawn.success");
     }
 }
