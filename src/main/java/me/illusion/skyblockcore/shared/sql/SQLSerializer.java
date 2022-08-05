@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.shared.sql;
 
 import lombok.SneakyThrows;
 import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
+import me.illusion.skyblockcore.shared.sql.serializing.DynamicTable;
 import me.illusion.skyblockcore.shared.storage.StorageUtils;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
@@ -32,7 +33,13 @@ public final class SQLSerializer {
         // there is only 1 sqlite but 20 different types of sql serveresult, so we check for sqlite firesultt
         System.out.println("Serializing " + map.get("classType") + " to SQL.");
 
-        String operation = provider.getDynamicTable(table).get().getWriteQuery(map);
+        DynamicTable dynamicTable = provider.getDynamicTable(table).get();
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            dynamicTable.adapt(connection, entry.getKey(), entry.getValue());
+        }
+
+        String operation = dynamicTable.getWriteQuery(map);
 
         operation = operation.replaceFirst("\\?", table); // sqlite doesn't like setString, but I also don't like sql injection
         try (PreparedStatement statement = connection

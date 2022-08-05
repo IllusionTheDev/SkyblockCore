@@ -37,13 +37,34 @@ public interface StorageHandler {
             }
 
             if (value instanceof SkyblockSerializable) {
-                map.put(key, process((SkyblockSerializable) value)); // recursion yay
+                flatten(map, "@" + key, process((SkyblockSerializable) value));
             }
         }
 
         map.put("classType", serializable.getClass().getName());
 
         return map;
+    }
+
+    /**
+     * Flattens a map's contents into another map
+     * the contents are identified by a key prefix
+     *
+     * @param targetMap the map to flatten into
+     * @param mapKey    the key prefix
+     * @param sourceMap the map to flatten from
+     */
+    default void flatten(Map<String, Object> targetMap, String mapKey, Map<String, Object> sourceMap) {
+        for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof SkyblockSerializable) {
+                flatten(targetMap, key, process((SkyblockSerializable) value));
+            }
+
+            targetMap.put(mapKey + "-" + key, value);
+        }
     }
 
 }
