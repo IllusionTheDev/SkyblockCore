@@ -2,8 +2,10 @@ package me.illusion.skyblockcore.shared.storage.handler;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
+import me.illusion.skyblockcore.shared.storage.StorageUtils;
 import me.illusion.skyblockcore.shared.storage.file.DataFileUtils;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
@@ -25,9 +27,9 @@ public class FileStorageHandler implements StorageHandler {
     }
 
     @Override
-    public CompletableFuture<Object> get(UUID uuid, String category) {
-        Class<?> clazz = getClassByCategory(category);
-        if (clazz == null) {
+    public CompletableFuture<SkyblockSerializable> get(UUID uuid, String category) {
+        Class<?> classByCategory = getClassByCategory(category);
+        if (classByCategory == null) {
             return CompletableFuture.completedFuture(null);
         }
 
@@ -36,11 +38,14 @@ public class FileStorageHandler implements StorageHandler {
             return CompletableFuture.completedFuture(null);
         }
 
-        return DataFileUtils.getData(new SerializedFile(file), clazz);
+        return DataFileUtils.getData(new SerializedFile(file), Map.class).thenApply((mapObj) -> {
+            Map<String, Object> map = (Map<String, Object>) mapObj;
+            return StorageUtils.unserialize(map);
+        });
     }
 
     @Override
-    public CompletableFuture<Void> save(UUID uuid, Object object, String category) {
+    public CompletableFuture<Void> save(UUID uuid, SkyblockSerializable object, String category) {
         Class<?> clazz = getClassByCategory(category);
         if (clazz == null) {
             return CompletableFuture.completedFuture(null);
@@ -58,7 +63,7 @@ public class FileStorageHandler implements StorageHandler {
                 }
             }
 
-            DataFileUtils.saveData(file, object);
+            DataFileUtils.saveData(file, process(object));
         });
     }
 

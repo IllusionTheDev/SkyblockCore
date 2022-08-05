@@ -1,11 +1,15 @@
 package me.illusion.skyblockcore.shared.storage;
 
+import jdk.internal.reflect.ReflectionFactory;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 public class StorageUtils {
 
@@ -31,5 +35,27 @@ public class StorageUtils {
             ExceptionLogger.log(e);
             return null;
         }
+    }
+
+    public static SkyblockSerializable unserialize(Map<String, Object> map) {
+        String className = map.get("classType").toString();
+
+        ReflectionFactory factory = ReflectionFactory.getReflectionFactory();
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        SkyblockSerializable object = null;
+        try {
+            object = (SkyblockSerializable) factory.newConstructorForSerialization(clazz, Object.class.getConstructor()).newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        object.load(map);
+        return object;
     }
 }

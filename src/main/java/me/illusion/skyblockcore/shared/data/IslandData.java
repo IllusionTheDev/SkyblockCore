@@ -3,24 +3,25 @@ package me.illusion.skyblockcore.shared.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.StringUtil;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor
-public class IslandData implements Serializable {
+public class IslandData implements SkyblockSerializable {
 
-    private final UUID id;
+    private UUID id;
     @Setter
     private SerializedFile[] islandSchematic;
     private transient List<UUID> users = new ArrayList<>();
-    private final UUID owner;
+    private UUID owner;
 
     private String serialized;
 
@@ -74,5 +75,28 @@ public class IslandData implements Serializable {
         while (serialized.contains("  ")) {
             serialized = serialized.replace("  ", " ");
         }
+    }
+
+    @Override
+    public void load(Map<String, Object> map) {
+        String idString = map.getOrDefault("id", UUID.randomUUID()).toString();
+        String ownerString = map.getOrDefault("owner", UUID.randomUUID()).toString();
+        String usersString = map.getOrDefault("users", "").toString();
+        String spawnPointRelativeToCenterString = map.getOrDefault("spawnPointRelativeToCenter", "").toString();
+
+        this.id = UUID.fromString(idString);
+        this.owner = UUID.fromString(ownerString);
+        this.serialized = usersString;
+        this.spawnPointRelativeToCenter = new SerializedLocation();
+
+        spawnPointRelativeToCenter.setFormat(spawnPointRelativeToCenterString);
+    }
+
+    @Override
+    public void save(Map<String, Object> map) {
+        map.put("id", id.toString());
+        map.put("owner", owner.toString());
+        map.put("users", serialized);
+        map.put("spawnPointRelativeToCenter", spawnPointRelativeToCenter.getFormat());
     }
 }

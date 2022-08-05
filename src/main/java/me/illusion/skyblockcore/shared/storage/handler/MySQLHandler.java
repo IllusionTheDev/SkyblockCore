@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.shared.storage.handler;
 
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.sql.SQLConnectionProvider;
 import me.illusion.skyblockcore.shared.sql.SQLSerializer;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
@@ -50,14 +51,14 @@ public class MySQLHandler extends SQLConnectionProvider implements StorageHandle
 
 
     @Override
-    public CompletableFuture<Object> get(UUID uuid, String category) {
+    public CompletableFuture<SkyblockSerializable> get(UUID uuid, String category) {
         System.out.println("Getting data from MySQL server.");
         return SQLSerializer.deserialize(get(), uuid, category);
     }
 
     @Override
-    public CompletableFuture<Void> save(UUID uuid, Object object, String category) {
-        return CompletableFuture.runAsync(() -> SQLSerializer.serialize(get(), uuid, object, category)).exceptionally(throwable -> {
+    public CompletableFuture<Void> save(UUID uuid, SkyblockSerializable object, String category) {
+        return CompletableFuture.runAsync(() -> SQLSerializer.serialize(this, uuid, process(object), category)).exceptionally(throwable -> {
             ExceptionLogger.log(throwable);
             return null;
         });

@@ -4,11 +4,14 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.storage.StorageHandler;
+import me.illusion.skyblockcore.shared.storage.StorageUtils;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import org.bson.Document;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +47,7 @@ public class MongoDBHandler implements StorageHandler {
     }
 
     @Override
-    public CompletableFuture<Object> get(UUID uuid, String category) {
+    public CompletableFuture<SkyblockSerializable> get(UUID uuid, String category) {
         return CompletableFuture.supplyAsync(() -> {
             Document document = new Document(category + "-uuid", uuid.toString());
 
@@ -53,15 +56,26 @@ public class MongoDBHandler implements StorageHandler {
             if (found == null)
                 return null;
 
-            return found.get("value");
+            Map<String, Object> map = new HashMap<>();
+
+            for (String key : found.keySet()) {
+                map.put(key, found.get(key));
+            }
+
+            return StorageUtils.unserialize(map);
         });
     }
 
     @Override
-    public CompletableFuture<Void> save(UUID uuid, Object object, String category) {
+    public CompletableFuture<Void> save(UUID uuid, SkyblockSerializable object, String category) {
         return CompletableFuture.runAsync(() -> {
-            Document document = new Document(category + "-uuid", uuid.toString())
-                    .append("value", object);
+            Document document = new Document(category + "-uuid", uuid.toString());
+
+            Map<String, Object> processed = process(object);
+
+            for (Map.Entry<String, Object> entry : processed.entrySet()) {
+                document.append(entry.getKey(), entry.getValue());
+            }
 
             islandStorage.insertOne(document);
         });
