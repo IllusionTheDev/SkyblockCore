@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.shared.sql.serializing;
 
+import java.io.Serializable;
 import java.util.function.Predicate;
 
 public enum SqlColumnType {
@@ -8,7 +9,7 @@ public enum SqlColumnType {
     DOUBLE(object -> object instanceof Double),
     FLOAT(object -> object instanceof Float),
     BOOLEAN(object -> object instanceof Boolean),
-    BLOB(object -> object instanceof byte[]),
+    BLOB(object -> object instanceof Serializable),
     TEXT(object -> object instanceof CharSequence);
 
     private final Predicate<Object> shouldAccept;
