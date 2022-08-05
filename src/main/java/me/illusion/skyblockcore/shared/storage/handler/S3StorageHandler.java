@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.storage.StorageUtils;
 
 import java.io.ByteArrayInputStream;
@@ -66,7 +67,7 @@ public class S3StorageHandler extends FileStorageHandler {
 
 
     @Override
-    public CompletableFuture<Object> get(UUID uuid, String category) {
+    public CompletableFuture<SkyblockSerializable> get(UUID uuid, String category) {
         return CompletableFuture.supplyAsync(() -> {
             Class<?> clazz = getClassByCategory(category);
             if (clazz == null) {
@@ -91,7 +92,8 @@ public class S3StorageHandler extends FileStorageHandler {
 
                 inputStream.read(targetArray);
 
-                return StorageUtils.getObject(targetArray);
+                Map<String, Object> map = (Map<String, Object>) StorageUtils.getObject(targetArray);
+                return StorageUtils.unserialize(map);
             } catch (Exception e) {
                 return null;
             }
@@ -100,7 +102,7 @@ public class S3StorageHandler extends FileStorageHandler {
     }
 
     @Override
-    public CompletableFuture<Void> save(UUID uuid, Object object, String category) {
+    public CompletableFuture<Void> save(UUID uuid, SkyblockSerializable object, String category) {
         return CompletableFuture.runAsync(() -> {
             Class<?> clazz = getClassByCategory(category);
 
@@ -111,7 +113,7 @@ public class S3StorageHandler extends FileStorageHandler {
             s3client.putObject(
                     bucketName,
                     category + "-" + uuid + "." + category.toLowerCase(Locale.ROOT),
-                    new ByteArrayInputStream(StorageUtils.getBytes(object)),
+                    new ByteArrayInputStream(StorageUtils.getBytes(process(object))),
                     new ObjectMetadata()
             );
         });

@@ -1,7 +1,6 @@
 package me.illusion.skyblockcore.shared.data;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-@RequiredArgsConstructor
 public class IslandData implements SkyblockSerializable {
 
     private UUID id;
@@ -28,6 +26,10 @@ public class IslandData implements SkyblockSerializable {
     @Setter
     private SerializedLocation spawnPointRelativeToCenter;
 
+    public IslandData(UUID id, UUID ownerId) {
+        this.id = id;
+        this.owner = ownerId;
+    }
 
     /**
      * Adds a user to the island

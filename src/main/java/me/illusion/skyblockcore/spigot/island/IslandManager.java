@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot.island;
 
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.shared.utilities.FileUtils;
@@ -322,7 +323,7 @@ public class IslandManager {
      *
      * @return deserialized object
      */
-    private CompletableFuture<Object> load(UUID uuid) {
+    private CompletableFuture<SkyblockSerializable> load(UUID uuid) {
         return main.getStorageHandler().get(uuid, "ISLAND");
     }
 

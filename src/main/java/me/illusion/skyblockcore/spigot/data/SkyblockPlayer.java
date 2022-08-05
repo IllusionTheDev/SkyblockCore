@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.data.PlayerData;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandCreateEvent;
@@ -184,7 +185,7 @@ public class SkyblockPlayer {
      *
      * @return deserialized object
      */
-    private CompletableFuture<Object> load(String table, UUID uuid) {
+    private CompletableFuture<SkyblockSerializable> load(String table, UUID uuid) {
         System.out.println("Loading " + table + " data for " + Bukkit.getPlayer(uuid).getName());
         return main.getStorageHandler().get(uuid, table);
     }
@@ -216,7 +217,7 @@ public class SkyblockPlayer {
      *
      * @param object - The object to serialize
      */
-    private void saveObject(UUID uuid, Object object) {
+    private void saveObject(UUID uuid, SkyblockSerializable object) {
         main.getStorageHandler().save(uuid, object, "PLAYER");
     }
 
