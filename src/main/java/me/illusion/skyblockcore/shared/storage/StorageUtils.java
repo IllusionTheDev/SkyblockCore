@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.shared.storage;
 
 import jdk.internal.reflect.ReflectionFactory;
 import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
+import me.illusion.skyblockcore.shared.serialization.SkyblockSerializer;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 
 import java.io.ByteArrayInputStream;
@@ -84,6 +85,7 @@ public class StorageUtils {
             throw new RuntimeException(e);
         }
 
+        SkyblockSerializer.load(object, map);
         object.load(map);
         return object;
     }

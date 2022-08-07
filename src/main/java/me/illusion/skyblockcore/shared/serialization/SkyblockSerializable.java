@@ -5,7 +5,13 @@ import java.util.Map;
 
 public interface SkyblockSerializable extends Serializable {
 
-    void load(Map<String, Object> map);
+    default void load(Map<String, Object> map) {
+        // Only override if you want to save additional data,
+        // Fields that are not transient are automatically loaded.
+    }
 
-    void save(Map<String, Object> map);
+    default void save(Map<String, Object> map) {
+        // Only override if you want to save additional data,
+        // Fields that are not transient are automatically saved.
+    }
 }
