@@ -118,6 +118,8 @@ public class DynamicTable {
             try (PreparedStatement statement = validConnection.prepareStatement(query)) {
                 statement.setString(1, columnName);
                 statement.setString(2, columnType.name());
+
+                statement.execute();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
