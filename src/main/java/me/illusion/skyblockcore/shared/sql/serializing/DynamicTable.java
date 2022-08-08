@@ -34,7 +34,7 @@ public class DynamicTable {
     public String getCreationQuery() {
         StringBuilder query = new StringBuilder();
         query.append("CREATE TABLE IF NOT EXISTS ").append(tableName).append(" (");
-        query.append("id VARCHAR PRIMARY KEY, ");
+        query.append("serialized_id VARCHAR PRIMARY KEY, ");
         query.append("category VARCHAR");
         for (Map.Entry<String, SqlColumnType> entry : columns.entrySet()) {
             query.append(", ").append(entry.getKey()).append(" ").append(entry.getValue().name());
@@ -56,7 +56,7 @@ public class DynamicTable {
 
         StringBuilder query = new StringBuilder();
         query.append("INSERT INTO ").append(tableName).append(" (");
-        query.append("id");
+        query.append("serialized_id");
         for (Map.Entry<String, SqlColumnType> entry : columns.entrySet()) {
             query.append(", ").append(entry.getKey());
         }
