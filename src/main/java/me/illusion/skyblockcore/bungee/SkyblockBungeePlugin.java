@@ -83,6 +83,8 @@ public class SkyblockBungeePlugin extends Plugin {
         packetManager.subscribe(PacketRegisterLoadedIsland.class, new LoadIslandPacketHandler(this));
         packetManager.subscribe(PacketPong.class, new PongPacketHandler(this));
         packetManager.subscribe(PacketUnregisterServer.class, new UnregisterPacketHandler(this));
+        packetManager.subscribe(PacketInvitePlayer.class, new InvitePacketHandler(this));
+        packetManager.subscribe(PacketRespondInvite.class, new InviteResponseHandler(this));
 
         System.out.println("[SkyblockCore] Packet handlers registered!");
         packetManager.send(new PacketPing());

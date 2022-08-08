@@ -2,6 +2,8 @@ package me.illusion.skyblockcore.bungee.data;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Optional;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import me.illusion.skyblockcore.bungee.SkyblockBungeePlugin;
 import me.illusion.skyblockcore.bungee.comparison.AllocationType;
 import me.illusion.skyblockcore.shared.data.IslandData;
@@ -32,6 +34,8 @@ public class PlayerFinder {
     private final Comparator<ServerInfo> comparator;
 
     private final SkyblockBungeePlugin main;
+    private final Cache<UUID, String> authedJoins = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
+
 
     public PlayerFinder(SkyblockBungeePlugin main) {
         this.main = main;
@@ -226,5 +230,27 @@ public class PlayerFinder {
 
     public Set<String> getSkyblockServerNames() {
         return skyblockServerNames;
+    }
+
+    public void authPlayer(UUID uuid, String server) {
+        System.out.println("Authing player " + uuid + " on server " + server);
+
+        if (!skyblockServerNames.contains(server))
+            return;
+
+        System.out.println("Player " + uuid + " is now authed on server " + server);
+        authedJoins.put(uuid, server);
+    }
+
+    public void unauthPlayer(UUID uuid) {
+        authedJoins.invalidate(uuid);
+    }
+
+    public String getAuthServer(UUID uuid) {
+        return authedJoins.getIfPresent(uuid);
+    }
+
+    public boolean isAuth(UUID uuid) {
+        return getAuthServer(uuid) != null;
     }
 }
