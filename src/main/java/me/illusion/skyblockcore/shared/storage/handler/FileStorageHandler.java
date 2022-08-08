@@ -63,7 +63,7 @@ public class FileStorageHandler implements StorageHandler {
                 }
             }
 
-            DataFileUtils.saveData(file, process(object));
+            DataFileUtils.saveData(file, StorageUtils.process(object));
         });
     }
 

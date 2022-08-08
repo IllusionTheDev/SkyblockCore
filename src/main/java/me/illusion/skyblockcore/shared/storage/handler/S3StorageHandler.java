@@ -113,7 +113,7 @@ public class S3StorageHandler extends FileStorageHandler {
             s3client.putObject(
                     bucketName,
                     category + "-" + uuid + "." + category.toLowerCase(Locale.ROOT),
-                    new ByteArrayInputStream(StorageUtils.getBytes(process(object))),
+                    new ByteArrayInputStream(StorageUtils.getBytes(StorageUtils.process(object))),
                     new ObjectMetadata()
             );
         });

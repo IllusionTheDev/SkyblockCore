@@ -71,7 +71,7 @@ public class MongoDBHandler implements StorageHandler {
         return CompletableFuture.runAsync(() -> {
             Document document = new Document(category + "-uuid", uuid.toString());
 
-            Map<String, Object> processed = process(object);
+            Map<String, Object> processed = StorageUtils.process(object);
 
             for (Map.Entry<String, Object> entry : processed.entrySet()) {
                 document.append(entry.getKey(), entry.getValue());

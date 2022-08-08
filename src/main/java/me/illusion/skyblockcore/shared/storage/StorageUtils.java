@@ -1,14 +1,11 @@
 package me.illusion.skyblockcore.shared.storage;
 
-import jdk.internal.reflect.ReflectionFactory;
 import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
 import me.illusion.skyblockcore.shared.serialization.SkyblockSerializer;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
+import sun.reflect.ReflectionFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +46,7 @@ public class StorageUtils {
             if (key.startsWith("@")) {
                 String section = key.substring(1, key.indexOf("-"));
                 String key2 = key.substring(key.indexOf("-") + 1);
-                
+
                 Map<String, Object> sectionMap = (Map<String, Object>) originalMap.get(section);
                 if (sectionMap == null) {
                     sectionMap = new HashMap<>();
@@ -63,6 +60,53 @@ public class StorageUtils {
 
 
         return originalMap;
+    }
+
+    public static Map<String, Object> process(SkyblockSerializable serializable) {
+        Map<String, Object> map = SkyblockSerializer.serialize(serializable);
+        serializable.save(map);
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof SkyblockSerializable) {
+                flatten(map, "@" + key, process((SkyblockSerializable) value));
+            }
+
+            if (!(value instanceof Serializable)) { // let's not save non-serializable stuff
+                map.remove(key);
+                System.err.println("Removed non-serializable value from storage: " + key);
+                continue;
+            }
+
+
+        }
+
+        map.put("classType", serializable.getClass().getName());
+
+        return map;
+    }
+
+    /**
+     * Flattens a map's contents into another map
+     * the contents are identified by a key prefix
+     *
+     * @param targetMap the map to flatten into
+     * @param mapKey    the key prefix
+     * @param sourceMap the map to flatten from
+     */
+    public static void flatten(Map<String, Object> targetMap, String mapKey, Map<String, Object> sourceMap) {
+        for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof SkyblockSerializable) {
+                flatten(targetMap, key, process((SkyblockSerializable) value));
+            }
+
+            targetMap.put(mapKey + "-" + key, value);
+        }
     }
 
     public static SkyblockSerializable unserialize(Map<String, Object> map) {

@@ -69,17 +69,24 @@ public class SkyblockSerializer {
             fields.addAll(getFields(superclass));
         }
 
-        outer:
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
 
             Class<?> fieldType = field.getType();
+
+            boolean serializable = fieldType.isPrimitive();
+
             for (Class<?> implementation : fieldType.getInterfaces()) {
-                if (!implementation.isAssignableFrom(SkyblockSerializable.class) && !implementation.isAssignableFrom(Serializable.class)) {
-                    continue outer;
+                if (implementation.isAssignableFrom(SkyblockSerializable.class) || implementation.equals(Serializable.class)) {
+                    serializable = true;
+                    break;
                 }
+            }
+
+            if (!serializable) {
+                continue;
             }
 
             fields.add(field);

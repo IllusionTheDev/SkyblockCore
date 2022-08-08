@@ -1,10 +1,8 @@
 package me.illusion.skyblockcore.shared.storage;
 
 import me.illusion.skyblockcore.shared.serialization.SkyblockSerializable;
-import me.illusion.skyblockcore.shared.serialization.SkyblockSerializer;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -21,51 +19,5 @@ public interface StorageHandler {
 
     CompletableFuture<Void> delete(UUID uuid, String category);
 
-    default Map<String, Object> process(SkyblockSerializable serializable) {
-        Map<String, Object> map = SkyblockSerializer.serialize(serializable);
-        serializable.save(map);
-
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            if (value instanceof SkyblockSerializable) {
-                flatten(map, "@" + key, process((SkyblockSerializable) value));
-            }
-
-            if (!(value instanceof Serializable)) { // let's not save non-serializable stuff
-                map.remove(key);
-                System.err.println("Removed non-serializable value from storage: " + key);
-                continue;
-            }
-
-
-        }
-
-        map.put("classType", serializable.getClass().getName());
-
-        return map;
-    }
-
-    /**
-     * Flattens a map's contents into another map
-     * the contents are identified by a key prefix
-     *
-     * @param targetMap the map to flatten into
-     * @param mapKey    the key prefix
-     * @param sourceMap the map to flatten from
-     */
-    default void flatten(Map<String, Object> targetMap, String mapKey, Map<String, Object> sourceMap) {
-        for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            if (value instanceof SkyblockSerializable) {
-                flatten(targetMap, key, process((SkyblockSerializable) value));
-            }
-
-            targetMap.put(mapKey + "-" + key, value);
-        }
-    }
 
 }
