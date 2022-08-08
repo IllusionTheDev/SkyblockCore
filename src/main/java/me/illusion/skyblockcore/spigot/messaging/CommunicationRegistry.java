@@ -34,7 +34,7 @@ public class CommunicationRegistry {
         if (communicationType == CommunicationType.REDIS) {
             main.getDependencyDownloader().dependOn(
                     "redis.clients.Jedis",
-                    "https://www.illusionthe.dev/dependencies/Skyblock.html",
+                    "https://www.illusionthe.dev/dependencies/Skyblock.jar",
                     "SkyblockDependencies.jar"
             );
 
