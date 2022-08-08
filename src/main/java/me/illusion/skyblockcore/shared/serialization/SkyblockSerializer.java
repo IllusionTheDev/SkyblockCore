@@ -29,18 +29,7 @@ public class SkyblockSerializer {
             field.setAccessible(true);
 
             // if the field is not serializable, skip it
-            Class<?> fieldType = field.getType();
-            boolean shouldSerialize = true;
 
-            for (Class<?> implementation : fieldType.getInterfaces()) {
-                if (!implementation.isAssignableFrom(SkyblockSerializable.class) && !implementation.isAssignableFrom(Serializable.class)) {
-                    shouldSerialize = false;
-                    break;
-                }
-            }
-
-            if (!shouldSerialize)
-                continue;
 
             try {
                 map.put(field.getName(), field.get(object));
@@ -80,9 +69,17 @@ public class SkyblockSerializer {
             fields.addAll(getFields(superclass));
         }
 
+        outer:
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
+            }
+
+            Class<?> fieldType = field.getType();
+            for (Class<?> implementation : fieldType.getInterfaces()) {
+                if (!implementation.isAssignableFrom(SkyblockSerializable.class) && !implementation.isAssignableFrom(Serializable.class)) {
+                    continue outer;
+                }
             }
 
             fields.add(field);
