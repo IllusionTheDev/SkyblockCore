@@ -49,7 +49,7 @@ dependencies {
     implementation group: "com.grinderwolf", name: "slimeworldmanager-api", version: "2.2.1"
     implementation group: 'redis.clients', name: 'jedis', version: '4.2.3'
     implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.11'
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.282'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.283'
     implementation 'com.grinderwolf:slimeworldmanager-plugin:2.2.1'
 
     implementation 'com.velocitypowered:velocity-api:3.1.0'
