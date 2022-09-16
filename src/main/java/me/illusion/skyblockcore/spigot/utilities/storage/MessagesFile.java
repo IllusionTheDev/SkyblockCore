@@ -25,8 +25,10 @@ public class MessagesFile extends YMLBase {
     }
 
     public void sendMessage(CommandSender player, String name, Function<String, String> action) {
-        if (!getConfiguration().contains("messages." + name))
+        if (!getConfiguration().contains("messages." + name)) {
+            System.out.println("[SkyblockCore] - Message " + name + " not found!");
             return;
+        }
 
         if (getConfiguration().isList("messages." + name)) {
             for (String str : getConfiguration().getStringList("messages." + name)) {

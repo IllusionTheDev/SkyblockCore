@@ -5,6 +5,7 @@ import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.command.SkyblockCommand;
 import me.illusion.skyblockcore.spigot.island.Island;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,6 +42,21 @@ public class IslandVisitCommand implements SkyblockCommand {
 
         if (sender.getName().equalsIgnoreCase(targetPlayer)) {
             main.getFiles().getMessages().sendMessage(sender, "commands.island-visit.self");
+            return;
+        }
+
+        Player onlineTarget = Bukkit.getPlayer(targetPlayer);
+
+        if (onlineTarget != null) {
+            Island island = main.getIslandManager().getPlayerIsland(onlineTarget.getUniqueId());
+
+            if (island == null) {
+                main.getFiles().getMessages().sendMessage(sender, "commands.island-visit.not-found");
+                return;
+            }
+
+            island.teleport(player);
+            main.getFiles().getMessages().sendMessage(sender, "commands.island-visit.success");
             return;
         }
 

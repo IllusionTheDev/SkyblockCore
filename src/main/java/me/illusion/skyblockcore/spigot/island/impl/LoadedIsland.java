@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.spigot.island.impl;
 import lombok.Getter;
 import me.illusion.skyblockcore.shared.data.IslandData;
 import me.illusion.skyblockcore.shared.sql.serialized.SerializedLocation;
+import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
 import me.illusion.skyblockcore.spigot.event.IslandSaveEvent;
 import me.illusion.skyblockcore.spigot.island.Island;
@@ -15,6 +16,8 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import static me.illusion.skyblockcore.spigot.utilities.concurrent.MainThreadExecutor.MAIN_THREAD_EXECUTOR;
 
 @Getter
 public class LoadedIsland implements Island {
@@ -53,13 +56,17 @@ public class LoadedIsland implements Island {
         return main.getIslandDependencies().getPastingHandler().save(this, schem -> {
             data.setIslandSchematic(schem);
 
+            saveData().join();
             Bukkit.getPluginManager().callEvent(new IslandSaveEvent(this));
+        }).exceptionally(thr -> {
+            ExceptionLogger.log(thr);
+            return null;
         });
 
     }
 
     public Location getSpawnPoint() {
-        return center.add(BukkitConverter.convertLocation(data.getSpawnPointRelativeToCenter()));
+        return center.clone().add(BukkitConverter.convertLocation(data.getSpawnPointRelativeToCenter()));
     }
 
     public void setSpawnPoint(Location location) {
@@ -74,7 +81,8 @@ public class LoadedIsland implements Island {
 
     public void updateWorldBorder() {
         if (!Bukkit.isPrimaryThread()) {
-            Bukkit.getScheduler().runTask(main, this::updateWorldBorder);
+            CompletableFuture.runAsync(this::updateWorldBorder, MAIN_THREAD_EXECUTOR).join(); // ensures order of execution
+            // Bukkit.getScheduler().runTask(main, this::updateWorldBorder);
             return;
         }
 
@@ -117,6 +125,7 @@ public class LoadedIsland implements Island {
      */
     @Override
     public CompletableFuture<Void> saveData() {
+        System.out.println("Saving island data");
         return main.getStorageHandler().save(data.getId(), data, "ISLAND");
     }
 

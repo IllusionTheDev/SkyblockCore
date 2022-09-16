@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.spigot.pasting.handler;
 
-import com.google.common.io.Files;
 import me.illusion.skyblockcore.shared.storage.SerializedFile;
 import me.illusion.skyblockcore.shared.utilities.ExceptionLogger;
 import me.illusion.skyblockcore.spigot.SkyblockPlugin;
@@ -15,6 +14,7 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -52,7 +52,7 @@ public class DefaultHandler implements PastingHandler {
             // Create the region file
             newFile.createNewFile();
             // Copy the file
-            Files.copy(finalFile, newFile);
+            Files.copy(finalFile.toPath(), newFile.toPath());
         } catch (IOException e) {
             ExceptionLogger.log(e);
         }

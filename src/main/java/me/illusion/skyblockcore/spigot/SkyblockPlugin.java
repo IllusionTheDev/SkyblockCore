@@ -18,6 +18,7 @@ import me.illusion.skyblockcore.spigot.command.island.invite.IslandInviteCommand
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandExpelCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandGoCommand;
 import me.illusion.skyblockcore.spigot.command.island.movement.IslandSetSpawnCommand;
+import me.illusion.skyblockcore.spigot.command.island.movement.IslandVisitCommand;
 import me.illusion.skyblockcore.spigot.data.PlayerManager;
 import me.illusion.skyblockcore.spigot.file.ConfigurationStore;
 import me.illusion.skyblockcore.spigot.file.IslandConfig;
@@ -35,6 +36,7 @@ import me.illusion.skyblockcore.spigot.messaging.CommunicationRegistry;
 import me.illusion.skyblockcore.spigot.messaging.responder.*;
 import me.illusion.skyblockcore.spigot.pasting.PastingHandler;
 import me.illusion.skyblockcore.spigot.pasting.PastingType;
+import me.illusion.skyblockcore.spigot.utilities.concurrent.MainThreadExecutor;
 import me.illusion.skyblockcore.spigot.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.spigot.utilities.storage.YMLBase;
 import me.illusion.skyblockcore.spigot.world.WorldManager;
@@ -45,7 +47,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.spigotmc.SpigotConfig;
 
 import java.io.File;
 import java.util.Locale;
@@ -70,6 +71,7 @@ public class SkyblockPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        MainThreadExecutor.init(this);
 
         commandManager = new CommandManager(this);
 
@@ -99,12 +101,10 @@ public class SkyblockPlugin extends JavaPlugin {
         System.out.println("Creating worlds");
         worldManager = new WorldManager(this);
         // Loads the SQL, when that's complete with a response (true|false), loads if false
-        setupStorage().whenComplete((val, throwable) -> {
-            if (!val) // if the setup is incorrect, don't load
-                return;
-
-            sync(this::load);
-        });
+        setupStorage().thenAcceptAsync(val -> {
+            if (val)
+                load();
+        }, MainThreadExecutor.MAIN_THREAD_EXECUTOR);
 
         ExceptionLogger.setFolder(new File(getDataFolder() + File.separator + "log"));
 
@@ -126,7 +126,9 @@ public class SkyblockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new DebugListener(this), this);
 
 
-        if (SpigotConfig.bungee) {
+        YMLBase base = new YMLBase(this, new File(getDataFolder().getParentFile().getParentFile(), "spigot.yml"), false);
+
+        if (base.getConfiguration().getBoolean("settings.bungeecord")) {
             System.out.println("Registering bungeecord messaging listener");
             packetManager = new PacketManager(files.getSettings().getConfiguration().getString("communication.server-id"));
             packetManager.registerProcessor(PacketDirection.INSTANCE_TO_PROXY, CommunicationRegistry.getChosenProcessor(this));
@@ -204,6 +206,7 @@ public class SkyblockPlugin extends JavaPlugin {
         commandManager.register(new IslandAcceptCommand(this));
         commandManager.register(new IslandExpelCommand(this));
         commandManager.register(new IslandDenyCommand(this));
+        commandManager.register(new IslandVisitCommand(this));
     }
 
     @Override
@@ -233,9 +236,6 @@ public class SkyblockPlugin extends JavaPlugin {
         return startSchematicFolder.listFiles();
     }
 
-    private void sync(Runnable runnable) {
-        Bukkit.getScheduler().runTask(this, runnable);
-    }
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {

@@ -20,6 +20,8 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static me.illusion.skyblockcore.spigot.utilities.concurrent.MainThreadExecutor.MAIN_THREAD_EXECUTOR;
+
 @Getter
 public class SkyblockPlayer {
 
@@ -147,14 +149,11 @@ public class SkyblockPlayer {
                     Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
 
                     System.out.println("Loaded island data");
-
-                    sync(this::teleportToIsland);
-
-                });
+                }).thenRunAsync(this::teleportToIsland, MAIN_THREAD_EXECUTOR);
     }
 
     private void loadIsland(IslandData islandData) {
-        sync(() -> main.getIslandManager().loadIsland(islandData)
+        main.getIslandManager().loadIsland(islandData)
                 .thenAccept(island -> {
                     Bukkit.getPluginManager().callEvent(new IslandCreateEvent(island));
                     Bukkit.getPluginManager().callEvent(new IslandLoadEvent(island));
@@ -164,14 +163,15 @@ public class SkyblockPlayer {
                     new ScheduleBuilder(main)
                             .in(1).seconds()
                             .run(this::teleportToIsland).sync().start();
-                }));
+                });
     }
 
 
     public void teleportToIsland() {
         if (!Bukkit.isPrimaryThread()) {
             System.out.println("Detected async teleport - Calling it sync");
-            Bukkit.getScheduler().runTask(main, this::teleportToIsland);
+            //Bukkit.getScheduler().runTask(main, this::teleportToIsland);
+            CompletableFuture.runAsync(this::teleportToIsland, MAIN_THREAD_EXECUTOR);
             return;
         }
 
@@ -222,9 +222,5 @@ public class SkyblockPlayer {
     }
 
     // ----- DATA POST-LOAD -----
-
-    private void sync(Runnable runnable) {
-        Bukkit.getScheduler().runTask(main, runnable);
-    }
 
 }

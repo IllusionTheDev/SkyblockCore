@@ -28,7 +28,7 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String name, String[] args) {
-        String identifier = String.join(".", name, String.join(".", args)).replace(" ", ".");
+        String identifier = String.join(".", name, String.join(".", args));
 
         // remove trailing dots, this is not tab completion
         while (identifier.endsWith(".")) {
