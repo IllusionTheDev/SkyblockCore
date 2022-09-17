@@ -56,11 +56,11 @@ public final class WorldUtils {
 
         World world = Bukkit.getWorld(worldName);
 
-        // Make sure the world is loaded
+        // Make sure the world is unloaded
         if (world != null) {
             unload(main, worldName, false).thenRun(() -> {
                 // Delete the region folder
-                new ScheduleBuilder(main).in(5).ticks().run(() -> deleteRegionFolder(main, worldName));
+                new ScheduleBuilder(main).in(5).ticks().run(() -> deleteRegionFolder(main, worldName)).async().start();
             });
             return;
         }
