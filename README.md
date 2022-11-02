@@ -9,6 +9,8 @@
 
 </div>
 
+Hey, this project has been archived. I might be considering a project rewrite soon, as I've learned a lot about sharding during the past 2 years. Feel free to contact me on Discord (my tag is available on my profile) if you'd like to discuss sharding for any network, as it is something I still have fun doing.
+
 #### This project consists on an advanced Skyblock core made to scale massively.
 
 To start, the plugin requires a SQL connection, used to store the islands and all the player data If you do not have/need a SQL connection, change the storage type to SQLITE on the config.yml file
