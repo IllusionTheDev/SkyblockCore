@@ -55,17 +55,4 @@ dependencies {
     implementation 'com.velocitypowered:velocity-api:3.1.0'
 
 
-    compileOnly project(':1_13')
-
 }
-shadowJar {
-    dependencies {
-        project(':1_13')
-        exclude(dependency("org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT"))
-
-    }
-
-    minimize()
-
-}
-
