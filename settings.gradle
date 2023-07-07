@@ -1,4 +1,4 @@
 rootProject.name = 'SkyblockCore'
-include '1_13'
-include 'core'
+include 'SkyblockCore-Common'
+include 'SkyblockCore-Spigot'
 
