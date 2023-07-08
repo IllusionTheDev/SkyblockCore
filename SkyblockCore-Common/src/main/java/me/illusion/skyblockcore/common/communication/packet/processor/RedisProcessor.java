@@ -8,17 +8,13 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import me.illusion.skyblockcore.common.communication.packet.Packet;
 import me.illusion.skyblockcore.common.communication.packet.PacketProcessor;
 import me.illusion.skyblockcore.common.communication.redis.RedisController;
-import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.SkyblockCacheDatabase;
 import redis.clients.jedis.BinaryJedisPubSub;
 
@@ -76,34 +72,9 @@ public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor
     }
 
     @Override
-    public CompletableFuture<List<IslandData>> fetchAllIslandData() {
-        return controller.supply(jedis -> {
-            byte[] key = createKey("island-data");
-
-            Map<byte[], byte[]> data = jedis.hgetAll(key);
-            List<IslandData> islandData = new ArrayList<>();
-
-            for (byte[] bytes : data.values()) {
-                islandData.add(deserialize(bytes));
-            }
-
-            return islandData;
-        });
-    }
-
-    @Override
-    public CompletableFuture<Void> insertIslandData(String serverId, IslandData data) {
-        return controller.borrow(jedis -> {
-            byte[] key = createKey("island-data");
-            jedis.hset(key, createKey(data.getIslandId().toString()), serialize(data));
-        });
-    }
-
-    @Override
     public CompletableFuture<Void> removeServer(String serverId) {
         return controller.borrow(jedis -> {
             jedis.hdel("island-servers", serverId);
-            jedis.del("island-data:" + serverId);
         });
     }
 
@@ -111,7 +82,6 @@ public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor
     public CompletableFuture<Void> removeIsland(UUID islandId) {
         return controller.borrow(jedis -> {
             jedis.hdel("island-servers", islandId.toString());
-            jedis.hdel("island-data", islandId.toString());
         });
     }
 
