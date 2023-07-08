@@ -61,6 +61,16 @@ public class IslandManager {
     /**
      * Loads an island from a template
      *
+     * @param player The player
+     * @return The loaded island
+     */
+    public CompletableFuture<Island> loadPlayerIsland(Player player) {
+        return database.fetchPlayerIsland(player.getUniqueId()).thenCompose(this::loadIsland);
+    }
+
+    /**
+     * Loads an island from a template
+     *
      * @param template The template
      * @param ownerId  The owner's id
      * @return The loaded island
@@ -106,6 +116,14 @@ public class IslandManager {
         return cosmosSetup.getSessionHolder().unloadSession(islandId, save, true).thenRun(() -> removeInternal(islandId));
     }
 
+    /**
+     * Requests to unload an island after a certain delay. If the island is requested to be loaded before the delay is over, the request is cancelled.
+     *
+     * @param islandId    The island's id
+     * @param save        Whether or not to save the island
+     * @param unloadDelay The delay
+     * @return A future
+     */
     public CompletableFuture<Boolean> requestUnloadIsland(UUID islandId, boolean save, Time unloadDelay) {
         unloadingIslands.add(islandId);
         return cosmosSetup.getSessionHolder().unloadAutomaticallyIn(unloadDelay, islandId, save).thenApply(unloaded -> {
@@ -127,8 +145,8 @@ public class IslandManager {
      * @return A future
      */
     private CompletableFuture<Island> loadFromTemplate(UUID islandId, IslandData data, TemplatedArea area) {
-        return cosmosSetup.getSessionHolder().createSession(islandId, area).thenApply(session -> {
-            Island island = new Island(data);
+        return cosmosSetup.getSessionHolder().loadOrCreateSession(islandId, area).thenApply(session -> {
+            Island island = new Island(data, session);
             loadedIslands.put(islandId, island);
             return island;
         });

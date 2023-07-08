@@ -1,0 +1,11 @@
+# The network type represents the type of network you are running.
+#
+# A "simple" network consists of a single skyblock server, and attempts to handle all the logic by itself.
+#
+# A "complex" network consists of multiple skyblock servers working together. Islands are only loaded in
+# a single server, and communication between servers is done through redis, to make sure that all servers
+# are in sync.
+network-type: simple
+
+complex-structure:
+  server-id: skyblock # An internal ID used for communication between servers. Ideally matches the server's id on your proxy.
