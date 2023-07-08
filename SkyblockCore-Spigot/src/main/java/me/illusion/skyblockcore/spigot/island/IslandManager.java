@@ -13,6 +13,9 @@ import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
+import me.illusion.skyblockcore.spigot.event.island.SkyblockIslandLoadEvent;
+import me.illusion.skyblockcore.spigot.event.island.SkyblockIslandUnloadEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /**
@@ -64,8 +67,14 @@ public class IslandManager {
      * @param player The player
      * @return The loaded island
      */
-    public CompletableFuture<Island> loadPlayerIsland(Player player) {
-        return database.fetchPlayerIsland(player.getUniqueId()).thenCompose(this::loadIsland);
+    public CompletableFuture<Island> loadPlayerIsland(Player player, String fallback) {
+        return database.fetchPlayerIsland(player.getUniqueId()).thenCompose(id -> {
+            if (id == null) {
+                return createIsland(fallback, player.getUniqueId());
+            }
+
+            return loadIsland(id);
+        });
     }
 
     /**
@@ -137,6 +146,16 @@ public class IslandManager {
     }
 
     /**
+     * Loads an island
+     *
+     * @param islandId The island's id
+     * @return A future
+     */
+    public CompletableFuture<Island> loadIsland(UUID islandId) {
+        return database.fetchIslandData(islandId).thenCompose(this::loadIsland);
+    }
+
+    /**
      * Forces all islands to unload
      *
      * @param islandId The island's id
@@ -148,12 +167,20 @@ public class IslandManager {
         return cosmosSetup.getSessionHolder().loadOrCreateSession(islandId, area).thenApply(session -> {
             Island island = new Island(data, session);
             loadedIslands.put(islandId, island);
+
+            Bukkit.getPluginManager().callEvent(new SkyblockIslandLoadEvent(island));
+
             return island;
         });
     }
 
     private void removeInternal(UUID islandId) {
-        loadedIslands.remove(islandId);
+        Island island = loadedIslands.remove(islandId);
+
+        if (island != null) {
+            Bukkit.getPluginManager().callEvent(new SkyblockIslandUnloadEvent(island));
+        }
+
         unloadingIslands.remove(islandId);
     }
 

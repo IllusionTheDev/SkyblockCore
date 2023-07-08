@@ -19,7 +19,7 @@ public class SimplePlayerJoinListener implements Listener {
     private void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        network.getPlugin().getIslandManager().loadPlayerIsland(player).thenAcceptAsync(island -> {
+        network.getPlugin().getIslandManager().loadPlayerIsland(player, "default").thenAcceptAsync(island -> {
 
             player.teleport(island.getCenter());
 

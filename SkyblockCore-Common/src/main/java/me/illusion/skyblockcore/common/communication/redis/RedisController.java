@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.common.communication.redis;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -21,6 +22,20 @@ public class RedisController {
                 jedis.auth(password);
 
                 consumer.accept(jedis);
+            }
+
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
+    }
+
+    public <T> CompletableFuture<T> supply(Function<Jedis, T> function) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Jedis jedis = pool.getResource()) {
+                jedis.auth(password);
+
+                return function.apply(jedis);
             }
 
         }).exceptionally(throwable -> {
