@@ -33,7 +33,7 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void disable() {
-
+        communicationsHandler.disable();
     }
 
     @Override

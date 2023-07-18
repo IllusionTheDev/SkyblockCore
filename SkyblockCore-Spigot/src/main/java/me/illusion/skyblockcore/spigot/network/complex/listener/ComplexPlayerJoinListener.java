@@ -27,8 +27,11 @@ public class ComplexPlayerJoinListener implements Listener {
             return;
         }
 
-        network.getDatabase().fetchIslandId(player.getUniqueId()).thenCompose(islandId -> network.getCommunicationsHandler().canLoad(islandId))
-            .thenAccept(allowed -> {
+        // We try to fetch the island id, and see if we can load it. If we can, we load it.
+        network.getDatabase()
+            .fetchIslandId(player.getUniqueId()) // Fetch the island id
+            .thenCompose(islandId -> network.getCommunicationsHandler().canLoad(islandId)) // Check if we can load the island
+            .thenAccept(allowed -> { // If we can load the island, we load it.
                 if (allowed) {
                     tryLoadDefault(player);
                 }

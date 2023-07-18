@@ -23,7 +23,6 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
 
     private final ComplexSkyblockNetwork network;
 
-
     public void disable() {
         cacheDatabase.removeServer(serverId);
     }

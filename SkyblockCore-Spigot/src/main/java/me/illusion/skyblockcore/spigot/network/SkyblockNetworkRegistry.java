@@ -15,6 +15,8 @@ public class SkyblockNetworkRegistry {
     private final SkyblockSpigotPlugin plugin;
     private final FileConfiguration config;
 
+    private String desiredStructure;
+
     public SkyblockNetworkRegistry(SkyblockSpigotPlugin plugin) {
         this.plugin = plugin;
         this.config = new YMLBase(plugin, "network-settings.yml").getConfiguration();
@@ -28,6 +30,10 @@ public class SkyblockNetworkRegistry {
         return structures.get(name);
     }
 
+    public SkyblockNetworkStructure getActiveStructure() {
+        return structures.get(desiredStructure);
+    }
+
     public void load() {
         String desiredStructure = config.getString("network-type", "undefined");
 
@@ -38,6 +44,7 @@ public class SkyblockNetworkRegistry {
             return;
         }
 
+        this.desiredStructure = desiredStructure;
         structure.enable(config.getConfigurationSection(desiredStructure));
     }
 

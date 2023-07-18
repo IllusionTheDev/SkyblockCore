@@ -156,6 +156,19 @@ public class IslandManager {
     }
 
     /**
+     * Disables the island manager, unloading all islands
+     *
+     * @param save  Whether or not to save the islands
+     * @param async Set this to FALSE if you're disabling the plugin, otherwise set it to TRUE. You can't use the scheduler on shutdown
+     * @return A future
+     */
+    public CompletableFuture<Void> disable(boolean save, boolean async) {
+        // We could save islands here, but at the moment island data isn't modified at all, so it's not necessary.
+
+        return cosmosSetup.getSessionHolder().unloadAll(save, async);
+    }
+
+    /**
      * Forces all islands to unload
      *
      * @param islandId The island's id
@@ -174,6 +187,12 @@ public class IslandManager {
         });
     }
 
+
+    /**
+     * Removes an island from the manager internally
+     *
+     * @param islandId The island's id
+     */
     private void removeInternal(UUID islandId) {
         Island island = loadedIslands.remove(islandId);
 
@@ -184,6 +203,11 @@ public class IslandManager {
         unloadingIslands.remove(islandId);
     }
 
+    /**
+     * Performs sanity checks when a session is removed
+     *
+     * @param session The session
+     */
     void registerRemoved(CosmosSession session) {
         UUID sessionId = session.getUuid();
 
