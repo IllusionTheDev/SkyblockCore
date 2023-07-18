@@ -2,11 +2,14 @@ package me.illusion.skyblockcore.spigot.network.complex;
 
 import me.illusion.cosmos.utilities.command.command.impl.AdvancedCommand;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
+import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.network.complex.communication.CommunicationsHandler;
+import me.illusion.skyblockcore.spigot.network.complex.communication.listener.TeleportRequestPacketHandler;
+import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexIslandLoadListener;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexIslandUnloadListener;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexPlayerJoinListener;
@@ -28,7 +31,11 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void enable(ConfigurationSection section) {
+        database = plugin.getDatabase();
 
+        registerListeners();
+        registerCommands();
+        registerPacketHandlers();
     }
 
     @Override
@@ -41,13 +48,18 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
         return "complex";
     }
 
-
     // Main startup logic
 
     private void registerListeners() {
         registerListener(new ComplexPlayerJoinListener(this));
         registerListener(new ComplexIslandLoadListener(this));
         registerListener(new ComplexIslandUnloadListener(this));
+    }
+
+    private void registerPacketHandlers() {
+        PacketManager packetManager = communicationsHandler.getPacketManager();
+
+        packetManager.subscribe(PacketRequestIslandTeleport.class, new TeleportRequestPacketHandler(this));
     }
 
     private void registerCommands() {

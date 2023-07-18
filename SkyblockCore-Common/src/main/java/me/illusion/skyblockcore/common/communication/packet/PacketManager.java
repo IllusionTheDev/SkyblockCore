@@ -71,14 +71,17 @@ public class PacketManager {
     }
 
     public CompletableFuture<Void> send(Packet packet) {
+        return send("global", packet);
+    }
 
+    public CompletableFuture<Void> send(String server, Packet packet) {
         ignoredPackets.put(packet.getPacketId(), true);
 
         Set<CompletableFuture<Void>> futures = new HashSet<>();
 
         try {
             for (PacketProcessor processor : processors) {
-                futures.add(processor.send(packet));
+                futures.add(processor.send(server, packet));
             }
 
             byte id = packet.getIdentifier();

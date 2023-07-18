@@ -2,7 +2,6 @@ package me.illusion.skyblockcore.spigot.network.complex.communication;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import lombok.AllArgsConstructor;
 import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.database.SkyblockCacheDatabase;
@@ -13,7 +12,6 @@ import me.illusion.skyblockcore.spigot.network.complex.communication.packet.requ
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.response.PacketResponseIslandTeleport;
 import org.bukkit.entity.Player;
 
-@AllArgsConstructor
 public class CommunicationsHandler { // Potential problem: If an island is requested to be loaded in 2 instances at the same time, it will be loaded twice.
 
     private final PacketManager packetManager;
@@ -22,6 +20,17 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
     private final SkyblockDatabase database;
 
     private final ComplexSkyblockNetwork network;
+
+    public CommunicationsHandler(ComplexSkyblockNetwork network) {
+        this.network = network;
+        this.database = network.getDatabase();
+
+        // We need to init the other values
+        // TODO: Write a config for this
+        packetManager = null;
+        serverId = null;
+        cacheDatabase = null;
+    }
 
     public void disable() {
         cacheDatabase.removeServer(serverId);
@@ -66,8 +75,13 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
                     .thenApplyAsync(island -> tryTeleportExisting(player, islandId), MainThreadExecutor.INSTANCE);
             }
 
-            packetManager.send(new PacketRequestIslandTeleport(player.getUniqueId(), islandId));
-            return packetManager.await(PacketResponseIslandTeleport.class, packet -> packet.getPlayerId().equals(player.getUniqueId()))
+            packetManager.send(serverId,
+                new PacketRequestIslandTeleport(this.serverId, player.getUniqueId(), islandId)); // This is the packet that is sent to the other server.
+
+            return packetManager.await(
+                    PacketResponseIslandTeleport.class,
+                    packet -> packet.getPlayerId().equals(player.getUniqueId()) // Filter the player ID we're looking for
+                )
                 .thenApply(packet -> packet != null && packet.isAllowed());
         });
     }
@@ -83,4 +97,10 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
         return false;
     }
 
+    // -- PACKET HANDLERS --
+
+
+    public PacketManager getPacketManager() {
+        return packetManager;
+    }
 }

@@ -32,20 +32,21 @@ public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor
         this.channelBytes = channel.getBytes(StandardCharsets.UTF_8);
 
         new Thread(() -> {
-            controller.getJedis().subscribe(this, channelBytes);
+            controller.getJedis().subscribe(this, channelBytes, "global".getBytes(StandardCharsets.UTF_8));
         }).start();
     }
 
     @Override
-    public CompletableFuture<Void> send(Packet packet) {
+    public CompletableFuture<Void> send(String server, Packet packet) {
         return controller.borrow(jedis -> {
             byte[] bytes = packet.getAllBytes();
-            jedis.publish(channelBytes, bytes);
+            jedis.publish(server.getBytes(StandardCharsets.UTF_8), bytes);
         }).exceptionally(throwable -> {
             throwable.printStackTrace();
             return null;
         });
     }
+
 
     @Override
     public void addCallback(Consumer<byte[]> receivedPacket) {
@@ -54,7 +55,7 @@ public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor
 
     @Override
     public void onMessage(byte[] channel, byte[] message) {
-        if (!Arrays.equals(channel, channelBytes)) {
+        if (!Arrays.equals(channel, channelBytes) && !Arrays.equals(channel, "global".getBytes(StandardCharsets.UTF_8))) {
             return;
         }
 

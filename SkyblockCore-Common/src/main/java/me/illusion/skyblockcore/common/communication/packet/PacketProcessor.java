@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 public interface PacketProcessor {
 
-    CompletableFuture<Void> send(Packet packet);
+    CompletableFuture<Void> send(String server, Packet packet);
 
     void addCallback(Consumer<byte[]> receivedPacket);
 
