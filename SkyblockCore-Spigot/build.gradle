@@ -1,0 +1,94 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+
+    // Adds runServer and runMojangMappedServer tasks for testing
+}
+
+group = 'me.illusion'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        url = "https://maven.enginehub.org/repo/"
+    }
+    maven {
+        name = "mojang"
+        url = "https://libraries.minecraft.net/"
+    }
+
+    maven {
+        name = "placeholderapi"
+        url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+    }
+
+    maven {
+        name = "illusion"
+        url = "https://repo.illusionthe.dev/releases/"
+    }
+}
+
+dependencies {
+    implementation('org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT')
+
+    implementation('org.projectlombok:lombok:1.18.24')
+    annotationProcessor('org.projectlombok:lombok:1.18.24')
+
+    implementation 'redis.clients:jedis:3.6.0'
+
+    implementation 'com.mojang:authlib:1.6.25'
+
+    implementation 'me.clip:placeholderapi:2.10.10'
+    implementation("com.sk89q.worldedit:worldedit-bukkit:7.2.14")
+
+    implementation("me.illusion:cosmos-plugin:1.0")
+
+    implementation(project(":SkyblockCore-Common"))
+}
+
+def targetJavaVersion = 17
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+shadowJar {
+    dependencies {
+        // only include the AudioPlayer-Protocol jar in the shadow jar
+        include(dependency('me.illusion:SkyblockCore-Common:1.0-SNAPSHOT'))
+    }
+}
