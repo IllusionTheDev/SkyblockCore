@@ -8,6 +8,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+/**
+ * This class is responsible for loading the player's island when they join the server. If another instance is responsible for the island, we do not load it.
+ * Feel free to fork or modify this code so you can handle rejection, if island visitation is not a feature.
+ */
 public class ComplexPlayerJoinListener implements Listener {
 
     private final ComplexSkyblockNetwork network;

@@ -5,6 +5,10 @@ import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+/**
+ * This class is responsible for letting the communications handler know when an island has been loaded, so all other servers are aware of this island's
+ * existence and current server id.
+ */
 public class ComplexIslandLoadListener implements Listener {
 
     private final ComplexSkyblockNetwork network;

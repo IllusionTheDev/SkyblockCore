@@ -12,6 +12,9 @@ import me.illusion.skyblockcore.spigot.network.complex.communication.packet.requ
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.response.PacketResponseIslandTeleport;
 import org.bukkit.entity.Player;
 
+/**
+ * Handles communications between instances. This class is responsible for handling island requests, teleport requests, and other communications.
+ */
 public class CommunicationsHandler { // Potential problem: If an island is requested to be loaded in 2 instances at the same time, it will be loaded twice.
 
     private final PacketManager packetManager;
@@ -32,26 +35,60 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
         cacheDatabase = null;
     }
 
+    /**
+     * Disables the communications handler. This will clean up any cached data in the database.
+     */
     public void disable() {
         cacheDatabase.removeServer(serverId);
     }
 
+    /**
+     * Fetches the server ID of where an island is loaded
+     *
+     * @param islandId The island ID
+     * @return A future containing the server ID, which may be null
+     */
     public CompletableFuture<String> getIslandServer(UUID islandId) {
         return cacheDatabase.getIslandServer(islandId);
     }
 
+    /**
+     * Updates the server ID of where an island is loaded
+     *
+     * @param islandId The island ID
+     * @param serverId The server ID
+     * @return A future containing the result of the update
+     */
     public CompletableFuture<Void> updateIslandServer(UUID islandId, String serverId) {
         return cacheDatabase.updateIslandServer(islandId, serverId);
     }
 
+    /**
+     * Updates the server ID of where an island is loaded, using the current server ID
+     *
+     * @param island The island
+     * @return A future containing the result of the update
+     */
     public CompletableFuture<Void> updateIslandServer(Island island) {
         return updateIslandServer(island.getIslandId(), serverId);
     }
 
+    /**
+     * Removes an island from the cache database
+     *
+     * @param islandId The island ID
+     * @return A future containing the result of the removal
+     */
     public CompletableFuture<Void> removeIsland(UUID islandId) {
         return cacheDatabase.removeIsland(islandId);
     }
 
+    /**
+     * Checks to see if an island can be loaded on this instance
+     *
+     * @param islandId The island ID
+     * @return A future containing the result of the check
+     */
     public CompletableFuture<Boolean> canLoad(UUID islandId) {
         if (islandId == null) {
             return CompletableFuture.completedFuture(true);
@@ -62,6 +99,13 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
 
     // -- GENERAL STUFF --
 
+    /**
+     * Attempts to teleport a player to an island
+     *
+     * @param player   The player
+     * @param islandId The island ID
+     * @return A future containing the result of the teleport
+     */
     public CompletableFuture<Boolean> attemptTeleportToIsland(Player player, UUID islandId) {
         boolean cached = tryTeleportExisting(player, islandId);
 
@@ -86,6 +130,13 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
         });
     }
 
+    /**
+     * Attempts to teleport a player to an existing island, if it is loaded
+     *
+     * @param player   The player
+     * @param islandId The island ID
+     * @return Whether or not the player was teleported
+     */
     private boolean tryTeleportExisting(Player player, UUID islandId) {
         Island cached = network.getIslandManager().getLoadedIsland(islandId);
 
@@ -98,7 +149,6 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
     }
 
     // -- PACKET HANDLERS --
-
 
     public PacketManager getPacketManager() {
         return packetManager;

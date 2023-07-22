@@ -1,8 +1,6 @@
 package me.illusion.skyblockcore.spigot.network.simple.listener;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import me.illusion.cosmos.utilities.time.Time;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
@@ -12,6 +10,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+/**
+ * This is the simple player quit listener, which unloads the island when the player quits.
+ */
 public class SimplePlayerQuitListener implements Listener {
 
     private final SimpleSkyblockNetwork network;
@@ -33,8 +34,8 @@ public class SimplePlayerQuitListener implements Listener {
             return;
         }
 
-        // Unload the island after 10 minutes of inactivity, this request will be cancelled if we attempt to load the island again, so no worries.
-        islandManager.requestUnloadIsland(island.getIslandId(), true, new Time(10, TimeUnit.MINUTES));
+        // Unload the island after a while, this request will be cancelled if we attempt to load the island again, so no worries.
+        islandManager.requestUnloadIsland(island.getIslandId(), true, network.getConfiguration().getUnloadDelay());
 
         player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation()); // Just to be sure
     }

@@ -9,6 +9,10 @@ import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * Represents a command that allows players to teleport to their island. This will fetch the server where the island is loaded, and send a request to teleport
+ * the player to that server. If the island is cached locally, the player will be teleported to the island directly.
+ */
 public class ComplexIslandCommand extends AdvancedCommand {
 
     private final ComplexSkyblockNetwork network;

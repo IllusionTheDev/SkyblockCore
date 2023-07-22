@@ -44,6 +44,13 @@ public class IslandManager {
      */
     public CompletableFuture<Island> loadIsland(IslandData data) {
         UUID islandId = data.getIslandId();
+
+        Island cached = getLoadedIsland(islandId);
+
+        if (cached != null) { // Idiots
+            return CompletableFuture.completedFuture(cached);
+        }
+
         String id = islandId.toString();
 
         TemplatedArea cachedArea = cosmosSetup.getTemplateCache().get(id);
@@ -68,6 +75,12 @@ public class IslandManager {
      * @return The loaded island
      */
     public CompletableFuture<Island> loadPlayerIsland(Player player, String fallback) {
+        Island cached = getPlayerIsland(player);
+
+        if (cached != null) { // Idiots
+            return CompletableFuture.completedFuture(cached);
+        }
+
         return database.fetchPlayerIsland(player.getUniqueId()).thenCompose(id -> {
             if (id == null) {
                 return createIsland(fallback, player.getUniqueId());
@@ -217,10 +230,23 @@ public class IslandManager {
     }
 
     // -------------- REGULAR METHODS -------------- //
+
+    /**
+     * Gets an island by its id
+     *
+     * @param islandId The island's id
+     * @return The island
+     */
     public Island getLoadedIsland(UUID islandId) {
         return loadedIslands.get(islandId);
     }
 
+    /**
+     * Gets an island by its owner's id
+     *
+     * @param playerId The owner's id
+     * @return The island
+     */
     public Island getPlayerIsland(UUID playerId) {
         for (Island island : loadedIslands.values()) {
             if (island.getData().getOwnerId().equals(playerId)) {
@@ -231,6 +257,12 @@ public class IslandManager {
         return null;
     }
 
+    /**
+     * Gets an island by its owner
+     *
+     * @param player The owner
+     * @return The island
+     */
     public Island getPlayerIsland(Player player) {
         return getPlayerIsland(player.getUniqueId());
     }

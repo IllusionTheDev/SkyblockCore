@@ -7,6 +7,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+/**
+ * This is the simple player join listener, which loads the island when the player joins.
+ */
 public class SimplePlayerJoinListener implements Listener {
 
     private final SimpleSkyblockNetwork network;
@@ -19,7 +22,7 @@ public class SimplePlayerJoinListener implements Listener {
     private void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        network.getPlugin().getIslandManager().loadPlayerIsland(player, "default").thenAcceptAsync(island -> {
+        network.getPlugin().getIslandManager().loadPlayerIsland(player, network.getConfiguration().getDefaultIslandName()).thenAcceptAsync(island -> {
 
             player.teleport(island.getCenter());
 

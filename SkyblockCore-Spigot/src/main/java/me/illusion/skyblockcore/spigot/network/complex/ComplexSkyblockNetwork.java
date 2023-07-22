@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
+import me.illusion.skyblockcore.spigot.network.complex.command.ComplexIslandCommand;
 import me.illusion.skyblockcore.spigot.network.complex.communication.CommunicationsHandler;
 import me.illusion.skyblockcore.spigot.network.complex.communication.listener.TeleportRequestPacketHandler;
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
@@ -17,6 +18,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
+/**
+ * Represents a complex SkyblockNetworkStructure. A complex structure is one that has multiple instances, where each instance claims ownership over a group of
+ * islands, and handles all the communication belonging to that group.
+ */
 public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     private final SkyblockSpigotPlugin plugin;
@@ -63,12 +68,12 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     private void registerCommands() {
-
+        registerCommand(new ComplexIslandCommand(this));
     }
 
     // Utility stuff
 
-    private void registerListener(Listener listener) {
+    public void registerListener(Listener listener) {
         Bukkit.getPluginManager().registerEvents(listener, plugin);
     }
 

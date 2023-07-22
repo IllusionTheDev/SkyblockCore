@@ -9,6 +9,9 @@ import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * This is the simple /island command, which immediately teleports the player to its island.
+ */
 public class SimpleIslandCommand extends AdvancedCommand {
 
     private final MessagesFile messages;

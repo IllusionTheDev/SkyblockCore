@@ -3,7 +3,7 @@ package me.illusion.skyblockcore.spigot.event.island;
 import me.illusion.skyblockcore.spigot.event.SkyblockEvent;
 import me.illusion.skyblockcore.spigot.island.Island;
 
-public class SkyblockIslandEvent extends SkyblockEvent {
+public abstract class SkyblockIslandEvent extends SkyblockEvent {
 
     private final Island island;
 

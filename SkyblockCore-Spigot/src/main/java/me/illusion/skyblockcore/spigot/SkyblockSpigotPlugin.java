@@ -18,6 +18,7 @@ import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistry;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -64,6 +65,8 @@ public class SkyblockSpigotPlugin extends JavaPlugin {
     private void registerNetworks() {
         networkRegistry.register(new ComplexSkyblockNetwork(this));
         networkRegistry.register(new SimpleSkyblockNetwork(this));
+
+        Bukkit.getScheduler().runTask(this, networkRegistry::load); // This will run after all plugins are loaded
     }
 
     private void initCosmos() {

@@ -61,7 +61,7 @@ dependencies {
     implementation(project(":SkyblockCore-Common"))
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 11
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

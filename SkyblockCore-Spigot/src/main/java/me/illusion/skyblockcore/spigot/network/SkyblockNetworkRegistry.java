@@ -8,6 +8,10 @@ import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
+/**
+ * The skyblock network registry is responsible for loading the correct skyblock network structure. It is expected that separate plugins hook into this registry
+ * and register their own skyblock network structures on startup. The network is loaded after all plugins enable.
+ */
 public class SkyblockNetworkRegistry {
 
     private final Map<String, SkyblockNetworkStructure> structures = new ConcurrentHashMap<>();
@@ -22,18 +26,37 @@ public class SkyblockNetworkRegistry {
         this.config = new YMLBase(plugin, "network-settings.yml").getConfiguration();
     }
 
+    /**
+     * Registers a skyblock network structure.
+     *
+     * @param structure The structure to register.
+     */
     public void register(SkyblockNetworkStructure structure) {
         structures.put(structure.getName(), structure);
     }
 
+    /**
+     * Gets a skyblock network structure by name.
+     *
+     * @param name The name of the structure.
+     * @return The structure, or null if it does not exist.
+     */
     public SkyblockNetworkStructure get(String name) {
         return structures.get(name);
     }
 
+    /**
+     * Gets the network structure currently in use
+     *
+     * @return The active structure.
+     */
     public SkyblockNetworkStructure getActiveStructure() {
         return structures.get(desiredStructure);
     }
 
+    /**
+     * Loads the skyblock network structure, as specified in the configuration file. If the structure does not exist, the plugin will be disabled.
+     */
     public void load() {
         String desiredStructure = config.getString("network-type", "undefined");
 
@@ -48,6 +71,11 @@ public class SkyblockNetworkRegistry {
         structure.enable(config.getConfigurationSection(desiredStructure));
     }
 
+    /**
+     * Disables the plugin, as the network structure failed to enable, and the plugin cannot function without it.
+     *
+     * @param name The name of the network structure that failed to enable. This is used for logging purposes.
+     */
     public void failToEnable(String name) {
         Logger logger = plugin.getLogger();
 

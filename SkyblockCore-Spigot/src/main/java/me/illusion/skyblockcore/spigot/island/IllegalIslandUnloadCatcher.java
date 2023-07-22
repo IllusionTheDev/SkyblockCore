@@ -5,6 +5,9 @@ import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+/**
+ * The objective of this class is to catch sessions that are bound to an island being unloaded without the island being marked as unloading.
+ */
 public class IllegalIslandUnloadCatcher implements Listener {
 
     private final SkyblockSpigotPlugin plugin;

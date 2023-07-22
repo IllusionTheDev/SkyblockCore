@@ -6,15 +6,22 @@ import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.network.simple.command.SimpleIslandCommand;
+import me.illusion.skyblockcore.spigot.network.simple.config.SimpleNetworkConfiguration;
 import me.illusion.skyblockcore.spigot.network.simple.listener.SimplePlayerJoinListener;
 import me.illusion.skyblockcore.spigot.network.simple.listener.SimplePlayerQuitListener;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
+/**
+ * This is a "simple" skyblock network, which is targeted at a single-instance network setup. The simple network will load islands when the player joins,
+ * without doing any instance checks, and unload when the player quits.
+ */
 public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     private final SkyblockSpigotPlugin plugin;
+
+    private SimpleNetworkConfiguration configuration;
 
     public SimpleSkyblockNetwork(SkyblockSpigotPlugin plugin) {
         this.plugin = plugin;
@@ -22,6 +29,8 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void enable(ConfigurationSection section) {
+        configuration = new SimpleNetworkConfiguration(plugin);
+
         registerListeners();
         registerCommands();
     }
@@ -67,5 +76,9 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     public MessagesFile getMessages() {
         return plugin.getMessages();
+    }
+
+    public SimpleNetworkConfiguration getConfiguration() {
+        return configuration;
     }
 }

@@ -2,7 +2,11 @@ package me.illusion.skyblockcore.spigot.network.complex.communication.packet.res
 
 import java.util.UUID;
 import me.illusion.skyblockcore.common.communication.packet.Packet;
+import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
 
+/**
+ * Packet sent to another instance in response to a {@link PacketRequestIslandTeleport}.
+ */
 public class PacketResponseIslandTeleport extends Packet {
 
     private final UUID playerId;

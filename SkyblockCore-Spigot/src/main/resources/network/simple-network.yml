@@ -1,0 +1,3 @@
+island:
+  default-name: "default"
+  unload-time: 10 minutes
