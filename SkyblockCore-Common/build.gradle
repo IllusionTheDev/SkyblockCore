@@ -20,7 +20,7 @@ dependencies {
     annotationProcessor('org.projectlombok:lombok:1.18.24')
 
     implementation 'com.google.guava:guava:32.1.1-jre'
-    implementation 'redis.clients:jedis:3.10.0'
+    implementation 'redis.clients:jedis:4.4.3'
 }
 
 def targetJavaVersion = 17
