@@ -12,4 +12,6 @@ public class IslandData implements Serializable {
     private final UUID islandId;
     private final UUID ownerId;
 
+    // TODO: Add more data here
+
 }

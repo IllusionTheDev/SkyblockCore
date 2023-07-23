@@ -5,9 +5,9 @@ import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.cosmos.cache.CosmosCache;
 import me.illusion.cosmos.database.CosmosDataContainer;
+import me.illusion.cosmos.grid.CosmosGrid;
 import me.illusion.cosmos.session.CosmosSessionHolder;
 import me.illusion.cosmos.template.TemplatedArea;
-import me.illusion.cosmos.template.grid.CosmosGrid;
 
 /**
  * This class is used to store all the Cosmos-related data that is used by the Skyblock plugin. Cosmos is the core of the Skyblock plugin, and is used to paste

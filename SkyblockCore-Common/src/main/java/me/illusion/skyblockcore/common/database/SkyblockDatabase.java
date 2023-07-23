@@ -1,11 +1,20 @@
 package me.illusion.skyblockcore.common.database;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import me.illusion.skyblockcore.common.data.IslandData;
 
 public interface SkyblockDatabase {
+
+    /**
+     * Enables the database
+     *
+     * @param properties The properties, such as the host, port, username, password, etc.
+     * @return A future
+     */
+    CompletableFuture<Boolean> enable(Map<String, ?> properties);
 
     /**
      * Fetches the island id of a player
@@ -77,5 +86,12 @@ public interface SkyblockDatabase {
             return function.apply(value);
         });
     }
+
+    /**
+     * Flushes the database
+     *
+     * @return A future
+     */
+    CompletableFuture<Void> flush();
 
 }
