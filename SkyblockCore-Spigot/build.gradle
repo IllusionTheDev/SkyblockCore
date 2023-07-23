@@ -53,7 +53,7 @@ dependencies {
 
     implementation 'com.mojang:authlib:1.6.25'
 
-    implementation 'me.clip:placeholderapi:2.10.10'
+    implementation 'me.clip:placeholderapi:2.11.3'
     implementation("com.sk89q.worldedit:worldedit-bukkit:7.2.14")
 
     implementation("me.illusion:cosmos-plugin:1.0")
