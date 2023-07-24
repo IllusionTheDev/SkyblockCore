@@ -1,0 +1,26 @@
+# This is the preferred database type. There are a few reasons why it may default to a fallback:
+# - The database type is not supported by the server (SQLite on a complex network)
+# - The database type is not registered (invalid type)
+# - The database configuration is invalid (invalid credentials)
+# If all fallbacks fail, the plugin will disable. This is a feature.
+preferred: mongodb
+
+mongodb:
+  fallback: mysql # If this fails to enable, default to mysql
+
+  ip: localhost
+  port: 27017
+  auth-source: admin
+  username: root
+  password: password
+  ssl: false
+
+  database: skyblock
+  collection: skyblock_data # There is a second island-ids collection
+
+mysql:
+  host: localhost
+  port: 3306
+  username: root
+  password: password
+  database: skyblock

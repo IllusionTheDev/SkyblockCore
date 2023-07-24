@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.common.database.fetching.mongo;
+package me.illusion.skyblockcore.common.database.fetching.mongo.codec;
 
 import java.util.UUID;
 import org.bson.BsonBinary;

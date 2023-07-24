@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.common.database.fetching.mongo;
+package me.illusion.skyblockcore.common.database.fetching.mongo.codec;
 
 import java.util.UUID;
 import me.illusion.skyblockcore.common.data.IslandData;

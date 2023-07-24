@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.data.IslandData;
+import me.illusion.skyblockcore.common.database.fetching.mongo.codec.MongoIslandDataCodec;
+import me.illusion.skyblockcore.common.database.fetching.mongo.codec.MongoUUIDCodec;
 import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -38,7 +40,7 @@ public class MongoSkyblockDatabase implements SkyblockDatabase {
             if (connectionString == null) {
                 String ip = getOrDefault(properties, "ip");
                 int port = getOrDefault(properties, "port");
-                String authsource = getOrDefault(properties, "auth_source");
+                String authsource = getOrDefault(properties, "auth-source");
                 String username = getOrDefault(properties, "username");
                 String password = getOrDefault(properties, "password");
                 boolean ssl = getOrDefault(properties, "ssl", false);
