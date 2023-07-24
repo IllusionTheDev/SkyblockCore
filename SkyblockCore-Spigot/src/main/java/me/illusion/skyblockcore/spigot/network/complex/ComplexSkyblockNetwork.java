@@ -40,7 +40,7 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void enable(ConfigurationSection section) {
-        database = plugin.getDatabase();
+        database = plugin.getDatabaseRegistry().getChosenDatabase();
 
         registerListeners();
         registerCommands();

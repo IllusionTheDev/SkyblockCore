@@ -39,7 +39,7 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
      * Disables the communications handler. This will clean up any cached data in the database.
      */
     public void disable() {
-        cacheDatabase.removeServer(serverId);
+        cacheDatabase.removeServer(serverId).join();
     }
 
     /**

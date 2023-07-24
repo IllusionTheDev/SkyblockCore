@@ -135,12 +135,33 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockDatabase {
         });
     }
 
+    /**
+     * Gets the queries for this database. The key is the query type, the value is the query itself.
+     *
+     * @return The queries for this database.
+     */
     protected abstract Map<SkyblockSQLQuery, String> getQueries();
 
+    /**
+     * Creates a connection to the database. This method is called when the connection is invalid or null.
+     *
+     * @return The connection to the database.
+     */
     protected abstract Connection createConnection();
 
+    /**
+     * Enables the driver for this database.
+     *
+     * @param properties The properties for this database.
+     * @return If the driver was enabled successfully.
+     */
     protected abstract boolean enableDriver(Map<String, ?> properties);
 
+    /**
+     * Gets the connection to the database. If the connection is invalid or null, it will create a new one.
+     *
+     * @return The connection to the database.
+     */
     protected Connection getConnection() {
         Connection connection = this.connection.get();
 
