@@ -10,6 +10,12 @@ import org.bukkit.configuration.ConfigurationSection;
 public interface SkyblockNetworkStructure {
 
     /**
+     * Called before any database loads. This is where you tell the database setup if you like files or not.
+     */
+    default void load() {
+    }
+
+    /**
      * Called when the network is enabled. This is where you should register all your listeners, commands, etc.
      *
      * @param section The configuration section for this network type. This is where you should get all your configuration values from.

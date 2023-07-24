@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.data.IslandData;
-import me.illusion.skyblockcore.common.database.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -24,6 +24,11 @@ public class MongoSkyblockDatabase implements SkyblockDatabase {
     private MongoClient mongoClient;
     private MongoCollection<IslandData> islandDataCollection;
     private MongoCollection<UUID> islandIdCollection;
+
+    @Override
+    public String getName() {
+        return "mongodb";
+    }
 
     @Override
     public CompletableFuture<Boolean> enable(Map<String, ?> properties) {

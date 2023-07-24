@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.common.database;
+package me.illusion.skyblockcore.common.database.structure;
 
 import java.util.Map;
 import java.util.UUID;
@@ -7,6 +7,13 @@ import java.util.function.Function;
 import me.illusion.skyblockcore.common.data.IslandData;
 
 public interface SkyblockDatabase {
+
+    /**
+     * Obtains the name of this database
+     *
+     * @return The name
+     */
+    String getName();
 
     /**
      * Enables the database
@@ -93,5 +100,14 @@ public interface SkyblockDatabase {
      * @return A future
      */
     CompletableFuture<Void> flush();
+
+    /**
+     * Checks if the database is file based, meaning it is not a remote database and is not supported by complex networks
+     *
+     * @return If the database is file based
+     */
+    default boolean isFileBased() {
+        return false;
+    }
 
 }

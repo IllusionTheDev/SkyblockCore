@@ -3,7 +3,7 @@ package me.illusion.skyblockcore.spigot.network.complex;
 import me.illusion.cosmos.utilities.command.command.impl.AdvancedCommand;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
-import me.illusion.skyblockcore.common.database.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
@@ -33,6 +33,10 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
         this.plugin = plugin;
     }
 
+    @Override
+    public void load() {
+        plugin.getDatabasesFile().setSupportsFileBased(false); // We don't support file-based databases, as they are instance-specific
+    }
 
     @Override
     public void enable(ConfigurationSection section) {

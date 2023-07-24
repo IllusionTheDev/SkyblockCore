@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import me.illusion.skyblockcore.common.communication.packet.Packet;
 import me.illusion.skyblockcore.common.communication.packet.PacketProcessor;
 import me.illusion.skyblockcore.common.communication.redis.RedisController;
-import me.illusion.skyblockcore.common.database.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.database.structure.SkyblockCacheDatabase;
 import redis.clients.jedis.BinaryJedisPubSub;
 
 public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor, SkyblockCacheDatabase {

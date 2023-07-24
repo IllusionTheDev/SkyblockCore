@@ -7,16 +7,16 @@ import java.util.Map;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
-public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
+public class PostgresSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
-    private static final String FETCH_ISLAND_ID = "SELECT island_id FROM skyblock_ids WHERE owner_id = ?";
-    private static final String FETCH_ISLAND_DATA = "SELECT * FROM skyblock_data WHERE island_id = ?";
-    private static final String DELETE_ISLAND_DATA = "DELETE FROM skyblock_data WHERE island_id"; // Remove island data with island id
-    private static final String DELETE_ISLAND_ID = "DELETE FROM skyblock_ids WHERE island_id"; // Remove island id with island id
-    private static final String SAVE_ISLAND_DATA = "INSERT INTO skyblock_data (island_id, owner_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE owner_id = ?";
-    private static final String SAVE_ISLAND_ID = "INSERT INTO skyblock_ids (owner_id, island_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE island_id = ?";
-    private static final String CREATE_ISLAND_DATA_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_data (island_id VARCHAR(36) PRIMARY KEY, owner_id VARCHAR(36))";
-    private static final String CREATE_ISLAND_ID_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_ids (owner_id VARCHAR(36) PRIMARY KEY, island_id VARCHAR(36))";
+    private static final String FETCH_ISLAND_ID = "SELECT island_id FROM island_id WHERE player_id = ?";
+    private static final String FETCH_ISLAND_DATA = "SELECT * FROM island_data WHERE island_id = ?";
+    private static final String DELETE_ISLAND_DATA = "DELETE FROM island_data WHERE island_id = ?";
+    private static final String DELETE_ISLAND_ID = "DELETE FROM island_id WHERE island_id = ?";
+    private static final String SAVE_ISLAND_DATA = "INSERT INTO island_data (island_id, player_id) VALUES (?, ?) ON CONFLICT (island_id) DO UPDATE SET player_id = ?";
+    private static final String SAVE_ISLAND_ID = "INSERT INTO island_id (player_id, island_id) VALUES (?, ?) ON CONFLICT (player_id) DO UPDATE SET island_id = ?";
+    private static final String CREATE_ISLAND_DATA_TABLE = "CREATE TABLE IF NOT EXISTS island_data (island_id VARCHAR(36) PRIMARY KEY, player_id VARCHAR(36))";
+    private static final String CREATE_ISLAND_ID_TABLE = "CREATE TABLE IF NOT EXISTS island_id (player_id VARCHAR(36) PRIMARY KEY, island_id VARCHAR(36))";
 
     private String host;
     private int port;
@@ -41,8 +41,8 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     @Override
     protected Connection createConnection() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
+            Class.forName("org.postgresql.Driver");
+            return DriverManager.getConnection("jdbc:postgresql://" + host + ":" + port + "/" + database, username, password);
         } catch (Exception expected) { // The driver will throw an exception if it fails to connect
             return null;
         }
@@ -65,6 +65,6 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
     @Override
     public String getName() {
-        return "mysql";
+        return "postgres";
     }
 }

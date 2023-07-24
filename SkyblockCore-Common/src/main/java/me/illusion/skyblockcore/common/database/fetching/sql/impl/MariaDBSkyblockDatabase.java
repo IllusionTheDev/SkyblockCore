@@ -7,7 +7,7 @@ import java.util.Map;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
-public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
+public class MariaDBSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
     private static final String FETCH_ISLAND_ID = "SELECT island_id FROM skyblock_ids WHERE owner_id = ?";
     private static final String FETCH_ISLAND_DATA = "SELECT * FROM skyblock_data WHERE island_id = ?";
@@ -41,8 +41,8 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     @Override
     protected Connection createConnection() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
+            Class.forName("org.mariadb.jdbc.Driver");
+            return DriverManager.getConnection("jdbc:mariadb://" + host + ":" + port + "/" + database, username, password);
         } catch (Exception expected) { // The driver will throw an exception if it fails to connect
             return null;
         }
@@ -65,6 +65,6 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
     @Override
     public String getName() {
-        return "mysql";
+        return "mariadb";
     }
 }

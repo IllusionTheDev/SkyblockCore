@@ -11,8 +11,10 @@ import me.illusion.cosmos.template.TemplatedArea;
 import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.cosmos.world.pool.WorldPoolSettings;
-import me.illusion.skyblockcore.common.database.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
+import me.illusion.skyblockcore.spigot.database.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistry;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
@@ -22,7 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
-public class SkyblockSpigotPlugin extends JavaPlugin {
+public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform {
 
     // General things (usually present in Cosmos)
     private CommandManager commandManager;
@@ -30,7 +32,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin {
 
     // Skyblock-specific setup
     private SkyblockCosmosSetup cosmosSetup;
-    private SkyblockDatabase database;
+
+    private SkyblockDatabasesFile databasesFile;
+    private SkyblockDatabaseRegistry databaseRegistry;
 
     private IslandManager islandManager;
 
@@ -42,13 +46,16 @@ public class SkyblockSpigotPlugin extends JavaPlugin {
         commandManager = new CommandManager(this, messages);
 
         networkRegistry = new SkyblockNetworkRegistry(this);
+        databasesFile = new SkyblockDatabasesFile(this);
+        databaseRegistry = new SkyblockDatabaseRegistry(this);
 
         initCosmos();
-        initDatabase();
 
         islandManager = new IslandManager(this);
 
         registerNetworks();
+
+        Bukkit.getScheduler().runTask(this, this::finishLoading);
     }
 
     @Override
@@ -62,11 +69,21 @@ public class SkyblockSpigotPlugin extends JavaPlugin {
         islandManager.disable(true, false);
     }
 
+    private void finishLoading() {
+        networkRegistry.load();
+        databaseRegistry.tryEnable(databasesFile).thenAccept(success -> {
+            if (!success) {
+                getLogger().severe("Failed to enable databases, disabling plugin...");
+                Bukkit.getPluginManager().disablePlugin(this);
+            }
+
+            networkRegistry.enable();
+        });
+    }
+
     private void registerNetworks() {
         networkRegistry.register(new ComplexSkyblockNetwork(this));
         networkRegistry.register(new SimpleSkyblockNetwork(this));
-
-        Bukkit.getScheduler().runTask(this, networkRegistry::load); // This will run after all plugins are loaded
     }
 
     private void initCosmos() {
@@ -94,10 +111,6 @@ public class SkyblockSpigotPlugin extends JavaPlugin {
             cosmos,
             cache
         );
-    }
-
-    private void initDatabase() {
-        // TODO
     }
 
 }

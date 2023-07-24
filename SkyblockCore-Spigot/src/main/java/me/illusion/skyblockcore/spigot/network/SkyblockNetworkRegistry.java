@@ -68,7 +68,15 @@ public class SkyblockNetworkRegistry {
         }
 
         this.desiredStructure = desiredStructure;
-        structure.enable(config.getConfigurationSection(desiredStructure));
+        structure.load();
+    }
+
+    /**
+     * Called when the plugin is done enabling and fully operational, including the database.
+     */
+    public void enable() {
+        SkyblockNetworkStructure desiredStructure = getActiveStructure();
+        desiredStructure.enable(config.getConfigurationSection(desiredStructure.getName()));
     }
 
     /**

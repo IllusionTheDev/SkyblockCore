@@ -3,18 +3,21 @@ package me.illusion.skyblockcore.common.database.fetching.sql;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.data.IslandData;
-import me.illusion.skyblockcore.common.database.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
 
 public abstract class AbstractSQLSkyblockDatabase implements SkyblockDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
+    private final AtomicReference<Connection> connection = new AtomicReference<>();
 
     @Override
     public CompletableFuture<Boolean> enable(Map<String, ?> properties) {
@@ -134,9 +137,23 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockDatabase {
 
     protected abstract Map<SkyblockSQLQuery, String> getQueries();
 
-    protected abstract Connection getConnection();
+    protected abstract Connection createConnection();
 
     protected abstract boolean enableDriver(Map<String, ?> properties);
+
+    protected Connection getConnection() {
+        Connection connection = this.connection.get();
+
+        try {
+            if (connection == null || !connection.isValid(5)) {
+                connection = createConnection();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return connection;
+    }
 
     protected <T> T getOrDefault(Map<String, ?> map, String key, T defaultValue) {
         Object value = map.get(key);

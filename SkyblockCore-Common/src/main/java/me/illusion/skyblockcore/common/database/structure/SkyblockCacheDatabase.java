@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.common.database;
+package me.illusion.skyblockcore.common.database.structure;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
