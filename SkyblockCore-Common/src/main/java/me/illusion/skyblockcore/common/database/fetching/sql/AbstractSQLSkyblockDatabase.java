@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 
@@ -20,7 +21,7 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
     private final AtomicReference<Connection> connection = new AtomicReference<>();
 
     @Override
-    public CompletableFuture<Boolean> enable(Map<String, ?> properties) {
+    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
         return associate(() -> enableDriver(properties)).thenCompose((__) -> createTables());
     }
 
@@ -155,7 +156,7 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
      * @param properties The properties for this database.
      * @return If the driver was enabled successfully.
      */
-    protected abstract boolean enableDriver(Map<String, ?> properties);
+    protected abstract boolean enableDriver(ReadOnlyConfigurationSection properties);
 
     /**
      * Gets the connection to the database. If the connection is invalid or null, it will create a new one.
@@ -174,20 +175,6 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
         }
 
         return connection;
-    }
-
-    protected <T> T getOrDefault(Map<String, ?> map, String key, T defaultValue) {
-        Object value = map.get(key);
-
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return (T) value;
-    }
-
-    protected <T> T getOrDefault(Map<String, ?> map, String key) {
-        return getOrDefault(map, key, null);
     }
 
     private <T> CompletableFuture<T> associate(Supplier<T> supplier) {

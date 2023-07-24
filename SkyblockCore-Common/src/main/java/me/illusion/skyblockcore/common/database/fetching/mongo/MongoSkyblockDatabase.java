@@ -5,12 +5,12 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.mongo.codec.MongoIslandDataCodec;
@@ -33,23 +33,23 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(Map<String, ?> properties) {
+    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
         return associate(() -> {
-            String connectionString = getOrDefault(properties, "connection_string");
+            String connectionString = properties.getString("connection-string");
 
             if (connectionString == null) {
-                String ip = getOrDefault(properties, "ip");
-                int port = getOrDefault(properties, "port");
-                String authsource = getOrDefault(properties, "auth-source");
-                String username = getOrDefault(properties, "username");
-                String password = getOrDefault(properties, "password");
-                boolean ssl = getOrDefault(properties, "ssl", false);
+                String ip = properties.getString("ip");
+                int port = properties.getInt("port");
+                String authsource = properties.getString("auth-source", "admin");
+                String username = properties.getString("username");
+                String password = properties.getString("password");
+                boolean ssl = properties.getBoolean("ssl", false);
 
                 connectionString = createConnectionString(ip, port, authsource, username, password, ssl);
             }
 
-            String database = getOrDefault(properties, "database", "skyblock");
-            String collectionName = getOrDefault(properties, "collection", "skyblock_data");
+            String database = properties.getString("database", "skyblock");
+            String collectionName = properties.getString("collection", "islands");
 
             CodecRegistry codecs = CodecRegistries.fromCodecs(
                 MongoIslandDataCodec.INSTANCE,
@@ -178,20 +178,6 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
         }
 
         return builder.toString();
-    }
-
-    private <T> T getOrDefault(Map<String, ?> map, String key, T defaultValue) {
-        Object value = map.get(key);
-
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return (T) value;
-    }
-
-    private <T> T getOrDefault(Map<String, ?> map, String key) {
-        return getOrDefault(map, key, null);
     }
 
 }

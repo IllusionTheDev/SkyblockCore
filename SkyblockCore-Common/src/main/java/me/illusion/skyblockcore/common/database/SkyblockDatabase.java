@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.common.database;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 
 public interface SkyblockDatabase {
 
@@ -18,7 +18,7 @@ public interface SkyblockDatabase {
      * @param properties The properties, such as the host, port, username, password, etc.
      * @return A future
      */
-    CompletableFuture<Boolean> enable(Map<String, ?> properties);
+    CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties);
 
     /**
      * Flushes the database, this is called when the server is shutting down

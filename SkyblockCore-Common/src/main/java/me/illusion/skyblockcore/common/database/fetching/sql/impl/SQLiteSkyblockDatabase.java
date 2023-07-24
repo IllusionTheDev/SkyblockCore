@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Map;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
@@ -50,8 +51,8 @@ public class SQLiteSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     }
 
     @Override
-    protected boolean enableDriver(Map<String, ?> properties) {
-        String fileName = getOrDefault(properties, "file-name", "database");
+    protected boolean enableDriver(ReadOnlyConfigurationSection properties) {
+        String fileName = properties.getString("file-name", "database");
         databaseFile = new File(dataFolder, fileName + ".db");
 
         try (Connection connection = getConnection()) {

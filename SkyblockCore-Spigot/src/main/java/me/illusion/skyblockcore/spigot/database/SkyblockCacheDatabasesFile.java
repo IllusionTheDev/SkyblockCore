@@ -1,9 +1,10 @@
 package me.illusion.skyblockcore.spigot.database;
 
-import java.util.Map;
 import me.illusion.cosmos.utilities.storage.YMLBase;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabaseSetup;
+import me.illusion.skyblockcore.spigot.utilities.config.BukkitConfigurationAdapter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +16,7 @@ public class SkyblockCacheDatabasesFile extends YMLBase implements SkyblockCache
     }
 
     @Override
-    public Map<String, ?> getProperties(String databaseType) {
+    public ReadOnlyConfigurationSection getProperties(String databaseType) {
         FileConfiguration config = getConfiguration();
         ConfigurationSection section = config.getConfigurationSection(databaseType);
 
@@ -23,7 +24,7 @@ public class SkyblockCacheDatabasesFile extends YMLBase implements SkyblockCache
             return null;
         }
 
-        return asMap(section);
+        return BukkitConfigurationAdapter.adapt(section);
     }
 
     @Override
@@ -51,9 +52,5 @@ public class SkyblockCacheDatabasesFile extends YMLBase implements SkyblockCache
     @Override
     public Class<SkyblockCacheDatabase> getDatabaseClass() {
         return SkyblockCacheDatabase.class;
-    }
-
-    private Map<String, ?> asMap(ConfigurationSection section) {
-        return section.getValues(false);
     }
 }

@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.common.database.cache.redis;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -8,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import me.illusion.skyblockcore.common.communication.redis.RedisController;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import redis.clients.jedis.Jedis;
 
@@ -22,12 +22,12 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(Map<String, ?> properties) {
+    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
         return CompletableFuture.supplyAsync(() -> {
-            String host = getOrDefault(properties, "host", "localhost");
-            int port = getOrDefault(properties, "port", 6379);
-            String password = getOrDefault(properties, "password", null);
-            boolean ssl = getOrDefault(properties, "ssl", false);
+            String host = properties.getString("host", "localhost");
+            int port = properties.getInt("port", 6379);
+            String password = properties.getString("password");
+            boolean ssl = properties.getBoolean("ssl", false);
 
             controller = new RedisController(host, port, password, ssl);
 
@@ -88,17 +88,4 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
         return future;
     }
 
-    private <T> T getOrDefault(Map<String, ?> map, String key, T defaultValue) {
-        Object value = map.get(key);
-
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return (T) value;
-    }
-
-    private <T> T getOrDefault(Map<String, ?> map, String key) {
-        return getOrDefault(map, key, null);
-    }
 }

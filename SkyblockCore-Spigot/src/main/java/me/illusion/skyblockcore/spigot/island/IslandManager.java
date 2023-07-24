@@ -10,7 +10,7 @@ import me.illusion.cosmos.session.CosmosSession;
 import me.illusion.cosmos.template.TemplatedArea;
 import me.illusion.cosmos.utilities.time.Time;
 import me.illusion.skyblockcore.common.data.IslandData;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.event.island.SkyblockIslandLoadEvent;
@@ -27,11 +27,11 @@ public class IslandManager {
     private final Set<UUID> unloadingIslands = Sets.newConcurrentHashSet();
 
     private final SkyblockCosmosSetup cosmosSetup;
-    private final SkyblockDatabase database;
+    private final SkyblockFetchingDatabase database;
 
     public IslandManager(SkyblockSpigotPlugin plugin) {
         this.cosmosSetup = plugin.getCosmosSetup();
-        this.database = plugin.getDatabase();
+        this.database = plugin.getDatabaseRegistry().getChosenDatabase();
 
         new IllegalIslandUnloadCatcher(plugin).register(); // This is a listener that catches when an island is unloaded illegally, through Cosmos directly.
     }

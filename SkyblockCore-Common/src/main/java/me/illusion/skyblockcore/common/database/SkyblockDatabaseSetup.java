@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.common.database;
 
-import java.util.Map;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 
 public interface SkyblockDatabaseSetup<DataType extends SkyblockDatabase> {
 
@@ -10,8 +10,7 @@ public interface SkyblockDatabaseSetup<DataType extends SkyblockDatabase> {
      * @param databaseType The database type
      * @return The properties
      */
-    // The reason why we return a map and not a config section is because this class works for all kinds of platforms, and is not limited to either bukkit or bungee
-    Map<String, ?> getProperties(String databaseType);
+    ReadOnlyConfigurationSection getProperties(String databaseType);
 
     /**
      * Gets the fallback database type

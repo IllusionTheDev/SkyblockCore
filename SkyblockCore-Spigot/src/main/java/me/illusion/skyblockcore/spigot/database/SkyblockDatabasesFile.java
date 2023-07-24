@@ -1,9 +1,10 @@
 package me.illusion.skyblockcore.spigot.database;
 
-import java.util.Map;
 import me.illusion.cosmos.utilities.storage.YMLBase;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabaseSetup;
+import me.illusion.skyblockcore.spigot.utilities.config.BukkitConfigurationAdapter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +18,7 @@ public class SkyblockDatabasesFile extends YMLBase implements SkyblockFetchingDa
     }
 
     @Override
-    public Map<String, ?> getProperties(String databaseType) {
+    public ReadOnlyConfigurationSection getProperties(String databaseType) {
         FileConfiguration config = getConfiguration();
         ConfigurationSection section = config.getConfigurationSection(databaseType);
 
@@ -25,7 +26,7 @@ public class SkyblockDatabasesFile extends YMLBase implements SkyblockFetchingDa
             return null;
         }
 
-        return asMap(section);
+        return BukkitConfigurationAdapter.adapt(section);
     }
 
     @Override
@@ -62,9 +63,5 @@ public class SkyblockDatabasesFile extends YMLBase implements SkyblockFetchingDa
 
     public void setSupportsFileBased(boolean supportsFileBased) { // This can be set by the network type
         this.supportsFileBased = supportsFileBased;
-    }
-
-    private Map<String, ?> asMap(ConfigurationSection section) {
-        return section.getValues(false);
     }
 }

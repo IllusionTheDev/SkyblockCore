@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
@@ -49,12 +50,12 @@ public class PostgresSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     }
 
     @Override
-    protected boolean enableDriver(Map<String, ?> properties) {
-        host = getOrDefault(properties, "host", "localhost");
-        port = getOrDefault(properties, "port", 3306);
-        database = getOrDefault(properties, "database", "skyblock");
-        username = getOrDefault(properties, "username", "root");
-        password = getOrDefault(properties, "password", "password");
+    protected boolean enableDriver(ReadOnlyConfigurationSection properties) {
+        host = properties.getString("host", "localhost");
+        port = properties.getInt("port", 3306);
+        database = properties.getString("database", "skyblock");
+        username = properties.getString("username", "root");
+        password = properties.getString("password", "password");
 
         try (Connection connection = createConnection()) {
             return connection != null;

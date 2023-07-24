@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.cache.redis.RedisSkyblockCache;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
@@ -177,7 +178,7 @@ public class SkyblockDatabaseRegistry {
             return tryEnableFallback(setup, fallback); // If the database is file based, and the setup doesn't support file based databases, we try the fallback
         }
 
-        Map<String, ?> properties = setup.getProperties(type);
+        ReadOnlyConfigurationSection properties = setup.getProperties(type);
 
         if (properties == null) { // If there are no properties to load from, we try the fallback
             logger.warning("Failed to find properties for " + type + ", attempting fallback..");
