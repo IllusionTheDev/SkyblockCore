@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.data.IslandData;
-import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 
-public abstract class AbstractSQLSkyblockDatabase implements SkyblockDatabase {
+public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
     private final AtomicReference<Connection> connection = new AtomicReference<>();

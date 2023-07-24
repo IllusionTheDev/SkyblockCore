@@ -2,10 +2,7 @@ package me.illusion.skyblockcore.common.database;
 
 import java.util.Map;
 
-/**
- * Represents a setup for a skyblock database. This class is used as a representation of the database.yml file, and is used to load the database.
- */
-public interface SkyblockDatabaseSetup {
+public interface SkyblockDatabaseSetup<DataType extends SkyblockDatabase> {
 
     /**
      * Gets the properties for a database type, this is used for loading the database
@@ -32,9 +29,13 @@ public interface SkyblockDatabaseSetup {
     String getPreferredDatabase();
 
     /**
-     * Gets whether the setuo supports file based databases
+     * Checks whether the setup supports the database, there are some databases that are not supported by some structures
      *
-     * @return TRUE if we should load file based databases, FALSE otherwise
+     * @param database The database
+     * @return TRUE if the setup supports the database, FALSE otherwise
      */
-    boolean supportsFileBased();
+    boolean isSupported(DataType database);
+
+    Class<DataType> getDatabaseClass();
+
 }

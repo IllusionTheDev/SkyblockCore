@@ -3,7 +3,8 @@ package me.illusion.skyblockcore.spigot.network.complex;
 import me.illusion.cosmos.utilities.command.command.impl.AdvancedCommand;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
-import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
@@ -26,7 +27,7 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     private final SkyblockSpigotPlugin plugin;
 
-    private SkyblockDatabase database;
+    private SkyblockFetchingDatabase database;
     private CommunicationsHandler communicationsHandler;
 
     public ComplexSkyblockNetwork(SkyblockSpigotPlugin plugin) {
@@ -101,7 +102,11 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
         return communicationsHandler;
     }
 
-    public SkyblockDatabase getDatabase() {
+    public SkyblockFetchingDatabase getDatabase() {
         return database;
+    }
+
+    public SkyblockCacheDatabase getCacheDatabase() {
+        return plugin.getDatabaseRegistry().getChosenCacheDatabase();
     }
 }

@@ -1,22 +1,26 @@
 package me.illusion.skyblockcore.common.database;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.database.cache.redis.RedisSkyblockCache;
+import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.mongo.MongoSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.impl.MariaDBSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.impl.MySQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.impl.PostgresSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.impl.SQLiteSkyblockDatabase;
-import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
 public class SkyblockDatabaseRegistry {
 
     private final Map<String, SkyblockDatabase> databases = new ConcurrentHashMap<>();
+    private final Map<Class<? extends SkyblockDatabase>, String> chosenDatabases = new ConcurrentHashMap<>();
     private final Logger logger;
-    private String chosenDatabase;
 
     public SkyblockDatabaseRegistry(SkyblockPlatform platform) {
         this.logger = platform.getLogger();
@@ -47,8 +51,38 @@ public class SkyblockDatabaseRegistry {
      *
      * @return The chosen database
      */
-    public SkyblockDatabase getChosenDatabase() {
-        return databases.get(chosenDatabase);
+    public SkyblockFetchingDatabase getChosenDatabase() {
+        return getChosenDatabase(SkyblockFetchingDatabase.class);
+    }
+
+    /**
+     * Gets the currently chosen database
+     *
+     * @return The chosen database
+     */
+    public SkyblockCacheDatabase getChosenCacheDatabase() {
+        return getChosenDatabase(SkyblockCacheDatabase.class);
+    }
+
+    /**
+     * Gets the currently chosen database
+     *
+     * @return The chosen database
+     */
+    public <DataType extends SkyblockDatabase> DataType getChosenDatabase(Class<DataType> databaseClass) {
+        String name = chosenDatabases.get(databaseClass);
+
+        if (name == null) {
+            return null;
+        }
+
+        SkyblockDatabase database = get(name);
+
+        if (database == null || !databaseClass.isAssignableFrom(database.getClass())) {
+            return null;
+        }
+
+        return databaseClass.cast(database);
     }
 
     /**
@@ -67,6 +101,9 @@ public class SkyblockDatabaseRegistry {
 
         // sql local databases
         register(new SQLiteSkyblockDatabase(platform.getDataFolder()));
+
+        // cache databases
+        register(new RedisSkyblockCache());
     }
 
     /**
@@ -75,7 +112,32 @@ public class SkyblockDatabaseRegistry {
      * @param setup The setup to use
      * @return A completable future that completes when the database is enabled
      */
-    public CompletableFuture<Boolean> tryEnable(SkyblockDatabaseSetup setup) {
+    public CompletableFuture<Boolean> tryEnableMultiple(SkyblockDatabaseSetup<?>... setup) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+
+        // Not a fan of this dance, but the idea is that if any of the databases fail to enable, we want to complete the future with false
+
+        for (SkyblockDatabaseSetup<?> databaseSetup : setup) {
+            futures.add(tryEnable(databaseSetup).thenApply(success -> {
+                if (!success) {
+                    future.complete(false);
+                }
+
+                return success;
+            }));
+        }
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            if (!future.isDone()) {
+                future.complete(true);
+            }
+        });
+
+        return future;
+    }
+
+    public <DataType extends SkyblockDatabase> CompletableFuture<Boolean> tryEnable(SkyblockDatabaseSetup<DataType> setup) {
         String preferred = setup.getPreferredDatabase();
 
         SkyblockDatabase database = databases.get(preferred);
@@ -90,11 +152,12 @@ public class SkyblockDatabaseRegistry {
     /**
      * Tries to enable a database, and if it fails, tries to enable the fallback
      *
-     * @param setup The setup to use
-     * @param type  The database type to try to enable
+     * @param setup      The setup to use
+     * @param type       The database type to try to enable
+     * @param <DataType> The internal database type, such as SkyblockCacheDatabase
      * @return A completable future that completes when the database is enabled
      */
-    private CompletableFuture<Boolean> tryEnableFallback(SkyblockDatabaseSetup setup, String type) {
+    private <DataType extends SkyblockDatabase> CompletableFuture<Boolean> tryEnableFallback(SkyblockDatabaseSetup<DataType> setup, String type) {
         if (type == null) { // If the fallback is null, we can't do anything, so we just return false
             return CompletableFuture.completedFuture(false);
         }
@@ -107,8 +170,10 @@ public class SkyblockDatabaseRegistry {
             return tryEnableFallback(setup, fallback);
         }
 
-        if (database.isFileBased() && !setup.supportsFileBased()) {
-            logger.warning(type + " is file based, and not supported in this current setup, attempting fallback..");
+        Class<DataType> clazz = setup.getDatabaseClass();
+
+        if (!clazz.isAssignableFrom(database.getClass()) || !setup.isSupported(clazz.cast(database))) {
+            logger.warning(type + " is not supported in this current setup, attempting fallback..");
             return tryEnableFallback(setup, fallback); // If the database is file based, and the setup doesn't support file based databases, we try the fallback
         }
 
@@ -123,7 +188,7 @@ public class SkyblockDatabaseRegistry {
             .thenCompose(success -> { // We try to enable the database, and if it fails, we try the fallback until there is no fallback
                 if (success) {
                     logger.info("Successfully enabled database " + type);
-                    chosenDatabase = type;
+                    chosenDatabases.put(clazz, type);
                     return CompletableFuture.completedFuture(true);
                 }
 

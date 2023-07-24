@@ -10,7 +10,7 @@ import me.illusion.cosmos.session.CosmosSession;
 import me.illusion.cosmos.template.TemplatedArea;
 import me.illusion.cosmos.utilities.time.Time;
 import me.illusion.skyblockcore.common.data.IslandData;
-import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.fetching.SkyblockDatabase;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.event.island.SkyblockIslandLoadEvent;

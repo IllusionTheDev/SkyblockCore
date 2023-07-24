@@ -16,6 +16,10 @@ public class RedisController {
         this.password = password;
     }
 
+    public RedisController(String host, int port, String password, boolean ssl) {
+        this(new JedisPool(host, port, ssl), password);
+    }
+
     public CompletableFuture<Void> borrow(Consumer<Jedis> consumer) {
         return CompletableFuture.runAsync(() -> {
             try (Jedis jedis = pool.getResource()) {

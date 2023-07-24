@@ -14,6 +14,7 @@ import me.illusion.cosmos.world.pool.WorldPoolSettings;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
+import me.illusion.skyblockcore.spigot.database.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.spigot.database.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistry;
@@ -34,6 +35,8 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
     private SkyblockCosmosSetup cosmosSetup;
 
     private SkyblockDatabasesFile databasesFile;
+    private SkyblockCacheDatabasesFile cacheDatabasesFile;
+
     private SkyblockDatabaseRegistry databaseRegistry;
 
     private IslandManager islandManager;
@@ -46,7 +49,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
         commandManager = new CommandManager(this, messages);
 
         networkRegistry = new SkyblockNetworkRegistry(this);
+
         databasesFile = new SkyblockDatabasesFile(this);
+        cacheDatabasesFile = new SkyblockCacheDatabasesFile(this);
         databaseRegistry = new SkyblockDatabaseRegistry(this);
 
         initCosmos();
@@ -71,7 +76,8 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
 
     private void finishLoading() {
         networkRegistry.load();
-        databaseRegistry.tryEnable(databasesFile).thenAccept(success -> {
+
+        databaseRegistry.tryEnableMultiple(databasesFile, cacheDatabasesFile).thenAccept(success -> {
             if (!success) {
                 getLogger().severe("Failed to enable databases, disabling plugin...");
                 Bukkit.getPluginManager().disablePlugin(this);

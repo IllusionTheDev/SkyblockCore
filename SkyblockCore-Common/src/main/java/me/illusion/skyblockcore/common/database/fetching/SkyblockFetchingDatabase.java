@@ -1,27 +1,12 @@
-package me.illusion.skyblockcore.common.database.structure;
+package me.illusion.skyblockcore.common.database.fetching;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import me.illusion.skyblockcore.common.data.IslandData;
+import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 
-public interface SkyblockDatabase {
-
-    /**
-     * Obtains the name of this database
-     *
-     * @return The name
-     */
-    String getName();
-
-    /**
-     * Enables the database
-     *
-     * @param properties The properties, such as the host, port, username, password, etc.
-     * @return A future
-     */
-    CompletableFuture<Boolean> enable(Map<String, ?> properties);
+public interface SkyblockFetchingDatabase extends SkyblockDatabase {
 
     /**
      * Fetches the island id of a player
@@ -93,13 +78,6 @@ public interface SkyblockDatabase {
             return function.apply(value);
         });
     }
-
-    /**
-     * Flushes the database
-     *
-     * @return A future
-     */
-    CompletableFuture<Void> flush();
 
     /**
      * Checks if the database is file based, meaning it is not a remote database and is not supported by complex networks

@@ -2,18 +2,16 @@ package me.illusion.skyblockcore.spigot.database;
 
 import java.util.Map;
 import me.illusion.cosmos.utilities.storage.YMLBase;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabaseSetup;
+import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabaseSetup;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class SkyblockDatabasesFile extends YMLBase implements SkyblockFetchingDatabaseSetup {
+public class SkyblockCacheDatabasesFile extends YMLBase implements SkyblockCacheDatabaseSetup {
 
-    private boolean supportsFileBased = true;
-
-    public SkyblockDatabasesFile(JavaPlugin plugin) {
-        super(plugin, "database.yml");
+    public SkyblockCacheDatabasesFile(JavaPlugin plugin) {
+        super(plugin, "cache-database.yml");
     }
 
     @Override
@@ -46,22 +44,13 @@ public class SkyblockDatabasesFile extends YMLBase implements SkyblockFetchingDa
     }
 
     @Override
-    public boolean isSupported(SkyblockFetchingDatabase database) {
-        return !database.isFileBased() || supportsFileBased(); // If the database is file based, we must also support file based databases
+    public boolean isSupported(SkyblockCacheDatabase database) {
+        return true;
     }
 
     @Override
-    public Class<SkyblockFetchingDatabase> getDatabaseClass() {
-        return SkyblockFetchingDatabase.class;
-    }
-
-    @Override
-    public boolean supportsFileBased() {
-        return supportsFileBased;
-    }
-
-    public void setSupportsFileBased(boolean supportsFileBased) { // This can be set by the network type
-        this.supportsFileBased = supportsFileBased;
+    public Class<SkyblockCacheDatabase> getDatabaseClass() {
+        return SkyblockCacheDatabase.class;
     }
 
     private Map<String, ?> asMap(ConfigurationSection section) {

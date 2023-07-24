@@ -12,14 +12,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.data.IslandData;
+import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.mongo.codec.MongoIslandDataCodec;
 import me.illusion.skyblockcore.common.database.fetching.mongo.codec.MongoUUIDCodec;
-import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 
-public class MongoSkyblockDatabase implements SkyblockDatabase {
+public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
 

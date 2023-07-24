@@ -4,8 +4,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
-import me.illusion.skyblockcore.common.database.structure.SkyblockCacheDatabase;
-import me.illusion.skyblockcore.common.database.structure.SkyblockDatabase;
+import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
@@ -20,19 +20,19 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
     private final PacketManager packetManager;
     private final String serverId;
     private final SkyblockCacheDatabase cacheDatabase;
-    private final SkyblockDatabase database;
+    private final SkyblockFetchingDatabase database;
 
     private final ComplexSkyblockNetwork network;
 
     public CommunicationsHandler(ComplexSkyblockNetwork network) {
         this.network = network;
         this.database = network.getDatabase();
+        this.cacheDatabase = network.getCacheDatabase();
 
         // We need to init the other values
         // TODO: Write a config for this
         packetManager = null;
         serverId = null;
-        cacheDatabase = null;
     }
 
     /**

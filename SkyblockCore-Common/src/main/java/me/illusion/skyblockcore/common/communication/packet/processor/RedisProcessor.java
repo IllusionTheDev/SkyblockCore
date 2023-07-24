@@ -9,16 +9,14 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import me.illusion.skyblockcore.common.communication.packet.Packet;
 import me.illusion.skyblockcore.common.communication.packet.PacketProcessor;
 import me.illusion.skyblockcore.common.communication.redis.RedisController;
-import me.illusion.skyblockcore.common.database.structure.SkyblockCacheDatabase;
 import redis.clients.jedis.BinaryJedisPubSub;
 
-public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor, SkyblockCacheDatabase {
+public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor {
 
     private final byte[] channelBytes;
     private final RedisController controller;
@@ -62,29 +60,6 @@ public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor
         callback.accept(message);
     }
 
-    @Override
-    public CompletableFuture<String> getIslandServer(UUID islandId) {
-        return controller.supply(jedis -> jedis.hget("island-servers", islandId.toString()));
-    }
-
-    @Override
-    public CompletableFuture<Void> updateIslandServer(UUID islandId, String serverId) {
-        return controller.borrow(jedis -> jedis.hset("island-servers", islandId.toString(), serverId));
-    }
-
-    @Override
-    public CompletableFuture<Void> removeServer(String serverId) {
-        return controller.borrow(jedis -> {
-            jedis.hdel("island-servers", serverId);
-        });
-    }
-
-    @Override
-    public CompletableFuture<Void> removeIsland(UUID islandId) {
-        return controller.borrow(jedis -> {
-            jedis.hdel("island-servers", islandId.toString());
-        });
-    }
 
     private byte[] createKey(String message) {
         return (new String(channelBytes) + ":" + message).getBytes(StandardCharsets.UTF_8);

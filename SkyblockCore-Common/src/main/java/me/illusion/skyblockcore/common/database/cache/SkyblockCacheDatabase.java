@@ -1,9 +1,10 @@
-package me.illusion.skyblockcore.common.database.structure;
+package me.illusion.skyblockcore.common.database.cache;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 
-public interface SkyblockCacheDatabase {
+public interface SkyblockCacheDatabase extends SkyblockDatabase {
 
     /**
      * Fetches the server id that has ownership of the island
