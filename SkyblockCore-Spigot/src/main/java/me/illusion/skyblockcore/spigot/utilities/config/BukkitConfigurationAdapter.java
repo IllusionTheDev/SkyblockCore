@@ -4,6 +4,11 @@ import java.util.Map;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import org.bukkit.configuration.ConfigurationSection;
 
+/**
+ * A utility class for adapting Bukkit configuration classes to common configuration classes
+ *
+ * @see ReadOnlyConfigurationSection
+ */
 public class BukkitConfigurationAdapter {
 
     /**

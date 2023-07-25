@@ -8,6 +8,9 @@ import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
+/**
+ * The mariadb implementation of {@link AbstractSQLSkyblockDatabase}
+ */
 public class MariaDBSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
     private static final String FETCH_ISLAND_ID = "SELECT island_id FROM skyblock_ids WHERE owner_id = ?";

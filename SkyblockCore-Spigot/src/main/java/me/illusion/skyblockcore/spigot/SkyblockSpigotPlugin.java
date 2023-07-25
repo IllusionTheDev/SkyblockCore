@@ -20,6 +20,9 @@ import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * The main class for the SkyblockCore Spigot platform plugin.
+ */
 @Getter
 public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform {
 

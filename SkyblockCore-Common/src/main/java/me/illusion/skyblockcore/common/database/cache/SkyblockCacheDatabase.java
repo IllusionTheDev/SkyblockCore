@@ -4,6 +4,10 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 
+/**
+ * This interface represents a template for all caching databases. A caching database is responsible for caching the data that is currently in use, such as what
+ * servers have what islands.
+ */
 public interface SkyblockCacheDatabase extends SkyblockDatabase {
 
     /**

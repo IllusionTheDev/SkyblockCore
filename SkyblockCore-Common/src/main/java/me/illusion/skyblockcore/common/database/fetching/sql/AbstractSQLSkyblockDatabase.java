@@ -15,6 +15,10 @@ import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 
+/**
+ * The abstract sql implementation of {@link SkyblockFetchingDatabase}. Certain methods are left abstract to allow for different implementations, as queries may
+ * differ. For example, Postgres uses BYTEA for binary data, while MySQL uses BLOB.
+ */
 public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();

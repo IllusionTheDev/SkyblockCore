@@ -19,6 +19,9 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 
+/**
+ * The mongodb implementation of {@link SkyblockFetchingDatabase}.
+ */
 public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();

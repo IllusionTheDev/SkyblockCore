@@ -6,9 +6,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * A wrapper for an item's persistent data container, providing simpler set... and get... methods
+ */
 public class ItemPDCWrapper extends PDCWrapper { // ugly wrapper class because pdc bad
 
-    private final JavaPlugin plugin;
     private final ItemStack item;
 
     public ItemPDCWrapper(JavaPlugin plugin, ItemStack item) {
@@ -17,7 +19,6 @@ public class ItemPDCWrapper extends PDCWrapper { // ugly wrapper class because p
 
     public ItemPDCWrapper(JavaPlugin plugin, ItemStack item, boolean clone) {
         super(plugin, (clone ? item.clone() : item).getItemMeta().getPersistentDataContainer());
-        this.plugin = plugin;
         this.item = clone ? item.clone() : item;
     }
 

@@ -17,6 +17,9 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
+/**
+ * A utility class for flood-filling areas. Uses a multithreaded approach, benefiting from a chunk snapshot cache.
+ */
 public final class AreaCreator {
 
     private static final Map<Long, ChunkSnapshot> chunkCache = new ConcurrentHashMap<>();
@@ -147,6 +150,12 @@ public final class AreaCreator {
         return future.join();
     }
 
+    /**
+     * Gets a chunk key for a given location.
+     *
+     * @param location The location to get the chunk key for.
+     * @return The chunk key.
+     */
     private static long getChunkKey(Location location) {
         int x = location.getBlockX() >> 4;
         int z = location.getBlockZ() >> 4;

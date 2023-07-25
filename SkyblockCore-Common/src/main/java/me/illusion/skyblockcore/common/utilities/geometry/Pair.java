@@ -1,5 +1,11 @@
 package me.illusion.skyblockcore.common.utilities.geometry;
 
+/**
+ * A simple pair class
+ *
+ * @param <K> The key type
+ * @param <V> The value type
+ */
 public class Pair<K, V> {
 
     private final K key;

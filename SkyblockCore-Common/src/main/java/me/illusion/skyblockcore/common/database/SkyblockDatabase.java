@@ -3,6 +3,9 @@ package me.illusion.skyblockcore.common.database;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 
+/**
+ * This interface represents a template for all databases. Do not implement this interface directly, instead implement one of the sub-interfaces.
+ */
 public interface SkyblockDatabase {
 
     /**

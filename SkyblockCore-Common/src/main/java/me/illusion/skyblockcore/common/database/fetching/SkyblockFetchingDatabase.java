@@ -6,6 +6,9 @@ import java.util.function.Function;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 
+/**
+ * This interface represents a template for all fetching databases. A fetching database is responsible for fetching the actual data from the database.
+ */
 public interface SkyblockFetchingDatabase extends SkyblockDatabase {
 
     /**

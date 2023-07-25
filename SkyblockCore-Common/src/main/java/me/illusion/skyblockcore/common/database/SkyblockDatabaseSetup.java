@@ -2,6 +2,11 @@ package me.illusion.skyblockcore.common.database;
 
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 
+/**
+ * Represents a setup for a skyblock database. This class is used to load the database.
+ *
+ * @param <DataType> The sub-interface of the database
+ */
 public interface SkyblockDatabaseSetup<DataType extends SkyblockDatabase> {
 
     /**
@@ -35,6 +40,11 @@ public interface SkyblockDatabaseSetup<DataType extends SkyblockDatabase> {
      */
     boolean isSupported(DataType database);
 
+    /**
+     * Obtains the sub-interface of the database
+     *
+     * @return The class
+     */
     Class<DataType> getDatabaseClass();
 
 }

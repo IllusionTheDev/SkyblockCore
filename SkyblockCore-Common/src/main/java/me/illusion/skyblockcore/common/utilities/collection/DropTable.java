@@ -5,6 +5,11 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * A drop table is a collection of items with a weight, the higher the weight, the more likely it is to be chosen.
+ *
+ * @param <Type> The type of the item
+ */
 public class DropTable<Type> {
 
     private final Random random = ThreadLocalRandom.current();

@@ -8,6 +8,9 @@ import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
+/**
+ * The mysql implementation of {@link AbstractSQLSkyblockDatabase}
+ */
 public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
     private static final String FETCH_ISLAND_ID = "SELECT island_id FROM skyblock_ids WHERE owner_id = ?";
@@ -58,7 +61,7 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
         password = properties.getString("password", "password");
 
         try (Connection connection = createConnection()) {
-            return connection != null;
+            return connection != null && connection.isValid(5);
         } catch (SQLException e) {
             return false;
         }

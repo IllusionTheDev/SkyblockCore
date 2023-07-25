@@ -3,6 +3,9 @@ package me.illusion.skyblockcore.common.utilities.geometry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
+/**
+ * Represents a range of numbers. If the min and max are the same, the range will always return that number.
+ */
 public class Range implements Supplier<Integer> {
 
     private final int min;
@@ -13,6 +16,11 @@ public class Range implements Supplier<Integer> {
         this.max = max;
     }
 
+    /**
+     * Parses a range from a string, e.g. "1-5" or "1"
+     *
+     * @param range The range string
+     */
     public Range(String range) {
         String[] split = range.split("-");
 
@@ -30,18 +38,39 @@ public class Range implements Supplier<Integer> {
         max = Integer.parseInt(split[1]);
     }
 
+    /**
+     * Checks if the value is in the range
+     *
+     * @param value The value
+     * @return If the value is in the range
+     */
     public boolean isInRange(int value) {
         return value >= min && value <= max;
     }
 
+    /**
+     * Gets the minimum value of the range
+     *
+     * @return The minimum value
+     */
     public int getMin() {
         return min;
     }
 
+    /**
+     * Gets the maximum value of the range
+     *
+     * @return The maximum value
+     */
     public int getMax() {
         return max;
     }
 
+    /**
+     * Gets a random value from the range
+     *
+     * @return The random value
+     */
     @Override
     public Integer get() {
         if (min == max) // Sanity check

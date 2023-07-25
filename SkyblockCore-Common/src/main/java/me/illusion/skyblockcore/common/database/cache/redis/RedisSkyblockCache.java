@@ -11,6 +11,9 @@ import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import redis.clients.jedis.Jedis;
 
+/**
+ * A redis implementation of {@link SkyblockCacheDatabase}
+ */
 public class RedisSkyblockCache implements SkyblockCacheDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();

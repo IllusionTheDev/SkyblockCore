@@ -62,7 +62,7 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
 
         Island island = network.getIslandManager().getLoadedIsland(islandId);
 
-        if (island == null) { // The island uinloaded after the request was sent, odd
+        if (island == null) { // The island unloaded after the request was sent, odd
             // TODO: Rejection logic
             return;
         }

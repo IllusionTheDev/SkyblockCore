@@ -5,6 +5,9 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * A wrapper for any persistent data container, providing simpler set... and get... methods
+ */
 public class PDCWrapper { // ugly wrapper class because pdc bad
 
     private final JavaPlugin plugin;

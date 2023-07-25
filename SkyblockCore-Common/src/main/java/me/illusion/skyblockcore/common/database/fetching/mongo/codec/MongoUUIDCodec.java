@@ -8,6 +8,9 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
+/**
+ * This codec is used for serializing and deserializing {@link UUID} objects.
+ */
 public class MongoUUIDCodec implements Codec<UUID> {
 
     public static final MongoUUIDCodec INSTANCE = new MongoUUIDCodec();

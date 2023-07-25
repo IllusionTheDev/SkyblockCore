@@ -17,6 +17,9 @@ import me.illusion.skyblockcore.common.database.fetching.sql.impl.PostgresSkyblo
 import me.illusion.skyblockcore.common.database.fetching.sql.impl.SQLiteSkyblockDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
+/**
+ * This class is responsible for registering and managing all skyblock databases.
+ */
 public class SkyblockDatabaseRegistry {
 
     private final Map<String, SkyblockDatabase> databases = new ConcurrentHashMap<>();

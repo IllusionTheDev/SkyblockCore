@@ -9,6 +9,9 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
+/**
+ * This codec is used for serializing and deserializing {@link IslandData} objects.
+ */
 public class MongoIslandDataCodec implements Codec<IslandData> {
 
     public static final MongoIslandDataCodec INSTANCE = new MongoIslandDataCodec();
