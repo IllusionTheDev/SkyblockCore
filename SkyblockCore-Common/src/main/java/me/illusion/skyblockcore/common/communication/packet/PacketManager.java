@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class PacketManager {
@@ -142,6 +143,15 @@ public class PacketManager {
 
         handlers.putIfAbsent(identifier, new ArrayList<>());
         handlers.get(identifier).add((PacketHandler<Packet>) handler);
+    }
+
+    public <T extends Packet> void subscribe(Class<T> packetClass, Consumer<T> consumer) {
+        subscribe(packetClass, new PacketHandler<T>() {
+            @Override
+            public void onReceive(T packet) {
+                consumer.accept(packet);
+            }
+        });
     }
 
     public <T extends Packet> CompletableFuture<T> await(Class<T> clazz, Predicate<T> predicate) {

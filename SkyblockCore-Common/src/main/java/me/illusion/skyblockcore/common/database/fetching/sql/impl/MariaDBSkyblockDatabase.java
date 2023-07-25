@@ -19,8 +19,11 @@ public class MariaDBSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     private static final String DELETE_ISLAND_ID = "DELETE FROM skyblock_ids WHERE island_id"; // Remove island id with island id
     private static final String SAVE_ISLAND_DATA = "INSERT INTO skyblock_data (island_id, owner_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE owner_id = ?";
     private static final String SAVE_ISLAND_ID = "INSERT INTO skyblock_ids (owner_id, island_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE island_id = ?";
+    private static final String FETCH_PROFILE_ID = "SELECT profile_id FROM skyblock_profiles WHERE owner_id = ?";
+    private static final String SAVE_PROFILE_ID = "INSERT INTO skyblock_profiles (owner_id, profile_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE profile_id = ?";
     private static final String CREATE_ISLAND_DATA_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_data (island_id VARCHAR(36) PRIMARY KEY, owner_id VARCHAR(36))";
     private static final String CREATE_ISLAND_ID_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_ids (owner_id VARCHAR(36) PRIMARY KEY, island_id VARCHAR(36))";
+    private static final String CREATE_PROFILE_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_profiles (profile_id VARCHAR(36) PRIMARY KEY, owner_id VARCHAR(36))";
 
     private String host;
     private int port;
@@ -30,15 +33,18 @@ public class MariaDBSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
     @Override
     protected Map<SkyblockSQLQuery, String> getQueries() {
-        return Map.of(
+        return of(
             SkyblockSQLQuery.FETCH_ISLAND_ID, FETCH_ISLAND_ID,
             SkyblockSQLQuery.FETCH_ISLAND_DATA, FETCH_ISLAND_DATA,
             SkyblockSQLQuery.DELETE_ISLAND_DATA, DELETE_ISLAND_DATA,
             SkyblockSQLQuery.DELETE_ISLAND_ID, DELETE_ISLAND_ID,
             SkyblockSQLQuery.SAVE_ISLAND_DATA, SAVE_ISLAND_DATA,
             SkyblockSQLQuery.SAVE_ISLAND_ID, SAVE_ISLAND_ID,
+            SkyblockSQLQuery.FETCH_PLAYER_PROFILE, FETCH_PROFILE_ID,
+            SkyblockSQLQuery.SAVE_PLAYER_PROFILE, SAVE_PROFILE_ID,
             SkyblockSQLQuery.CREATE_ISLAND_DATA_TABLE, CREATE_ISLAND_DATA_TABLE,
-            SkyblockSQLQuery.CREATE_ISLAND_ID_TABLE, CREATE_ISLAND_ID_TABLE
+            SkyblockSQLQuery.CREATE_ISLAND_ID_TABLE, CREATE_ISLAND_ID_TABLE,
+            SkyblockSQLQuery.CREATE_PROFILE_TABLE, CREATE_PROFILE_TABLE
         );
     }
 

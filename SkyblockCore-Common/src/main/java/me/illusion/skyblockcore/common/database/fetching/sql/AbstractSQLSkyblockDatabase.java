@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -118,6 +119,43 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
     }
 
     @Override
+    public CompletableFuture<Void> setProfileId(UUID playerId, UUID profileId) {
+        return associate(() -> {
+            String query = getQueries().get(SkyblockSQLQuery.SAVE_PLAYER_PROFILE);
+
+            try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, profileId.toString());
+                statement.setString(2, playerId.toString());
+
+                statement.execute();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public CompletableFuture<UUID> getProfileId(UUID playerId) {
+        return associate(() -> {
+            String query = getQueries().get(SkyblockSQLQuery.FETCH_PLAYER_PROFILE);
+
+            try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, playerId.toString());
+
+                ResultSet set = statement.executeQuery();
+
+                if (set.next()) {
+                    return UUID.fromString(set.getString("profile_id"));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        });
+    }
+
+    @Override
     public CompletableFuture<Void> flush() {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
@@ -205,5 +243,26 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
 
         futures.add(future);
         return future;
+    }
+
+    protected Map<SkyblockSQLQuery, String> of(Object... objects) {
+        Map<SkyblockSQLQuery, String> map = new HashMap<>();
+
+        for (int index = 0; index < objects.length; index += 2) {
+            Object key = objects[index];
+            Object value = objects[index + 1];
+
+            if (!(key instanceof SkyblockSQLQuery)) {
+                throw new IllegalArgumentException("Key must be of type SkyblockSQLQuery");
+            }
+
+            if (!(value instanceof String)) {
+                throw new IllegalArgumentException("Value must be of type String");
+            }
+
+            map.put((SkyblockSQLQuery) key, (String) value);
+        }
+
+        return map;
     }
 }

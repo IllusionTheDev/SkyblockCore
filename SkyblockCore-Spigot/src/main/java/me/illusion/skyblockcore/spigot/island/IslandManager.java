@@ -11,6 +11,7 @@ import me.illusion.cosmos.template.TemplatedArea;
 import me.illusion.cosmos.utilities.time.Time;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
+import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.event.island.SkyblockIslandLoadEvent;
@@ -30,10 +31,12 @@ public class IslandManager {
 
     private final SkyblockCosmosSetup cosmosSetup;
     private final SkyblockFetchingDatabase database;
+    private final SkyblockProfileCache profileCache;
 
     public IslandManager(SkyblockSpigotPlugin plugin) {
         this.cosmosSetup = plugin.getCosmosSetup();
         this.database = plugin.getDatabaseRegistry().getChosenDatabase();
+        this.profileCache = plugin.getProfileCache();
 
         new IllegalIslandUnloadCatcher(plugin).register(); // This is a listener that catches when an island is unloaded illegally, through Cosmos directly.
     }
@@ -73,19 +76,18 @@ public class IslandManager {
     /**
      * Loads an island from a template
      *
-     * @param player The player
      * @return The loaded island
      */
-    public CompletableFuture<Island> loadPlayerIsland(Player player, String fallback) {
-        Island cached = getPlayerIsland(player);
+    public CompletableFuture<Island> loadPlayerIsland(UUID profileId, String fallback) {
+        Island cached = getProfileIsland(profileId);
 
         if (cached != null) { // Idiots
             return CompletableFuture.completedFuture(cached);
         }
 
-        return register(database.fetchPlayerIsland(player.getUniqueId()).thenCompose(id -> {
+        return register(database.fetchPlayerIsland(profileId).thenCompose(id -> {
             if (id == null) {
-                return createIsland(fallback, player.getUniqueId());
+                return createIsland(fallback, profileId);
             }
 
             return loadIsland(id);
@@ -96,10 +98,9 @@ public class IslandManager {
      * Loads an island from a template
      *
      * @param template The template
-     * @param ownerId  The owner's id
      * @return The loaded island
      */
-    public CompletableFuture<Island> createIsland(String template, UUID ownerId) {
+    public CompletableFuture<Island> createIsland(String template, UUID profileId) {
         TemplatedArea cachedArea = cosmosSetup.getTemplateCache().get(template);
 
         if (cachedArea == null) {
@@ -107,7 +108,7 @@ public class IslandManager {
         }
 
         UUID islandId = UUID.randomUUID();
-        IslandData data = new IslandData(islandId, ownerId);
+        IslandData data = new IslandData(islandId, profileId);
 
         return register(database.saveIslandData(data).thenCompose(irrelevant -> loadFromTemplate(islandId, data, cachedArea)));
     }
@@ -118,14 +119,14 @@ public class IslandManager {
      * @param playerId The player's id
      * @return A future
      */
-    public CompletableFuture<IslandData> getIslandData(UUID playerId) {
-        Island cached = getPlayerIsland(playerId);
+    public CompletableFuture<IslandData> getIslandData(UUID profileId) {
+        Island cached = getProfileIsland(profileId);
 
         if (cached != null) {
             return CompletableFuture.completedFuture(cached.getData());
         }
 
-        return register(database.fetchPlayerIsland(playerId));
+        return register(database.fetchPlayerIsland(profileId));
     }
 
     /**
@@ -262,12 +263,12 @@ public class IslandManager {
     /**
      * Gets an island by its owner's id
      *
-     * @param playerId The owner's id
+     * @param profileId The owner's id
      * @return The island
      */
-    public Island getPlayerIsland(UUID playerId) {
+    public Island getProfileIsland(UUID profileId) {
         for (Island island : loadedIslands.values()) {
-            if (island.getData().getOwnerId().equals(playerId)) {
+            if (island.getData().getOwnerId().equals(profileId)) {
                 return island;
             }
         }
@@ -283,6 +284,16 @@ public class IslandManager {
      */
     public Island getPlayerIsland(Player player) {
         return getPlayerIsland(player.getUniqueId());
+    }
+
+    public Island getPlayerIsland(UUID playerId) {
+        UUID cachedProfileId = profileCache.getCachedProfileId(playerId);
+
+        if (cachedProfileId == null) {
+            return null;
+        }
+
+        return getProfileIsland(cachedProfileId);
     }
 
 
