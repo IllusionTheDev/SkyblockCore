@@ -1,0 +1,39 @@
+preferred-container: default # Whatever is set as cosmos' default container. This is where islands are saved
+preferred-grid: world-per-area # Builtin grid types: single-world, world-per-area
+
+single-world:
+  # world-id: <uuid>
+  world-name: skyblock-world # Defaults to skyblock-world, creates world if it doesn't exist
+  generator: builtin # If you specify an invalid generator it will default to builtin, which is a void world generator
+  distance-between-islands: 1000 # Defaults to 1000
+  y-level: 128 # This is the y-level where the islands are pasted, defaults to 128
+
+world-per-area: # This can really benefit from fine-tuning
+
+  spawn-location: # This is the location where the spawn island is pasted, and is considered "the island center"
+    x: 0
+    y: 128
+    z: 0
+
+  # The max-cached-worlds field represents the amount of worlds that are kept as loaded, but unused.
+  # This serves as a buffer and helps provide quicker loading times at the expense of RAM.
+  max-cached-worlds: 5
+
+  # The max-unloaded-worlds field represents the amount of worlds that are kept as unloaded
+  # But the files are still kept on disk. These worlds will be loaded back into memory if they are needed.
+  # You should lower this amount if you are limited on disk space, or if you have a lot of worlds.
+  max-unloaded-worlds: 25
+
+  # The pre-generated-worlds field represents the amount of worlds that are generated on startup.
+  # This should ideally match max-cached-worlds, but can be higher if you're expecting spikes on startup.
+  pre-generated-worlds: 5
+
+  # This is the amount of ticks that are waited between each generation of the pre-generated-worlds.
+  # You should keep this as low as possible to prevent spiking after startup, but increase this
+  # if you're running lower-end hardware, as creating worlds drastically lowers your TPS.
+  batch-delay-ticks: 20
+
+  # This is the amount of time that is waited between unloading and saving a world, and deleting it.
+  # When using Paper (or forks of it), worlds are saved async after the world unload event is called,
+  # which means that the world's contents aren't done saving and can corrupt or mess up the deletion process.
+  deletion-delay: 10 seconds

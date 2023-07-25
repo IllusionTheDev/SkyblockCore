@@ -2,20 +2,15 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
-import me.illusion.cosmos.cache.CosmosCache;
-import me.illusion.cosmos.database.CosmosDataContainer;
-import me.illusion.cosmos.grid.CosmosGrid;
-import me.illusion.cosmos.grid.impl.WorldPerAreaGrid;
-import me.illusion.cosmos.session.CosmosSessionHolder;
-import me.illusion.cosmos.template.TemplatedArea;
 import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
-import me.illusion.cosmos.world.pool.WorldPoolSettings;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.database.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.spigot.database.SkyblockDatabasesFile;
+import me.illusion.skyblockcore.spigot.database.cosmos.SkyblockCosmosSetupFile;
+import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistry;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
@@ -33,6 +28,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
 
     // Skyblock-specific setup
     private SkyblockCosmosSetup cosmosSetup;
+    private SkyblockGridRegistry gridRegistry;
 
     private SkyblockDatabasesFile databasesFile;
     private SkyblockCacheDatabasesFile cacheDatabasesFile;
@@ -54,7 +50,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
         cacheDatabasesFile = new SkyblockCacheDatabasesFile(this);
         databaseRegistry = new SkyblockDatabaseRegistry(this);
 
-        initCosmos();
+        gridRegistry = new SkyblockGridRegistry();
 
         islandManager = new IslandManager(this);
 
@@ -76,6 +72,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
 
     private void finishLoading() {
         networkRegistry.load();
+        initCosmos();
 
         databaseRegistry.tryEnableMultiple(databasesFile, cacheDatabasesFile).thenAccept(success -> {
             if (!success) {
@@ -85,6 +82,8 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
 
             networkRegistry.enable();
         });
+
+
     }
 
     private void registerNetworks() {
@@ -94,29 +93,10 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
 
     private void initCosmos() {
         // We get the cosmos plugin
-        CosmosPlugin cosmos = (CosmosPlugin) getServer().getPluginManager().getPlugin("Cosmos");
+        CosmosPlugin cosmosPlugin = (CosmosPlugin) Bukkit.getPluginManager().getPlugin("Cosmos");
 
-        // We get the default container, this is set in the cosmos config
-        CosmosDataContainer container = cosmos.getContainerRegistry().getDefaultContainer();
-
-        // We create a world per area grid, this might be configurable later
-        CosmosGrid grid = new WorldPerAreaGrid(
-            WorldPoolSettings.builder().build() // Default world pool
-        );
-
-        // Create a session holder for skyblock, this is where sessions will be stored
-        CosmosSessionHolder sessionHolder = new CosmosSessionHolder(this, container, grid);
-
-        // We get the template cache, this is where templates will be cached
-        CosmosCache<TemplatedArea> cache = cosmos.getTemplateCache();
-
-        cosmosSetup = new SkyblockCosmosSetup(
-            container,
-            grid,
-            sessionHolder,
-            cosmos,
-            cache
-        );
+        SkyblockCosmosSetupFile cosmosSetupFile = new SkyblockCosmosSetupFile(cosmosPlugin, this);
+        cosmosSetup = cosmosSetupFile.getSetup();
     }
 
 }
