@@ -10,6 +10,7 @@ import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.database.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.spigot.database.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.database.cosmos.SkyblockCosmosSetupFile;
+import me.illusion.skyblockcore.spigot.event.startup.SkyblockEnabledEvent;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistry;
@@ -85,6 +86,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
             }
 
             networkRegistry.enable();
+            Bukkit.getPluginManager().callEvent(new SkyblockEnabledEvent(this));
         });
 
 
@@ -96,6 +98,10 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
     }
 
     private void initCosmos() {
+        if (cosmosSetup != null) {
+            throw new IllegalStateException("Cosmos setup already initialized!");
+
+        }
         // We get the cosmos plugin
         CosmosPlugin cosmosPlugin = (CosmosPlugin) Bukkit.getPluginManager().getPlugin("Cosmos");
 

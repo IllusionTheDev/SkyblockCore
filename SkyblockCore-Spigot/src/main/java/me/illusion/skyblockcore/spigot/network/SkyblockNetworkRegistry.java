@@ -20,6 +20,7 @@ public class SkyblockNetworkRegistry {
     private final FileConfiguration config;
 
     private String desiredStructure;
+    private boolean loaded = false;
 
     public SkyblockNetworkRegistry(SkyblockSpigotPlugin plugin) {
         this.plugin = plugin;
@@ -42,6 +43,10 @@ public class SkyblockNetworkRegistry {
      * @return The structure, or null if it does not exist.
      */
     public SkyblockNetworkStructure get(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null!");
+        }
+
         return structures.get(name);
     }
 
@@ -51,6 +56,10 @@ public class SkyblockNetworkRegistry {
      * @return The active structure.
      */
     public SkyblockNetworkStructure getActiveStructure() {
+        if (desiredStructure == null) {
+            throw new IllegalStateException("Network structure not loaded! Call this method after SkyblockEnableEvent is called.");
+        }
+
         return structures.get(desiredStructure);
     }
 
@@ -58,6 +67,10 @@ public class SkyblockNetworkRegistry {
      * Loads the skyblock network structure, as specified in the configuration file. If the structure does not exist, the plugin will be disabled.
      */
     public void load() {
+        if (desiredStructure != null) {
+            throw new IllegalStateException("Network structure already initialized!");
+        }
+
         String desiredStructure = config.getString("network-type", "undefined");
 
         SkyblockNetworkStructure structure = structures.get(desiredStructure);
@@ -75,6 +88,11 @@ public class SkyblockNetworkRegistry {
      * Called when the plugin is done enabling and fully operational, including the database.
      */
     public void enable() {
+        if (loaded) {
+            throw new IllegalStateException("Network structure already enabled!");
+        }
+
+        loaded = true;
         SkyblockNetworkStructure desiredStructure = getActiveStructure();
         desiredStructure.enable(config.getConfigurationSection(desiredStructure.getName()));
     }
