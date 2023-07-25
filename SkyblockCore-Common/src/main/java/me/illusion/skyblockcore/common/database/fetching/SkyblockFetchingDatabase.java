@@ -14,10 +14,10 @@ public interface SkyblockFetchingDatabase extends SkyblockDatabase {
     /**
      * Fetches the island id of a player
      *
-     * @param playerId The player's id
+     * @param profileId The profile's id
      * @return The island id
      */
-    CompletableFuture<UUID> fetchIslandId(UUID playerId);
+    CompletableFuture<UUID> fetchIslandId(UUID profileId);
 
     /**
      * Fetches the island data of an island
@@ -44,13 +44,30 @@ public interface SkyblockFetchingDatabase extends SkyblockDatabase {
     CompletableFuture<Void> deleteIslandData(UUID islandId);
 
     /**
-     * Deletes the island data of a player
+     * Fetches the profile id of a player
      *
      * @param playerId The player's id
+     * @return The profile id
+     */
+    CompletableFuture<UUID> getProfileId(UUID playerId);
+
+    /**
+     * Sets the profile id of a player
+     *
+     * @param playerId  The player's id
+     * @param profileId The profile's id
      * @return A future
      */
-    default CompletableFuture<Void> deletePlayerIsland(UUID playerId) {
-        return compose(fetchIslandId(playerId), this::deleteIslandData);
+    CompletableFuture<Void> setProfileId(UUID playerId, UUID profileId);
+
+    /**
+     * Deletes the island data of a player
+     *
+     * @param profileId The player's id
+     * @return A future
+     */
+    default CompletableFuture<Void> deletePlayerIsland(UUID profileId) {
+        return compose(fetchIslandId(profileId), this::deleteIslandData);
     }
 
     /**

@@ -28,11 +28,11 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
         this.network = network;
         this.database = network.getDatabase();
         this.cacheDatabase = network.getCacheDatabase();
+        this.serverId = network.getConfiguration().getServerId();
 
         // We need to init the other values
         // TODO: Write a config for this
         packetManager = null;
-        serverId = null;
     }
 
     /**

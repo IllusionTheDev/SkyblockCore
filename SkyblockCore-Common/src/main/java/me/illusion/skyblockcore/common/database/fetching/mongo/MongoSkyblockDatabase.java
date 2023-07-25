@@ -27,8 +27,10 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
 
     private MongoClient mongoClient;
+
     private MongoCollection<IslandData> islandDataCollection;
     private MongoCollection<UUID> islandIdCollection;
+    private MongoCollection<UUID> profileIdCollection;
 
     @Override
     public String getName() {
@@ -70,6 +72,7 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
                 islandDataCollection = mongoClient.getDatabase(database)
                     .getCollection(collectionName, IslandData.class); // if the collection doesn't exist, it will be created
                 islandIdCollection = mongoClient.getDatabase(database).getCollection("island_ids", UUID.class);
+                profileIdCollection = mongoClient.getDatabase(database).getCollection("profile_ids", UUID.class);
 
                 // validate the session
                 mongoClient.listDatabaseNames().first(); // throws an exception if the connection is invalid
@@ -124,6 +127,27 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
             Document filter = new Document("islandId", islandId);
             islandDataCollection.deleteOne(filter);
             islandIdCollection.deleteOne(filter);
+        });
+    }
+
+    @Override
+    public CompletableFuture<UUID> getProfileId(UUID playerId) {
+        return associate(() -> {
+            Document filter = new Document("playerId", playerId);
+
+            for (UUID id : profileIdCollection.find(filter)) {
+                return id;
+            }
+
+            return null; // What if there is no profile id?
+        });
+    }
+
+    @Override
+    public CompletableFuture<Void> setProfileId(UUID playerId, UUID profileId) {
+        return associate(() -> {
+            Document filter = new Document("playerId", playerId);
+            profileIdCollection.replaceOne(filter, profileId);
         });
     }
 

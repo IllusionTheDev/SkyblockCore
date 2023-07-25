@@ -9,6 +9,7 @@ import me.illusion.skyblockcore.spigot.network.simple.command.SimpleIslandComman
 import me.illusion.skyblockcore.spigot.network.simple.config.SimpleNetworkConfiguration;
 import me.illusion.skyblockcore.spigot.network.simple.listener.SimplePlayerJoinListener;
 import me.illusion.skyblockcore.spigot.network.simple.listener.SimplePlayerQuitListener;
+import me.illusion.skyblockcore.spigot.network.simple.profile.SimpleProfileCache;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -30,6 +31,7 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
     public void enable() {
         configuration = new SimpleNetworkConfiguration(plugin);
 
+        registerProfileCache();
         registerListeners();
         registerCommands();
     }
@@ -45,6 +47,13 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     // Main startup logic
+
+    private void registerProfileCache() {
+        SimpleProfileCache profileCache = new SimpleProfileCache(plugin);
+
+        registerListener(profileCache);
+        plugin.setProfileCache(profileCache);
+    }
 
     private void registerListeners() {
         registerListener(new SimplePlayerJoinListener(this));

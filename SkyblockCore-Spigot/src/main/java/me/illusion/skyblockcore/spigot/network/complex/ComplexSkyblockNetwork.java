@@ -16,6 +16,7 @@ import me.illusion.skyblockcore.spigot.network.complex.config.ComplexNetworkConf
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexIslandLoadListener;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexIslandUnloadListener;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexPlayerJoinListener;
+import me.illusion.skyblockcore.spigot.network.complex.profile.ComplexProfileCache;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -46,6 +47,7 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
         database = plugin.getDatabaseRegistry().getChosenDatabase();
         configuration = new ComplexNetworkConfiguration(plugin);
 
+        registerProfileCache();
         registerListeners();
         registerCommands();
         registerPacketHandlers();
@@ -73,6 +75,13 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
         PacketManager packetManager = communicationsHandler.getPacketManager();
 
         packetManager.subscribe(PacketRequestIslandTeleport.class, new TeleportRequestPacketHandler(this));
+    }
+
+    private void registerProfileCache() {
+        ComplexProfileCache profileCache = new ComplexProfileCache(this);
+
+        registerListener(profileCache);
+        plugin.setProfileCache(profileCache);
     }
 
     private void registerCommands() {
@@ -111,5 +120,9 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     public SkyblockCacheDatabase getCacheDatabase() {
         return plugin.getDatabaseRegistry().getChosenCacheDatabase();
+    }
+
+    public ComplexNetworkConfiguration getConfiguration() {
+        return configuration;
     }
 }

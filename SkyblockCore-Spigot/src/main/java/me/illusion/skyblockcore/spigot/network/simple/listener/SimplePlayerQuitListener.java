@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.spigot.network.simple.listener;
 
 import java.util.UUID;
+import me.illusion.skyblockcore.spigot.event.player.SkyblockPlayerQuitEvent;
 import me.illusion.skyblockcore.spigot.island.Island;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
 import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
@@ -8,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * This is the simple player quit listener, which unloads the island when the player quits.
@@ -22,13 +22,17 @@ public class SimplePlayerQuitListener implements Listener {
     }
 
     @EventHandler
-    private void onQuit(PlayerQuitEvent event) {
+    private void onQuit(SkyblockPlayerQuitEvent event) {
         Player player = event.getPlayer();
-        UUID playerId = player.getUniqueId();
+        UUID profileId = event.getProfileId();
+
+        if (profileId == null) {
+            return;
+        }
 
         IslandManager islandManager = network.getPlugin().getIslandManager();
 
-        Island island = islandManager.getPlayerIsland(playerId);
+        Island island = islandManager.getProfileIsland(profileId);
 
         if (island == null) {
             return;

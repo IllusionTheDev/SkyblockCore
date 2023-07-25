@@ -6,6 +6,7 @@ import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 import me.illusion.skyblockcore.spigot.config.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
@@ -42,6 +43,8 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
     private IslandManager islandManager;
 
     private SkyblockNetworkRegistry networkRegistry;
+
+    private SkyblockProfileCache profileCache;
 
     @Override
     public void onEnable() {
@@ -91,6 +94,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
             networkRegistry.enable();
             Bukkit.getPluginManager().callEvent(new SkyblockEnabledEvent(this));
         });
+
     }
 
     private void registerNetworks() {
@@ -110,4 +114,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
         cosmosSetup = cosmosSetupFile.getSetup();
     }
 
+    public void setProfileCache(SkyblockProfileCache profileCache) {
+        this.profileCache = profileCache;
+    }
 }
