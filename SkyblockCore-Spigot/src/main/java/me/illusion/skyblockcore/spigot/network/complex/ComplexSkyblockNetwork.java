@@ -12,11 +12,11 @@ import me.illusion.skyblockcore.spigot.network.complex.command.ComplexIslandComm
 import me.illusion.skyblockcore.spigot.network.complex.communication.CommunicationsHandler;
 import me.illusion.skyblockcore.spigot.network.complex.communication.listener.TeleportRequestPacketHandler;
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
+import me.illusion.skyblockcore.spigot.network.complex.config.ComplexNetworkConfiguration;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexIslandLoadListener;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexIslandUnloadListener;
 import me.illusion.skyblockcore.spigot.network.complex.listener.ComplexPlayerJoinListener;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
 /**
@@ -30,6 +30,8 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
     private SkyblockFetchingDatabase database;
     private CommunicationsHandler communicationsHandler;
 
+    private ComplexNetworkConfiguration configuration;
+
     public ComplexSkyblockNetwork(SkyblockSpigotPlugin plugin) {
         this.plugin = plugin;
     }
@@ -40,8 +42,9 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     @Override
-    public void enable(ConfigurationSection section) {
+    public void enable() {
         database = plugin.getDatabaseRegistry().getChosenDatabase();
+        configuration = new ComplexNetworkConfiguration(plugin);
 
         registerListeners();
         registerCommands();

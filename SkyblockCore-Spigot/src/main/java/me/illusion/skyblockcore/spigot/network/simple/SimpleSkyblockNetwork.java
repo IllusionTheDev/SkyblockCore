@@ -10,7 +10,6 @@ import me.illusion.skyblockcore.spigot.network.simple.config.SimpleNetworkConfig
 import me.illusion.skyblockcore.spigot.network.simple.listener.SimplePlayerJoinListener;
 import me.illusion.skyblockcore.spigot.network.simple.listener.SimplePlayerQuitListener;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
 /**
@@ -28,7 +27,7 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     @Override
-    public void enable(ConfigurationSection section) {
+    public void enable() {
         configuration = new SimpleNetworkConfiguration(plugin);
 
         registerListeners();

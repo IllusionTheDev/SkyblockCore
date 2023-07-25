@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.spigot.database;
+package me.illusion.skyblockcore.spigot.config;
 
 import me.illusion.cosmos.utilities.storage.YMLBase;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;

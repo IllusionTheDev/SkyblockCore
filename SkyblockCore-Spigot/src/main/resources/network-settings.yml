@@ -6,6 +6,3 @@
 # a single server, and communication between servers is done through redis, to make sure that all servers
 # are in sync.
 network-type: simple
-
-complex-structure:
-  server-id: skyblock # An internal ID used for communication between servers. Ideally matches the server's id on your proxy.

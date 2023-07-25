@@ -94,7 +94,7 @@ public class SkyblockNetworkRegistry {
 
         loaded = true;
         SkyblockNetworkStructure desiredStructure = getActiveStructure();
-        desiredStructure.enable(config.getConfigurationSection(desiredStructure.getName()));
+        desiredStructure.enable();
     }
 
     /**

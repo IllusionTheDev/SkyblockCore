@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.spigot.database.cosmos;
+package me.illusion.skyblockcore.spigot.config.cosmos;
 
 import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.cosmos.database.CosmosContainerRegistry;

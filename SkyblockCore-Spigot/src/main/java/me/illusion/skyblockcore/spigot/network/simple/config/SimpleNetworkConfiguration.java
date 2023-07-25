@@ -18,7 +18,7 @@ public class SimpleNetworkConfiguration extends YMLBase {
     private final Time unloadDelay;
 
     public SimpleNetworkConfiguration(JavaPlugin plugin) {
-        super(plugin, "networks/simple-network.yml");
+        super(plugin, "network/simple-network.yml");
 
         FileConfiguration configuration = getConfiguration();
 

@@ -6,10 +6,10 @@ import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.spigot.config.SkyblockCacheDatabasesFile;
+import me.illusion.skyblockcore.spigot.config.SkyblockDatabasesFile;
+import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
-import me.illusion.skyblockcore.spigot.database.SkyblockCacheDatabasesFile;
-import me.illusion.skyblockcore.spigot.database.SkyblockDatabasesFile;
-import me.illusion.skyblockcore.spigot.database.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.event.startup.SkyblockEnabledEvent;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManager;
@@ -88,8 +88,6 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
             networkRegistry.enable();
             Bukkit.getPluginManager().callEvent(new SkyblockEnabledEvent(this));
         });
-
-
     }
 
     private void registerNetworks() {
