@@ -67,7 +67,11 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
             network.disable();
         }
 
-        islandManager.disable(true, false);
+        islandManager.disable(true, false).join();
+        islandManager.flush().join();
+
+        databaseRegistry.getChosenDatabase().flush().join();
+        databaseRegistry.getChosenCacheDatabase().flush().join();
     }
 
     private void finishLoading() {

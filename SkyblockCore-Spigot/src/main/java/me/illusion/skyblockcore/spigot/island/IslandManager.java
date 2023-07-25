@@ -26,6 +26,8 @@ public class IslandManager {
     private final Map<UUID, Island> loadedIslands = new ConcurrentHashMap<>();
     private final Set<UUID> unloadingIslands = Sets.newConcurrentHashSet();
 
+    private final Set<CompletableFuture<?>> pending = Sets.newConcurrentHashSet();
+
     private final SkyblockCosmosSetup cosmosSetup;
     private final SkyblockFetchingDatabase database;
 
@@ -56,16 +58,16 @@ public class IslandManager {
         TemplatedArea cachedArea = cosmosSetup.getTemplateCache().get(id);
 
         if (cachedArea != null) {
-            return loadFromTemplate(islandId, data, cachedArea);
+            return register(loadFromTemplate(islandId, data, cachedArea));
         }
 
-        return cosmosSetup.getIslandContainer().fetchTemplate(id).thenCompose(template -> {
+        return register(cosmosSetup.getIslandContainer().fetchTemplate(id).thenCompose(template -> {
             if (template == null) {
                 throw new IllegalStateException("Template not found, database is corrupted!");
             }
 
             return loadFromTemplate(islandId, data, template);
-        });
+        }));
     }
 
     /**
@@ -81,13 +83,13 @@ public class IslandManager {
             return CompletableFuture.completedFuture(cached);
         }
 
-        return database.fetchPlayerIsland(player.getUniqueId()).thenCompose(id -> {
+        return register(database.fetchPlayerIsland(player.getUniqueId()).thenCompose(id -> {
             if (id == null) {
                 return createIsland(fallback, player.getUniqueId());
             }
 
             return loadIsland(id);
-        });
+        }));
     }
 
     /**
@@ -107,7 +109,7 @@ public class IslandManager {
         UUID islandId = UUID.randomUUID();
         IslandData data = new IslandData(islandId, ownerId);
 
-        return loadFromTemplate(islandId, data, cachedArea);
+        return register(database.saveIslandData(data).thenCompose(irrelevant -> loadFromTemplate(islandId, data, cachedArea)));
     }
 
     /**
@@ -123,7 +125,7 @@ public class IslandManager {
             return CompletableFuture.completedFuture(cached.getData());
         }
 
-        return database.fetchPlayerIsland(playerId);
+        return register(database.fetchPlayerIsland(playerId));
     }
 
     /**
@@ -135,7 +137,7 @@ public class IslandManager {
      */
     public CompletableFuture<Void> forceUnloadIsland(UUID islandId, boolean save) {
         unloadingIslands.add(islandId);
-        return cosmosSetup.getSessionHolder().unloadSession(islandId, save, true).thenRun(() -> removeInternal(islandId));
+        return register(cosmosSetup.getSessionHolder().unloadSession(islandId, save, true).thenRun(() -> removeInternal(islandId)));
     }
 
     /**
@@ -148,14 +150,14 @@ public class IslandManager {
      */
     public CompletableFuture<Boolean> requestUnloadIsland(UUID islandId, boolean save, Time unloadDelay) {
         unloadingIslands.add(islandId);
-        return cosmosSetup.getSessionHolder().unloadAutomaticallyIn(unloadDelay, islandId, save).thenApply(unloaded -> {
+        return register(cosmosSetup.getSessionHolder().unloadAutomaticallyIn(unloadDelay, islandId, save).thenApply(unloaded -> {
             if (unloaded) {
                 removeInternal(islandId);
             }
 
             unloadingIslands.remove(islandId);
             return unloaded;
-        });
+        }));
     }
 
     /**
@@ -165,7 +167,7 @@ public class IslandManager {
      * @return A future
      */
     public CompletableFuture<Island> loadIsland(UUID islandId) {
-        return database.fetchIslandData(islandId).thenCompose(this::loadIsland);
+        return register(database.fetchIslandData(islandId).thenCompose(this::loadIsland));
     }
 
     /**
@@ -178,7 +180,7 @@ public class IslandManager {
     public CompletableFuture<Void> disable(boolean save, boolean async) {
         // We could save islands here, but at the moment island data isn't modified at all, so it's not necessary.
 
-        return cosmosSetup.getSessionHolder().unloadAll(save, async);
+        return register(cosmosSetup.getSessionHolder().unloadAll(save, async));
     }
 
     /**
@@ -190,14 +192,14 @@ public class IslandManager {
      * @return A future
      */
     private CompletableFuture<Island> loadFromTemplate(UUID islandId, IslandData data, TemplatedArea area) {
-        return cosmosSetup.getSessionHolder().loadOrCreateSession(islandId, area).thenApply(session -> {
+        return register(cosmosSetup.getSessionHolder().loadOrCreateSession(islandId, area).thenApply(session -> {
             Island island = new Island(data, session);
             loadedIslands.put(islandId, island);
 
             Bukkit.getPluginManager().callEvent(new SkyblockIslandLoadEvent(island));
 
             return island;
-        });
+        }));
     }
 
 
@@ -227,6 +229,22 @@ public class IslandManager {
         if (!unloadingIslands.contains(sessionId) && loadedIslands.containsKey(sessionId)) {
             throw new IllegalStateException("Session was removed without being unloaded! Possible API misuse!");
         }
+    }
+
+    /**
+     * Registers a task to the pending list
+     *
+     * @param task The task
+     * @param <T>  The task's type
+     * @return The task
+     */
+    private <T> CompletableFuture<T> register(CompletableFuture<T> task) {
+        pending.add(task);
+        return task.whenComplete((result, error) -> pending.remove(task));
+    }
+
+    public CompletableFuture<Void> flush() {
+        return CompletableFuture.allOf(pending.toArray(new CompletableFuture[0]));
     }
 
     // -------------- REGULAR METHODS -------------- //
