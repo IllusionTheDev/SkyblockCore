@@ -31,12 +31,12 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
     }
 
     @Override
-    public CompletableFuture<UUID> fetchIslandId(UUID playerId) {
+    public CompletableFuture<UUID> fetchIslandId(UUID profileId) {
         return associate(() -> {
             String query = getQueries().get(SkyblockSQLQuery.FETCH_ISLAND_ID);
 
             try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, playerId.toString());
+                statement.setString(1, profileId.toString());
 
                 ResultSet set = statement.executeQuery();
 

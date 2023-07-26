@@ -84,9 +84,9 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
     }
 
     @Override
-    public CompletableFuture<UUID> fetchIslandId(UUID playerId) {
+    public CompletableFuture<UUID> fetchIslandId(UUID profileId) {
         return associate(() -> {
-            Document filter = new Document("ownerId", playerId);
+            Document filter = new Document("ownerId", profileId);
 
             for (UUID id : islandIdCollection.find(filter)) {
                 return id;

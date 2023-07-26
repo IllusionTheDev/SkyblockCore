@@ -73,11 +73,11 @@ public interface SkyblockFetchingDatabase extends SkyblockDatabase {
     /**
      * Fetches the island data of a player
      *
-     * @param playerId The player's id
+     * @param profileId The player's id
      * @return The island data
      */
-    default CompletableFuture<IslandData> fetchPlayerIsland(UUID playerId) {
-        return compose(fetchIslandId(playerId), this::fetchIslandData);
+    default CompletableFuture<IslandData> fetchPlayerIsland(UUID profileId) {
+        return compose(fetchIslandId(profileId), this::fetchIslandData);
     }
 
     /**

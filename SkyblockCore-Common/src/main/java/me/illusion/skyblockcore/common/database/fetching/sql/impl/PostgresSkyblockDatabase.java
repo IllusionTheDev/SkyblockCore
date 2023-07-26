@@ -13,17 +13,17 @@ import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
  */
 public class PostgresSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
-    private static final String FETCH_ISLAND_ID = "SELECT island_id FROM island_id WHERE player_id = ?";
+    private static final String FETCH_ISLAND_ID = "SELECT island_id FROM island_id WHERE owner_id = ?";
     private static final String FETCH_ISLAND_DATA = "SELECT * FROM island_data WHERE island_id = ?";
     private static final String DELETE_ISLAND_DATA = "DELETE FROM island_data WHERE island_id = ?";
     private static final String DELETE_ISLAND_ID = "DELETE FROM island_id WHERE island_id = ?";
-    private static final String SAVE_ISLAND_DATA = "INSERT INTO island_data (island_id, player_id) VALUES (?, ?) ON CONFLICT (island_id) DO UPDATE SET player_id = ?";
-    private static final String SAVE_ISLAND_ID = "INSERT INTO island_id (player_id, island_id) VALUES (?, ?) ON CONFLICT (player_id) DO UPDATE SET island_id = ?";
+    private static final String SAVE_ISLAND_DATA = "INSERT INTO island_data (island_id, owner_id) VALUES (?, ?) ON CONFLICT (island_id) DO UPDATE SET owner_id = ?";
+    private static final String SAVE_ISLAND_ID = "INSERT INTO island_id (owner_id, island_id) VALUES (?, ?) ON CONFLICT (owner_id) DO UPDATE SET island_id = ?";
     private static final String FETCH_PLAYER_PROFILE = "SELECT profile_id FROM profile WHERE player_id = ?";
     private static final String SAVE_PLAYER_PROFILE = "INSERT INTO profile (player_id, profile_id) VALUES (?, ?) ON CONFLICT (player_id) DO UPDATE SET profile_id = ?";
-    private static final String CREATE_ISLAND_DATA_TABLE = "CREATE TABLE IF NOT EXISTS island_data (island_id VARCHAR(36) PRIMARY KEY, player_id VARCHAR(36))";
-    private static final String CREATE_ISLAND_ID_TABLE = "CREATE TABLE IF NOT EXISTS island_id (player_id VARCHAR(36) PRIMARY KEY, island_id VARCHAR(36))";
-    private static final String CREATE_PROFILE_TABLE = "CREATE TABLE IF NOT EXISTS profile (player_id VARCHAR(36) PRIMARY KEY, profile_id VARCHAR(36))";
+    private static final String CREATE_ISLAND_DATA_TABLE = "CREATE TABLE IF NOT EXISTS island_data (island_id VARCHAR(36) PRIMARY KEY, owner_id VARCHAR(36))";
+    private static final String CREATE_ISLAND_ID_TABLE = "CREATE TABLE IF NOT EXISTS island_id (owner_id VARCHAR(36) PRIMARY KEY, island_id VARCHAR(36))";
+    private static final String CREATE_PROFILE_TABLE = "CREATE TABLE IF NOT EXISTS profile (owner_id VARCHAR(36) PRIMARY KEY, profile_id VARCHAR(36))";
 
     private String host;
     private int port;
