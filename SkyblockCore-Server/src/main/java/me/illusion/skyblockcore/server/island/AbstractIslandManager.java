@@ -10,6 +10,9 @@ import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabas
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 
+/**
+ * Abstract implementation of the SkyblockIslandManager
+ */
 public abstract class AbstractIslandManager implements SkyblockIslandManager {
 
     protected final Map<UUID, SkyblockIsland> loadedIslands = new ConcurrentHashMap<>();

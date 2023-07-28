@@ -1,5 +1,8 @@
 package me.illusion.skyblockcore.server.util;
 
+/**
+ * Represents a multi-platform location. It is expected that each platform makes an adapter for this class.
+ */
 public class SkyblockLocation {
 
     private final String world;

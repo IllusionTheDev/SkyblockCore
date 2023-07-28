@@ -101,11 +101,17 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
     }
 
+    /**
+     * Registers the default skyblock networks
+     */
     private void registerNetworks() {
         networkRegistry.register(new ComplexSkyblockNetwork(this));
         networkRegistry.register(new SimpleSkyblockNetwork(this));
     }
 
+    /**
+     * Initializes the cosmos setup
+     */
     private void initCosmos() {
         if (cosmosSetup != null) {
             throw new IllegalStateException("Cosmos setup already initialized!");
@@ -118,6 +124,11 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         cosmosSetup = cosmosSetupFile.getSetup();
     }
 
+    /**
+     * Sets the profile cache
+     *
+     * @param profileCache The profile cache
+     */
     public void setProfileCache(SkyblockProfileCache profileCache) {
         this.profileCache = profileCache;
     }
