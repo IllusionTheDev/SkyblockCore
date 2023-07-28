@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.spigot.network;
+package me.illusion.skyblockcore.server.network;
 
 /**
  * The network structure system acts as a sort of "plugin" for the SkyblockCore ecosystem. Its main purpose is to split all the possible network types into

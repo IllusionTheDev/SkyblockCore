@@ -58,7 +58,9 @@ dependencies {
 
     implementation("me.illusion:cosmos-plugin:1.0")
 
+
     implementation(project(":SkyblockCore-Common"))
+    implementation(project(":SkyblockCore-Server"))
 }
 
 def targetJavaVersion = 17

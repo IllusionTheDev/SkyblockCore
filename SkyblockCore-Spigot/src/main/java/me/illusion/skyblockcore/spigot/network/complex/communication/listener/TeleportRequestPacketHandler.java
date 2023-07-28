@@ -5,10 +5,11 @@ import com.google.common.cache.CacheBuilder;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.illusion.skyblockcore.common.communication.packet.PacketHandler;
-import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.response.PacketResponseIslandTeleport;
+import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,7 +36,7 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
         UUID playerId = packet.getPlayerId();
         UUID islandId = packet.getIslandId();
 
-        Island loadedIsland = network.getIslandManager().getLoadedIsland(islandId);
+        SkyblockIsland loadedIsland = network.getIslandManager().getLoadedIsland(islandId);
 
         boolean allowed = loadedIsland != null;
 
@@ -60,13 +61,13 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
             return;
         }
 
-        Island island = network.getIslandManager().getLoadedIsland(islandId);
+        SkyblockIsland island = network.getIslandManager().getLoadedIsland(islandId);
 
         if (island == null) { // The island unloaded after the request was sent, odd
             // TODO: Rejection logic
             return;
         }
 
-        player.teleport(island.getCenter());
+        player.teleport(SkyblockBukkitAdapter.toBukkitLocation(island.getCenter()));
     }
 }

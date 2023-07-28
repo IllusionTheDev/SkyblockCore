@@ -2,8 +2,8 @@ package me.illusion.skyblockcore.spigot.network.simple.config;
 
 import lombok.Getter;
 import me.illusion.cosmos.utilities.storage.YMLBase;
-import me.illusion.cosmos.utilities.time.Time;
-import me.illusion.skyblockcore.spigot.utilities.time.TimeParser;
+import me.illusion.skyblockcore.common.utilities.time.Time;
+import me.illusion.skyblockcore.common.utilities.time.TimeParser;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 

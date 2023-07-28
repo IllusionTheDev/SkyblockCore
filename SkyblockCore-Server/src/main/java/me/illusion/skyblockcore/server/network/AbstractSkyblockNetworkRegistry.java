@@ -1,30 +1,28 @@
-package me.illusion.skyblockcore.spigot.network;
+package me.illusion.skyblockcore.server.network;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import me.illusion.cosmos.utilities.storage.YMLBase;
-import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
+import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 
 /**
  * The skyblock network registry is responsible for loading the correct skyblock network structure. It is expected that separate plugins hook into this registry
  * and register their own skyblock network structures on startup. The network is loaded after all plugins enable.
  */
-public class SkyblockNetworkRegistry {
+public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetworkRegistry {
 
     private final Map<String, SkyblockNetworkStructure> structures = new ConcurrentHashMap<>();
 
-    private final SkyblockSpigotPlugin plugin;
-    private final FileConfiguration config;
+    private final SkyblockServerPlatform platform;
+    private final ReadOnlyConfigurationSection config;
 
     private String desiredStructure;
     private boolean loaded = false;
 
-    public SkyblockNetworkRegistry(SkyblockSpigotPlugin plugin) {
-        this.plugin = plugin;
-        this.config = new YMLBase(plugin, "network-settings.yml").getConfiguration();
+    public AbstractSkyblockNetworkRegistry(SkyblockServerPlatform platform, ReadOnlyConfigurationSection config) {
+        this.platform = platform;
+        this.config = config;
     }
 
     /**
@@ -32,6 +30,7 @@ public class SkyblockNetworkRegistry {
      *
      * @param structure The structure to register.
      */
+    @Override
     public void register(SkyblockNetworkStructure structure) {
         structures.put(structure.getName(), structure);
     }
@@ -42,6 +41,7 @@ public class SkyblockNetworkRegistry {
      * @param name The name of the structure.
      * @return The structure, or null if it does not exist.
      */
+    @Override
     public SkyblockNetworkStructure get(String name) {
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null!");
@@ -55,6 +55,7 @@ public class SkyblockNetworkRegistry {
      *
      * @return The active structure.
      */
+    @Override
     public SkyblockNetworkStructure getActiveStructure() {
         if (desiredStructure == null) {
             throw new IllegalStateException("Network structure not loaded! Call this method after SkyblockEnableEvent is called.");
@@ -66,6 +67,7 @@ public class SkyblockNetworkRegistry {
     /**
      * Loads the skyblock network structure, as specified in the configuration file. If the structure does not exist, the plugin will be disabled.
      */
+    @Override
     public void load() {
         if (desiredStructure != null) {
             throw new IllegalStateException("Network structure already initialized!");
@@ -87,6 +89,7 @@ public class SkyblockNetworkRegistry {
     /**
      * Called when the plugin is done enabling and fully operational, including the database.
      */
+    @Override
     public void enable() {
         if (loaded) {
             throw new IllegalStateException("Network structure already enabled!");
@@ -102,14 +105,12 @@ public class SkyblockNetworkRegistry {
      *
      * @param name The name of the network structure that failed to enable. This is used for logging purposes.
      */
-    public void failToEnable(String name) {
-        Logger logger = plugin.getLogger();
+    protected void failToEnable(String name) {
+        Logger logger = platform.getLogger();
 
         logger.severe("Failed to enable network structure " + name + "!");
         logger.severe("Please check your configuration file and try again.");
         logger.severe("Disabling plugin...");
-
-        Bukkit.getPluginManager().disablePlugin(plugin);
     }
 
 }

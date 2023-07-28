@@ -5,17 +5,19 @@ import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
-import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
+import me.illusion.skyblockcore.server.SkyblockServerPlatform;
+import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
+import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistry;
+import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.config.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.event.startup.SkyblockEnabledEvent;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
-import me.illusion.skyblockcore.spigot.island.IslandManager;
-import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistry;
-import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
+import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
+import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistryImpl;
 import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
 import org.bukkit.Bukkit;
@@ -25,25 +27,23 @@ import org.bukkit.plugin.java.JavaPlugin;
  * The main class for the SkyblockCore Spigot platform plugin.
  */
 @Getter
-public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform {
+public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPlatform {
 
-    // General things (usually present in Cosmos)
+    // Non-platform spigot specific things
     private CommandManager commandManager;
     private MessagesFile messages;
 
-    // Skyblock-specific setup
+    // Spigot-specific things
     private SkyblockCosmosSetup cosmosSetup;
     private SkyblockGridRegistry gridRegistry;
 
     private SkyblockDatabasesFile databasesFile;
     private SkyblockCacheDatabasesFile cacheDatabasesFile;
 
+    // Server-platform specific things
     private SkyblockDatabaseRegistry databaseRegistry;
-
-    private IslandManager islandManager;
-
+    private SkyblockIslandManager islandManager;
     private SkyblockNetworkRegistry networkRegistry;
-
     private SkyblockProfileCache profileCache;
 
     @Override
@@ -51,7 +51,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
         messages = new MessagesFile(this);
         commandManager = new CommandManager(this, messages);
 
-        networkRegistry = new SkyblockNetworkRegistry(this);
+        networkRegistry = new SkyblockNetworkRegistryImpl(this);
 
         databasesFile = new SkyblockDatabasesFile(this);
         cacheDatabasesFile = new SkyblockCacheDatabasesFile(this);
@@ -59,7 +59,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockPlatform
 
         gridRegistry = new SkyblockGridRegistry();
 
-        islandManager = new IslandManager(this);
+        islandManager = new IslandManagerImpl(this);
 
         registerNetworks();
 

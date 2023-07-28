@@ -6,10 +6,11 @@ import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
-import me.illusion.skyblockcore.spigot.island.Island;
+import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
 import me.illusion.skyblockcore.spigot.network.complex.communication.packet.response.PacketResponseIslandTeleport;
+import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
 import org.bukkit.entity.Player;
 
 /**
@@ -69,7 +70,7 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
      * @param island The island
      * @return A future containing the result of the update
      */
-    public CompletableFuture<Void> updateIslandServer(Island island) {
+    public CompletableFuture<Void> updateIslandServer(SkyblockIsland island) {
         return updateIslandServer(island.getIslandId(), serverId);
     }
 
@@ -138,10 +139,10 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
      * @return Whether or not the player was teleported
      */
     private boolean tryTeleportExisting(Player player, UUID islandId) {
-        Island cached = network.getIslandManager().getLoadedIsland(islandId);
+        SkyblockIsland cached = network.getIslandManager().getLoadedIsland(islandId);
 
         if (cached != null) {
-            player.teleport(cached.getCenter());
+            player.teleport(SkyblockBukkitAdapter.toBukkitLocation(cached.getCenter()));
             return true;
         }
 

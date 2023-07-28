@@ -2,11 +2,12 @@ package me.illusion.skyblockcore.spigot.grid.impl;
 
 import me.illusion.cosmos.grid.CosmosGrid;
 import me.illusion.cosmos.grid.impl.WorldPerAreaGrid;
-import me.illusion.cosmos.utilities.time.Time;
 import me.illusion.cosmos.world.VoidGenerator;
 import me.illusion.cosmos.world.pool.WorldPoolSettings;
+import me.illusion.skyblockcore.common.utilities.time.Time;
+import me.illusion.skyblockcore.common.utilities.time.TimeParser;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridProvider;
-import me.illusion.skyblockcore.spigot.utilities.time.TimeParser;
+import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.Vector;
@@ -33,7 +34,7 @@ public class WorldPerAreaGridProvider implements SkyblockGridProvider {
             .chunkGenerator(generator)
             .spawnLocation(spawnLocation)
             .batchDelayTicks(batchDelayTicks)
-            .deletionDelay(deletionDelay)
+            .deletionDelay(SkyblockBukkitAdapter.asCosmosTime(deletionDelay))
             .build();
 
         return new WorldPerAreaGrid(settings);

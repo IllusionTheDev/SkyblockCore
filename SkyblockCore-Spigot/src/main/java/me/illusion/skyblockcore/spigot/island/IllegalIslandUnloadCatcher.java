@@ -11,9 +11,11 @@ import org.bukkit.event.Listener;
 public class IllegalIslandUnloadCatcher implements Listener {
 
     private final SkyblockSpigotPlugin plugin;
+    private final IslandManagerImpl impl;
 
-    public IllegalIslandUnloadCatcher(SkyblockSpigotPlugin plugin) {
+    public IllegalIslandUnloadCatcher(IslandManagerImpl impl, SkyblockSpigotPlugin plugin) {
         this.plugin = plugin;
+        this.impl = impl;
     }
 
     public void register() {
@@ -22,7 +24,7 @@ public class IllegalIslandUnloadCatcher implements Listener {
 
     @EventHandler
     private void onUnload(CosmosUnloadSessionEvent event) {
-        plugin.getIslandManager().registerRemoved(event.getSession());
+        impl.registerRemoved(event.getSession());
     }
 
 }

@@ -2,6 +2,8 @@ package me.illusion.skyblockcore.common.platform;
 
 import java.io.File;
 import java.util.logging.Logger;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 
 /**
  * The SkyblockPlatform interface is a template that includes all the common methods across all platforms, such as Spigot, Bungee, Velocity etc. This interface
@@ -22,6 +24,20 @@ public interface SkyblockPlatform {
      * @return The data folder
      */
     File getDataFolder();
+
+    /**
+     * Gets the database registry for the platform
+     *
+     * @return The database registry
+     */
+    SkyblockDatabaseRegistry getDatabaseRegistry();
+
+    /**
+     * Gets the profile cache for the platform
+     *
+     * @return The profile cache
+     */
+    SkyblockProfileCache getProfileCache();
 
 
 }

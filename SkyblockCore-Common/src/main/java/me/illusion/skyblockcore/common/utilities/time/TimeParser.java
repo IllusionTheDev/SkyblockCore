@@ -1,9 +1,8 @@
-package me.illusion.skyblockcore.spigot.utilities.time;
+package me.illusion.skyblockcore.common.utilities.time;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import me.illusion.cosmos.utilities.time.Time;
 
 /**
  * Utility class for parsing time strings, e.g. "5 minutes"

@@ -1,17 +1,17 @@
 package me.illusion.skyblockcore.spigot.event.island;
 
+import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.spigot.event.SkyblockEvent;
-import me.illusion.skyblockcore.spigot.island.Island;
 
 public abstract class SkyblockIslandEvent extends SkyblockEvent {
 
-    private final Island island;
+    private final SkyblockIsland island;
 
-    public SkyblockIslandEvent(Island island) {
+    public SkyblockIslandEvent(SkyblockIsland island) {
         this.island = island;
     }
 
-    public Island getIsland() {
+    public SkyblockIsland getIsland() {
         return island;
     }
 

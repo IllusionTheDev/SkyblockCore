@@ -5,9 +5,9 @@ import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
+import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
+import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
-import me.illusion.skyblockcore.spigot.island.IslandManager;
-import me.illusion.skyblockcore.spigot.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.network.complex.command.ComplexIslandCommand;
 import me.illusion.skyblockcore.spigot.network.complex.communication.CommunicationsHandler;
 import me.illusion.skyblockcore.spigot.network.complex.communication.listener.TeleportRequestPacketHandler;
@@ -102,7 +102,7 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
         return plugin;
     }
 
-    public IslandManager getIslandManager() {
+    public SkyblockIslandManager getIslandManager() {
         return plugin.getIslandManager();
     }
 
