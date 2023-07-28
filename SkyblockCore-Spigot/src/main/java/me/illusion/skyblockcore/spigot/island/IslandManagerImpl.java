@@ -6,14 +6,13 @@ import me.illusion.cosmos.session.CosmosSession;
 import me.illusion.cosmos.template.TemplatedArea;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.utilities.time.Time;
+import me.illusion.skyblockcore.server.event.island.SkyblockIslandLoadEvent;
+import me.illusion.skyblockcore.server.event.island.SkyblockIslandUnloadEvent;
 import me.illusion.skyblockcore.server.island.AbstractIslandManager;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
-import me.illusion.skyblockcore.spigot.event.island.SkyblockIslandLoadEvent;
-import me.illusion.skyblockcore.spigot.event.island.SkyblockIslandUnloadEvent;
 import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
-import org.bukkit.Bukkit;
 
 /**
  * Manages islands. The lifecycle of an island is tied to a CosmosSession, which means that if the session is destroyed, the island is destroyed.
@@ -147,7 +146,7 @@ public class IslandManagerImpl extends AbstractIslandManager {
             SkyblockIsland island = new SkyblockIsland(data, SkyblockBukkitAdapter.toSkyblockLocation(session.getPastedArea().getPasteLocation()));
             loadedIslands.put(islandId, island);
 
-            Bukkit.getPluginManager().callEvent(new SkyblockIslandLoadEvent(island));
+            platform.getEventManager().callEvent(new SkyblockIslandLoadEvent(island));
 
             return island;
         }));
@@ -163,7 +162,7 @@ public class IslandManagerImpl extends AbstractIslandManager {
         SkyblockIsland island = loadedIslands.remove(islandId);
 
         if (island != null) {
-            Bukkit.getPluginManager().callEvent(new SkyblockIslandUnloadEvent(island));
+            platform.getEventManager().callEvent(new SkyblockIslandUnloadEvent(island));
         }
 
         unloadingIslands.remove(islandId);

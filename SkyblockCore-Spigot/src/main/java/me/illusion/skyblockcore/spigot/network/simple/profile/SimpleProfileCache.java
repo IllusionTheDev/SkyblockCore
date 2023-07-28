@@ -2,10 +2,11 @@ package me.illusion.skyblockcore.spigot.network.simple.profile;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.profile.AbstractSkyblockProfileCache;
+import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
+import me.illusion.skyblockcore.server.event.player.SkyblockPlayerQuitEvent;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
-import me.illusion.skyblockcore.spigot.event.player.SkyblockPlayerJoinEvent;
-import me.illusion.skyblockcore.spigot.event.player.SkyblockPlayerQuitEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,8 +20,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
  */
 public class SimpleProfileCache extends AbstractSkyblockProfileCache implements Listener {
 
+    private final SkyblockPlatform platform;
+
     public SimpleProfileCache(SkyblockSpigotPlugin plugin) {
         super(plugin.getDatabaseRegistry().getChosenDatabase());
+        this.platform = plugin;
     }
 
     @Override
@@ -34,11 +38,11 @@ public class SimpleProfileCache extends AbstractSkyblockProfileCache implements 
                 return;
             }
 
-            SkyblockPlayerQuitEvent event = new SkyblockPlayerQuitEvent(player, oldProfileId);
-            Bukkit.getPluginManager().callEvent(event);
+            SkyblockPlayerQuitEvent event = new SkyblockPlayerQuitEvent(playerId, oldProfileId);
+            platform.getEventManager().callEvent(event);
 
-            SkyblockPlayerJoinEvent joinEvent = new SkyblockPlayerJoinEvent(player, newProfileId);
-            Bukkit.getPluginManager().callEvent(joinEvent);
+            SkyblockPlayerJoinEvent joinEvent = new SkyblockPlayerJoinEvent(playerId, newProfileId);
+            platform.getEventManager().callEvent(joinEvent);
         });
     }
 
@@ -48,8 +52,8 @@ public class SimpleProfileCache extends AbstractSkyblockProfileCache implements 
         UUID playerId = player.getUniqueId();
 
         cacheProfileId(playerId).thenAccept(profileId -> {
-            SkyblockPlayerJoinEvent joinEvent = new SkyblockPlayerJoinEvent(player, profileId);
-            Bukkit.getPluginManager().callEvent(joinEvent);
+            SkyblockPlayerJoinEvent joinEvent = new SkyblockPlayerJoinEvent(playerId, profileId);
+            platform.getEventManager().callEvent(joinEvent);
         });
     }
 
@@ -64,8 +68,8 @@ public class SimpleProfileCache extends AbstractSkyblockProfileCache implements 
             return;
         }
 
-        SkyblockPlayerQuitEvent quitEvent = new SkyblockPlayerQuitEvent(player, cachedProfileId);
-        Bukkit.getPluginManager().callEvent(quitEvent);
+        SkyblockPlayerQuitEvent quitEvent = new SkyblockPlayerQuitEvent(playerId, cachedProfileId);
+        platform.getEventManager().callEvent(quitEvent);
 
         deleteFromCache(playerId);
     }

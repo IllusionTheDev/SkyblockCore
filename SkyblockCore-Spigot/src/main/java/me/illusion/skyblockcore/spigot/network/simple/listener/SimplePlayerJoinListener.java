@@ -1,34 +1,44 @@
 package me.illusion.skyblockcore.spigot.network.simple.listener;
 
+import java.util.UUID;
 import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
-import me.illusion.skyblockcore.spigot.event.player.SkyblockPlayerJoinEvent;
+import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
+import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
 import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
 /**
  * This is the simple player join listener, which loads the island when the player joins.
  */
-public class SimplePlayerJoinListener implements Listener {
+public class SimplePlayerJoinListener {
 
     private final SimpleSkyblockNetwork network;
+    private final SkyblockIslandManager islandManager;
 
     public SimplePlayerJoinListener(SimpleSkyblockNetwork network) {
         this.network = network;
+        this.islandManager = network.getPlugin().getIslandManager();
+
+        network.getEventManager().subscribe(SkyblockPlayerJoinEvent.class, this::handle);
     }
 
-    @EventHandler
-    private void onJoin(SkyblockPlayerJoinEvent event) {
-        Player player = event.getPlayer();
+    private void handle(SkyblockPlayerJoinEvent event) {
+        Player player = Bukkit.getPlayer(event.getPlayerId());
 
-        network.getPlugin().getIslandManager().loadPlayerIsland(event.getProfileId(), network.getConfiguration().getDefaultIslandName())
-            .thenAcceptAsync(island -> {
+        if (player == null) {
+            return;
+        }
 
-                player.teleport(SkyblockBukkitAdapter.toBukkitLocation(island.getCenter()));
+        UUID profileId = event.getProfileId();
+        String defaultIslandName = network.getConfiguration().getDefaultIslandName();
 
-            }, MainThreadExecutor.INSTANCE); // Need to use main thread executor due to async teleportation not being allowed
+        islandManager.loadPlayerIsland(profileId, defaultIslandName).thenAcceptAsync(island -> {
+
+            player.teleport(SkyblockBukkitAdapter.toBukkitLocation(island.getCenter()));
+
+        }, MainThreadExecutor.INSTANCE); // Need to use main thread executor due to async teleportation not being allowed
     }
 
 }

@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.spigot.network.simple;
 
 import me.illusion.cosmos.utilities.command.command.impl.AdvancedCommand;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
+import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
@@ -56,8 +57,8 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     private void registerListeners() {
-        registerListener(new SimplePlayerJoinListener(this));
-        registerListener(new SimplePlayerQuitListener(this));
+        new SimplePlayerJoinListener(this);
+        new SimplePlayerQuitListener(this);
     }
 
     private void registerCommands() {
@@ -88,5 +89,9 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     public SimpleNetworkConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public SkyblockEventManager getEventManager() {
+        return plugin.getEventManager();
     }
 }

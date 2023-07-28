@@ -5,6 +5,7 @@ import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
+import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
@@ -66,9 +67,9 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
     // Main startup logic
 
     private void registerListeners() {
-        registerListener(new ComplexPlayerJoinListener(this));
-        registerListener(new ComplexIslandLoadListener(this));
-        registerListener(new ComplexIslandUnloadListener(this));
+        new ComplexPlayerJoinListener(this);
+        new ComplexIslandLoadListener(this);
+        new ComplexIslandUnloadListener(this);
     }
 
     private void registerPacketHandlers() {
@@ -124,5 +125,9 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     public ComplexNetworkConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public SkyblockEventManager getEventManager() {
+        return plugin.getEventManager();
     }
 }

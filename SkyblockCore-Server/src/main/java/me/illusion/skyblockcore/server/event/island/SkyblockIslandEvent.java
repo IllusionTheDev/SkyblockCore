@@ -1,7 +1,7 @@
-package me.illusion.skyblockcore.spigot.event.island;
+package me.illusion.skyblockcore.server.event.island;
 
+import me.illusion.skyblockcore.common.event.SkyblockEvent;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
-import me.illusion.skyblockcore.spigot.event.SkyblockEvent;
 
 public abstract class SkyblockIslandEvent extends SkyblockEvent {
 

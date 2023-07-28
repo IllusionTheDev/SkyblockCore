@@ -19,8 +19,11 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
 
     protected final SkyblockFetchingDatabase database;
     protected final SkyblockProfileCache profileCache;
+    protected final SkyblockPlatform platform;
 
     public AbstractIslandManager(SkyblockPlatform platform) {
+        this.platform = platform;
+
         this.database = platform.getDatabaseRegistry().getChosenDatabase();
         this.profileCache = platform.getProfileCache();
     }

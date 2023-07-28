@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.common.platform;
 import java.io.File;
 import java.util.logging.Logger;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 
 /**
@@ -38,6 +39,13 @@ public interface SkyblockPlatform {
      * @return The profile cache
      */
     SkyblockProfileCache getProfileCache();
+
+    /**
+     * Gets the event manager for the platform
+     *
+     * @return The event manager
+     */
+    SkyblockEventManager getEventManager();
 
 
 }

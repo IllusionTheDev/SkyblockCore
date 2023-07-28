@@ -1,24 +1,23 @@
-package me.illusion.skyblockcore.spigot.event.player;
+package me.illusion.skyblockcore.server.event.player;
 
 import java.util.UUID;
-import me.illusion.skyblockcore.spigot.event.SkyblockEvent;
-import org.bukkit.entity.Player;
+import me.illusion.skyblockcore.common.event.SkyblockEvent;
 
 /**
  * Generic Skyblock player event. Contains the player and their chosen profile ID.
  */
 public abstract class SkyblockPlayerEvent extends SkyblockEvent {
 
-    private final Player player;
+    private final UUID playerId;
     private final UUID profileId;
 
-    public SkyblockPlayerEvent(Player player, UUID profileId) {
-        this.player = player;
+    public SkyblockPlayerEvent(UUID playerId, UUID profileId) {
+        this.playerId = playerId;
         this.profileId = profileId;
     }
 
-    public Player getPlayer() {
-        return player;
+    public UUID getPlayerId() {
+        return playerId;
     }
 
     public UUID getProfileId() {

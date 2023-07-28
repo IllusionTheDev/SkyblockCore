@@ -5,6 +5,9 @@ import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.event.impl.SkyblockPlatformEnabledEvent;
+import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
+import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
@@ -14,7 +17,6 @@ import me.illusion.skyblockcore.spigot.config.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
-import me.illusion.skyblockcore.spigot.event.startup.SkyblockEnabledEvent;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistryImpl;
@@ -45,6 +47,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     private SkyblockIslandManager islandManager;
     private SkyblockNetworkRegistry networkRegistry;
     private SkyblockProfileCache profileCache;
+    private SkyblockEventManager eventManager;
 
     @Override
     public void onEnable() {
@@ -60,6 +63,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         gridRegistry = new SkyblockGridRegistry();
 
         islandManager = new IslandManagerImpl(this);
+        eventManager = new SkyblockEventManagerImpl();
 
         registerNetworks();
 
@@ -92,7 +96,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
             }
 
             networkRegistry.enable();
-            Bukkit.getPluginManager().callEvent(new SkyblockEnabledEvent(this));
+            eventManager.callEvent(new SkyblockPlatformEnabledEvent(this));
         });
 
     }
@@ -117,4 +121,5 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     public void setProfileCache(SkyblockProfileCache profileCache) {
         this.profileCache = profileCache;
     }
+
 }
