@@ -1,5 +1,9 @@
 package me.illusion.skyblockcore.common.database.cache.redis;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -51,6 +55,35 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
     @Override
     public CompletableFuture<Void> removeServer(String serverId) {
         return associateTask(jedis -> jedis.hdel("island-servers", serverId));
+    }
+
+    @Override
+    public CompletableFuture<Collection<UUID>> getIslands(String serverId) {
+        return associate(jedis -> jedis.hkeys("island-servers")).thenApply(strings -> {
+            List<UUID> islands = new ArrayList<>();
+
+            for (String string : strings) {
+                islands.add(UUID.fromString(string));
+            }
+
+            return islands;
+        });
+    }
+
+    @Override
+    public CompletableFuture<Map<String, Collection<UUID>>> getAllIslands() {
+        return associate(jedis -> jedis.hgetAll("island-servers")).thenApply(stringMap -> {
+            Map<String, Collection<UUID>> map = new ConcurrentHashMap<>();
+
+            for (Map.Entry<String, String> entry : stringMap.entrySet()) {
+                String islandId = entry.getKey();
+                String serverId = entry.getValue();
+
+                map.computeIfAbsent(serverId, k -> new ArrayList<>()).add(UUID.fromString(islandId));
+            }
+
+            return map;
+        });
     }
 
     @Override

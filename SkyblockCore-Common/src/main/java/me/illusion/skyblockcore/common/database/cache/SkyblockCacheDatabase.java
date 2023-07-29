@@ -1,5 +1,7 @@
 package me.illusion.skyblockcore.common.database.cache;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.database.SkyblockDatabase;
@@ -42,5 +44,20 @@ public interface SkyblockCacheDatabase extends SkyblockDatabase {
      * @return A future which completes when the server is removed from the cache.
      */
     CompletableFuture<Void> removeServer(String serverId);
+
+    /**
+     * Gets all the islands that are owned by the server
+     *
+     * @param serverId The server's id
+     * @return A future of the islands
+     */
+    CompletableFuture<Collection<UUID>> getIslands(String serverId);
+
+    /**
+     * Gets all the islands that are owned by all servers
+     *
+     * @return A future of the islands
+     */
+    CompletableFuture<Map<String, Collection<UUID>>> getAllIslands();
 
 }

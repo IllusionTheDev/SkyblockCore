@@ -32,7 +32,6 @@ public class ReadOnlyConfigurationSection {
         return get(path, ReadOnlyConfigurationSection.class);
     }
 
-
     public Object get(String path) {
         return internalMap.get(path);
     }

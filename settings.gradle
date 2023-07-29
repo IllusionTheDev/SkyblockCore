@@ -2,4 +2,6 @@ rootProject.name = 'SkyblockCore'
 include 'SkyblockCore-Common'
 include 'SkyblockCore-Server'
 include 'SkyblockCore-Spigot'
+include 'SkyblockCore-Proxy'
+include 'SkyblockCore-BungeeCord'
 
