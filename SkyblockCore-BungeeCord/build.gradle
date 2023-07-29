@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'me.illusion'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+
+    // spigot repo
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    // This lets gradle find the BungeeCord files online
+
+}
+
+dependencies {
+    compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
+
+    compileOnly('org.projectlombok:lombok:1.18.28')
+    annotationProcessor('org.projectlombok:lombok:1.18.28')
+
+    implementation(project(':SkyblockCore-Common'))
+    implementation(project(':SkyblockCore-Proxy'))
+}

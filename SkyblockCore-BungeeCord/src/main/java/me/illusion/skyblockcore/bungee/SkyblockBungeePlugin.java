@@ -51,7 +51,7 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
     private void finishEnable() {
         profileCache = new BungeeProfileCache(this);
         matchmaker = new BungeeSkyblockMatchmaker(this);
-        
+
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new SimpleSkyblockCommand(this));
     }
 
