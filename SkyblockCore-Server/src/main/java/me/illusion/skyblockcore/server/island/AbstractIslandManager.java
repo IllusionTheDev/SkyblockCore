@@ -9,6 +9,7 @@ import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
+import me.illusion.skyblockcore.server.util.SkyblockLocation;
 
 /**
  * Abstract implementation of the SkyblockIslandManager
@@ -129,16 +130,37 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
         return null;
     }
 
+    /**
+     * Gets an island by a player's id
+     *
+     * @param playerId The player id.
+     * @return The island
+     */
     @Override
     public SkyblockIsland getPlayerIsland(UUID playerId) {
         UUID cachedProfileId = profileCache.getCachedProfileId(playerId);
 
-        if (cachedProfileId == null) {
+        if (cachedProfileId == null) { // If the player's profile isn't cached, their island isn't loaded.
             return null;
         }
 
         return getProfileIsland(cachedProfileId);
     }
 
+    /**
+     * Gets an island by its location
+     *
+     * @param location The location.
+     * @return The island
+     */
+    @Override
+    public SkyblockIsland getIslandAt(SkyblockLocation location) {
+        for (SkyblockIsland island : loadedIslands.values()) {
+            if (island.contains(location)) {
+                return island;
+            }
+        }
 
+        return null;
+    }
 }

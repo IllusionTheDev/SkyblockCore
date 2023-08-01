@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.utilities.time.Time;
+import me.illusion.skyblockcore.server.util.SkyblockLocation;
 
 /**
  * The skyblock island manager is responsible for loading and unloading skyblock islands. Each platform should implement their own island manager, which will
@@ -111,4 +112,12 @@ public interface SkyblockIslandManager {
      * @return The player's island.
      */
     SkyblockIsland getPlayerIsland(UUID playerId);
+
+    /**
+     * Get the island at a location.
+     *
+     * @param location The location.
+     * @return The island at the location.
+     */
+    SkyblockIsland getIslandAt(SkyblockLocation location);
 }

@@ -10,6 +10,8 @@ import me.illusion.skyblockcore.server.event.island.SkyblockIslandLoadEvent;
 import me.illusion.skyblockcore.server.event.island.SkyblockIslandUnloadEvent;
 import me.illusion.skyblockcore.server.island.AbstractIslandManager;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
+import me.illusion.skyblockcore.server.util.SkyblockCuboid;
+import me.illusion.skyblockcore.server.util.SkyblockLocation;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
@@ -143,7 +145,11 @@ public class IslandManagerImpl extends AbstractIslandManager {
      */
     private CompletableFuture<SkyblockIsland> loadFromTemplate(UUID islandId, IslandData data, TemplatedArea area) {
         return register(cosmosSetup.getSessionHolder().loadOrCreateSession(islandId, area).thenApply(session -> {
-            SkyblockIsland island = new SkyblockIsland(data, SkyblockBukkitAdapter.toSkyblockLocation(session.getPastedArea().getPasteLocation()));
+
+            SkyblockLocation pasteLocation = SkyblockBukkitAdapter.toSkyblockLocation(session.getPastedArea().getPasteLocation());
+            SkyblockCuboid bounds = SkyblockBukkitAdapter.toSkyblockCuboid(session.getPastedArea().getDimensions());
+
+            SkyblockIsland island = new SkyblockIsland(data, pasteLocation, bounds);
             loadedIslands.put(islandId, island);
 
             platform.getEventManager().callEvent(new SkyblockIslandLoadEvent(island));

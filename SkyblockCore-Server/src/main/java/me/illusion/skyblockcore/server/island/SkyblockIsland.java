@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.server.island;
 
 import java.util.UUID;
 import me.illusion.skyblockcore.common.data.IslandData;
+import me.illusion.skyblockcore.server.util.SkyblockCuboid;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
 
 /**
@@ -12,10 +13,12 @@ public class SkyblockIsland {
 
     private final IslandData data;
     private final SkyblockLocation location;
+    private final SkyblockCuboid bounds;
 
-    public SkyblockIsland(IslandData data, SkyblockLocation location) {
+    public SkyblockIsland(IslandData data, SkyblockLocation location, SkyblockCuboid bounds) {
         this.data = data;
         this.location = location;
+        this.bounds = bounds;
     }
 
     public IslandData getData() {
@@ -28,6 +31,14 @@ public class SkyblockIsland {
 
     public SkyblockLocation getCenter() {
         return location;
+    }
+
+    public SkyblockCuboid getBounds() {
+        return bounds;
+    }
+
+    public boolean contains(SkyblockLocation location) {
+        return bounds.contains(location);
     }
 
 }
