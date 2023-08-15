@@ -20,6 +20,10 @@ public class BungeeYMLBase {
         this(plugin, new File(plugin.getDataFolder(), name), true);
     }
 
+    public BungeeYMLBase(Plugin plugin, File file) {
+        this(plugin, file, true);
+    }
+
     public BungeeYMLBase(Plugin plugin, File file, boolean existsOnSource) {
         this.plugin = plugin;
         this.file = file;

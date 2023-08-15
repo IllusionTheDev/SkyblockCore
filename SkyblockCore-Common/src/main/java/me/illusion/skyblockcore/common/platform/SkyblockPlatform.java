@@ -2,9 +2,9 @@ package me.illusion.skyblockcore.common.platform;
 
 import java.io.File;
 import java.util.logging.Logger;
+import me.illusion.skyblockcore.common.config.ConfigurationProvider;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
-import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 
 /**
  * The SkyblockPlatform interface is a template that includes all the common methods across all platforms, such as Spigot, Bungee, Velocity etc. This interface
@@ -34,18 +34,18 @@ public interface SkyblockPlatform {
     SkyblockDatabaseRegistry getDatabaseRegistry();
 
     /**
-     * Gets the profile cache for the platform
-     *
-     * @return The profile cache
-     */
-    SkyblockProfileCache getProfileCache();
-
-    /**
      * Gets the event manager for the platform
      *
      * @return The event manager
      */
     SkyblockEventManager getEventManager();
+
+    /**
+     * Gets the configuration provider for the platform, used to load configuration files
+     *
+     * @return The configuration provider
+     */
+    ConfigurationProvider getConfigurationProvider();
 
 
 }

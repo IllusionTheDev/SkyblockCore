@@ -4,15 +4,17 @@ import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
+import me.illusion.skyblockcore.common.config.ConfigurationProvider;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.impl.SkyblockPlatformEnabledEvent;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
-import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistry;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
+import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
+import me.illusion.skyblockcore.spigot.config.BukkitConfigurationProvider;
 import me.illusion.skyblockcore.spigot.config.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
@@ -22,6 +24,7 @@ import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
 import me.illusion.skyblockcore.spigot.network.SkyblockNetworkRegistryImpl;
 import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.spigot.network.simple.SimpleSkyblockNetwork;
+import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -43,11 +46,13 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     private SkyblockCacheDatabasesFile cacheDatabasesFile;
 
     // Server-platform specific things
+    private ConfigurationProvider configurationProvider;
+
     private SkyblockDatabaseRegistry databaseRegistry;
     private SkyblockIslandManager islandManager;
     private SkyblockNetworkRegistry networkRegistry;
-    private SkyblockProfileCache profileCache;
     private SkyblockEventManager eventManager;
+    private SkyblockPlayerManager playerManager;
 
     @Override
     public void onEnable() {
@@ -62,6 +67,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         gridRegistry = new SkyblockGridRegistry();
 
+        configurationProvider = new BukkitConfigurationProvider(this);
         islandManager = new IslandManagerImpl(this);
         eventManager = new SkyblockEventManagerImpl();
 
@@ -95,7 +101,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
                 Bukkit.getPluginManager().disablePlugin(this);
             }
 
+            playerManager = new SkyblockBukkitPlayerManager(this);
             networkRegistry.enable();
+
             eventManager.callEvent(new SkyblockPlatformEnabledEvent(this));
         });
 
@@ -122,15 +130,6 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         SkyblockCosmosSetupFile cosmosSetupFile = new SkyblockCosmosSetupFile(cosmosPlugin, this);
         cosmosSetup = cosmosSetupFile.getSetup();
-    }
-
-    /**
-     * Sets the profile cache
-     *
-     * @param profileCache The profile cache
-     */
-    public void setProfileCache(SkyblockProfileCache profileCache) {
-        this.profileCache = profileCache;
     }
 
 }

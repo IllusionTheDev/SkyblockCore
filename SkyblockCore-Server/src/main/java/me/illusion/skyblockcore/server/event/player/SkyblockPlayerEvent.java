@@ -1,26 +1,20 @@
 package me.illusion.skyblockcore.server.event.player;
 
-import java.util.UUID;
 import me.illusion.skyblockcore.common.event.SkyblockEvent;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 
 /**
  * Generic Skyblock player event. Contains the player and their chosen profile ID.
  */
 public abstract class SkyblockPlayerEvent extends SkyblockEvent {
 
-    private final UUID playerId;
-    private final UUID profileId;
+    private final SkyblockPlayer player;
 
-    public SkyblockPlayerEvent(UUID playerId, UUID profileId) {
-        this.playerId = playerId;
-        this.profileId = profileId;
+    public SkyblockPlayerEvent(SkyblockPlayer player) {
+        this.player = player;
     }
 
-    public UUID getPlayerId() {
-        return playerId;
-    }
-
-    public UUID getProfileId() {
-        return profileId;
+    public SkyblockPlayer getPlayer() {
+        return player;
     }
 }

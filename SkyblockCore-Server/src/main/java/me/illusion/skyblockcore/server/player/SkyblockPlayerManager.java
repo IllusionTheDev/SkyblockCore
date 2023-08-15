@@ -1,13 +1,13 @@
-package me.illusion.skyblockcore.common.profile;
+package me.illusion.skyblockcore.server.player;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * This interface is used to cache profile IDs. Profile IDs allow for a player to have multiple profiles, and each profile is associated with a different
- * island.
- */
-public interface SkyblockProfileCache {
+public interface SkyblockPlayerManager {
+
+    SkyblockPlayer getPlayer(UUID playerId);
+
+    SkyblockPlayer getPlayerFromProfile(UUID profileId);
 
     /**
      * This method is used to cache a profile ID for a player.
@@ -26,13 +26,6 @@ public interface SkyblockProfileCache {
      */
     CompletableFuture<Void> saveProfileId(UUID playerId, UUID profileId);
 
-    /**
-     * This method is used to create a profile ID for a player.
-     *
-     * @param playerId The player ID to create the profile ID for.
-     * @return The profile ID that was created.
-     */
-    UUID createProfileId(UUID playerId);
 
     /**
      * This method is used to get the cached profile ID for a player.
@@ -41,12 +34,5 @@ public interface SkyblockProfileCache {
      * @return The cached profile ID for the player.
      */
     UUID getCachedProfileId(UUID playerId);
-
-    /**
-     * This method is used to delete a profile ID from the cache.
-     *
-     * @param playerId The player ID to delete the profile ID for.
-     */
-    void deleteFromCache(UUID playerId);
 
 }
