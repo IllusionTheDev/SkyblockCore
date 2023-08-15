@@ -49,8 +49,4 @@ public class SkyblockCacheDatabasesFile extends BungeeYMLBase implements Skybloc
         return true;
     }
 
-    @Override
-    public Class<SkyblockCacheDatabase> getDatabaseClass() {
-        return SkyblockCacheDatabase.class;
-    }
 }

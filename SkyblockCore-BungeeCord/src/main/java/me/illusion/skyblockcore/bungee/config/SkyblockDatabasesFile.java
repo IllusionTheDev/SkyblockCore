@@ -49,11 +49,6 @@ public class SkyblockDatabasesFile extends BungeeYMLBase implements SkyblockFetc
     }
 
     @Override
-    public Class<SkyblockFetchingDatabase> getDatabaseClass() {
-        return SkyblockFetchingDatabase.class;
-    }
-
-    @Override
     public boolean supportsFileBased() {
         return false;
     }

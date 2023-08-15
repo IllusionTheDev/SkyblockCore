@@ -32,11 +32,6 @@ public class BungeeProxyServerData implements ProxyServerData {
         return islandIds.size();
     }
 
-    @Override
-    public void sendPlayer(UUID playerId) {
-
-    }
-
     private ServerInfo getServer() {
         return ProxyServer.getInstance().getServerInfo(serverName);
     }

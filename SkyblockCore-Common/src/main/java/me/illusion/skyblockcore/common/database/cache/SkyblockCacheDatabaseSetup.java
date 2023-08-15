@@ -8,4 +8,7 @@ import me.illusion.skyblockcore.common.database.SkyblockDatabaseSetup;
  */
 public interface SkyblockCacheDatabaseSetup extends SkyblockDatabaseSetup<SkyblockCacheDatabase> {
 
+    default Class<SkyblockCacheDatabase> getDatabaseClass() {
+        return SkyblockCacheDatabase.class;
+    }
 }

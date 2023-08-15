@@ -49,8 +49,4 @@ public class SkyblockCacheDatabasesFile extends YMLBase implements SkyblockCache
         return true;
     }
 
-    @Override
-    public Class<SkyblockCacheDatabase> getDatabaseClass() {
-        return SkyblockCacheDatabase.class;
-    }
 }

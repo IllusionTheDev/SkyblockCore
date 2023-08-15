@@ -52,11 +52,6 @@ public class SkyblockDatabasesFile extends YMLBase implements SkyblockFetchingDa
     }
 
     @Override
-    public Class<SkyblockFetchingDatabase> getDatabaseClass() {
-        return SkyblockFetchingDatabase.class;
-    }
-
-    @Override
     public boolean supportsFileBased() {
         return supportsFileBased;
     }

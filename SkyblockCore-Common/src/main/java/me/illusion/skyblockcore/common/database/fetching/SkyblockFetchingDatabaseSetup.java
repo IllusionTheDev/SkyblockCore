@@ -13,4 +13,9 @@ public interface SkyblockFetchingDatabaseSetup extends SkyblockDatabaseSetup<Sky
      * @return TRUE if we should load file based databases, FALSE otherwise
      */
     boolean supportsFileBased();
+
+    @Override
+    default Class<SkyblockFetchingDatabase> getDatabaseClass() {
+        return SkyblockFetchingDatabase.class;
+    }
 }
