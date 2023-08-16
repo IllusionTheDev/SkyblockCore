@@ -19,13 +19,13 @@ public abstract class Packet {
     private ByteArrayDataOutput stream;
     private ByteArrayDataInput input;
 
-    public Packet(byte[] bytes) {
+    protected Packet(byte[] bytes) {
         input = ByteStreams.newDataInput(bytes);
         identifier = readByte();
         uuid = readUUID();
     }
 
-    public Packet() {
+    protected Packet() {
         this.identifier = PacketManager.getIdentifier(getClass());
         this.uuid = UUID.randomUUID();
 

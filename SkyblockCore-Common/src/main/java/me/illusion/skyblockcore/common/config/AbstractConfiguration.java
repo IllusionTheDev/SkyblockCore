@@ -9,7 +9,7 @@ public abstract class AbstractConfiguration {
     private final ConfigurationProvider provider;
     protected ReadOnlyConfigurationSection configuration;
 
-    public AbstractConfiguration(SkyblockPlatform platform, String fileName) {
+    protected AbstractConfiguration(SkyblockPlatform platform, String fileName) {
         provider = platform.getConfigurationProvider();
 
         this.file = new File(provider.getDataFolder(), fileName);

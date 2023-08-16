@@ -95,7 +95,7 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
             return CompletableFuture.completedFuture(true);
         }
 
-        return getIslandServer(islandId).thenApply(serverId -> serverId == null || serverId.equals(this.serverId));
+        return getIslandServer(islandId).thenApply(instanceId -> instanceId == null || instanceId.equals(serverId));
     }
 
     // -- GENERAL STUFF --
@@ -114,8 +114,8 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
             return CompletableFuture.completedFuture(true);
         }
 
-        return getIslandServer(islandId).thenCompose(serverId -> {
-            if (serverId == null || serverId.equals(this.serverId)) {
+        return getIslandServer(islandId).thenCompose(instanceId -> {
+            if (instanceId == null || instanceId.equals(serverId)) {
                 return network.getIslandManager().loadIsland(islandId)
                     .thenApplyAsync(island -> tryTeleportExisting(player, islandId), MainThreadExecutor.INSTANCE);
             }

@@ -1,12 +1,12 @@
 package me.illusion.skyblockcore.common.utilities.geometry;
 
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
 
 /**
  * Represents a range of numbers. If the min and max are the same, the range will always return that number.
  */
-public class Range implements Supplier<Integer> {
+public class Range implements IntSupplier {
 
     private final int min;
     private final int max;
@@ -66,13 +66,8 @@ public class Range implements Supplier<Integer> {
         return max;
     }
 
-    /**
-     * Gets a random value from the range
-     *
-     * @return The random value
-     */
     @Override
-    public Integer get() {
+    public int getAsInt() {
         if (min == max) // Sanity check
         {
             return min;

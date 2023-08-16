@@ -85,36 +85,28 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
 
     @Override
     public CompletableFuture<UUID> fetchIslandId(UUID profileId) {
-        return associate(() -> {
-            Document filter = new Document("ownerId", profileId);
-            return islandIdCollection.find(filter).first();
-        });
+        return associate(() -> islandIdCollection.find(ownerId(profileId)).first());
     }
 
     @Override
     public CompletableFuture<IslandData> fetchIslandData(UUID islandId) {
-        return associate(() -> {
-            Document filter = new Document("islandId", islandId);
-            return islandDataCollection.find(filter).first();
-        });
+        return associate(() -> islandDataCollection.find(islandId(islandId)).first());
     }
 
     @Override
     public CompletableFuture<Void> saveIslandData(IslandData data) {
         return associate(() -> {
-            Document filter = new Document("islandId", data.getIslandId());
-            islandDataCollection.replaceOne(filter, data);
+            islandDataCollection.replaceOne(islandId(data.getIslandId()), data);
 
             // Let's also set the island id to the owner
-            Document idFilter = new Document("ownerId", data.getOwnerId());
-            islandIdCollection.replaceOne(idFilter, data.getIslandId());
+            islandIdCollection.replaceOne(ownerId(data.getOwnerId()), data.getIslandId());
         });
     }
 
     @Override
     public CompletableFuture<Void> deleteIslandData(UUID islandId) {
         return associate(() -> {
-            Document filter = new Document("islandId", islandId);
+            Document filter = islandId(islandId);
             islandDataCollection.deleteOne(filter);
             islandIdCollection.deleteOne(filter);
         });
@@ -122,18 +114,12 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
 
     @Override
     public CompletableFuture<UUID> getProfileId(UUID playerId) {
-        return associate(() -> {
-            Document filter = new Document("playerId", playerId);
-            return profileIdCollection.find(filter).first();
-        });
+        return associate(() -> profileIdCollection.find(playerId(playerId)).first());
     }
 
     @Override
     public CompletableFuture<Void> setProfileId(UUID playerId, UUID profileId) {
-        return associate(() -> {
-            Document filter = new Document("playerId", playerId);
-            profileIdCollection.replaceOne(filter, profileId);
-        });
+        return associate((Runnable) () -> profileIdCollection.replaceOne(playerId(playerId), profileId));
     }
 
     private <T> CompletableFuture<T> associate(Supplier<T> supplier) {
@@ -192,4 +178,15 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
         return builder.toString();
     }
 
+    private Document islandId(UUID islandId) {
+        return new Document("islandId", islandId);
+    }
+
+    private Document playerId(UUID playerId) {
+        return new Document("playerId", playerId);
+    }
+
+    private Document ownerId(UUID ownerId) {
+        return new Document("ownerId", ownerId);
+    }
 }

@@ -46,10 +46,6 @@ public class ComplexPlayerJoinListener {
     }
 
     private void tryLoadDefault(UUID profileId, SkyblockPlayer player) {
-        islandManager.loadPlayerIsland(profileId, "default").thenAccept(island -> {
-
-            player.teleport(island.getCenter());
-
-        });
+        islandManager.loadPlayerIsland(profileId, "default").thenAccept(island -> player.teleport(island.getCenter()));
     }
 }

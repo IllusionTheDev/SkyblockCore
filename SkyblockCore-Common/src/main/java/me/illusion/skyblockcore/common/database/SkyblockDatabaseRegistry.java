@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
@@ -156,12 +157,12 @@ public class SkyblockDatabaseRegistry {
     /**
      * Tries to enable a database, and if it fails, tries to enable the fallback
      *
-     * @param setup      The setup to use
-     * @param type       The database type to try to enable
-     * @param <DataType> The internal database type, such as SkyblockCacheDatabase
+     * @param setup The setup to use
+     * @param type  The database type to try to enable
+     * @param <T>   The internal database type, such as SkyblockCacheDatabase
      * @return A completable future that completes when the database is enabled
      */
-    private <DataType extends SkyblockDatabase> CompletableFuture<Boolean> tryEnableFallback(SkyblockDatabaseSetup<DataType> setup, String type) {
+    private <T extends SkyblockDatabase> CompletableFuture<Boolean> tryEnableFallback(SkyblockDatabaseSetup<T> setup, String type) {
         if (type == null) { // If the fallback is null, we can't do anything, so we just return false
             return CompletableFuture.completedFuture(false);
         }
@@ -170,35 +171,39 @@ public class SkyblockDatabaseRegistry {
         String fallback = setup.getFallback(type);
 
         if (database == null) { // If the database specified doesn't exist, we try the fallback
-            logger.warning("Failed to find database " + type + ", attempting fallback..");
+            warning("Failed to find database {0}, attempting fallback..", type);
             return tryEnableFallback(setup, fallback);
         }
 
-        Class<DataType> clazz = setup.getDatabaseClass();
+        Class<T> clazz = setup.getDatabaseClass();
 
         if (!clazz.isAssignableFrom(database.getClass()) || !setup.isSupported(clazz.cast(database))) {
-            logger.warning(type + " is not supported in this current setup, attempting fallback..");
+            warning("Failed to enable database {0}, attempting fallback..", type);
             return tryEnableFallback(setup, fallback); // If the database is file based, and the setup doesn't support file based databases, we try the fallback
         }
 
         ReadOnlyConfigurationSection properties = setup.getProperties(type);
 
         if (properties == null) { // If there are no properties to load from, we try the fallback
-            logger.warning("Failed to find properties for " + type + ", attempting fallback..");
+            warning("Failed to find properties for {0}, attempting fallback..", type);
             return tryEnableFallback(setup, fallback);
         }
 
         return database.enable(properties)
             .thenCompose(success -> { // We try to enable the database, and if it fails, we try the fallback until there is no fallback
-                if (success) {
+                if (Boolean.TRUE.equals(success)) {
                     logger.info("Successfully enabled database " + type);
                     chosenDatabases.put(clazz, type);
                     return CompletableFuture.completedFuture(true);
                 }
 
-                logger.warning("Failed to enable database " + type + ", attempting fallback..");
+                warning("Failed to enable database {0}, attempting fallback..", type);
                 return tryEnableFallback(setup, fallback);
             });
+    }
+
+    private void warning(String message, Object... objects) {
+        logger.log(Level.WARNING, message, objects);
     }
 
 }

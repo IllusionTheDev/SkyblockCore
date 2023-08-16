@@ -51,7 +51,7 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     @Override
     protected Connection createConnection() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver"); // This isn't needed in JDBC 4.0+ (Java 6+), but old versions of spigot are stinky
             return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
         } catch (Exception expected) { // The driver will throw an exception if it fails to connect
             return null;

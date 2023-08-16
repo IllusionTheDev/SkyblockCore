@@ -20,7 +20,7 @@ public abstract class AbstractSkyblockServerMatchmaker implements SkyblockServer
     private final ServerDataComparator comparator;
     private final SkyblockCacheDatabase cacheDatabase;
 
-    public AbstractSkyblockServerMatchmaker(SkyblockProxyPlatform platform) {
+    protected AbstractSkyblockServerMatchmaker(SkyblockProxyPlatform platform) {
         this.comparator = platform.getMatchmakerComparatorRegistry().getDefaultComparator();
         this.cacheDatabase = platform.getDatabaseRegistry().getChosenCacheDatabase();
     }

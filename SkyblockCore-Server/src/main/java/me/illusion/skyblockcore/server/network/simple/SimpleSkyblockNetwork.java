@@ -32,7 +32,7 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void disable() {
-
+        // There's no unloading logic for the simple network, as it's not needed.
     }
 
     @Override

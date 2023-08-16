@@ -11,6 +11,9 @@ import org.bukkit.util.Vector;
 
 public final class SkyblockBukkitAdapter {
 
+    private SkyblockBukkitAdapter() {
+    }
+
     public static Location toBukkitLocation(SkyblockLocation location) {
         return new Location(Bukkit.getWorld(location.getWorld()), location.getX(), location.getY(), location.getZ());
     }

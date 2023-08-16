@@ -27,11 +27,7 @@ public class SimplePlayerJoinListener {
 
         String defaultIslandName = network.getConfiguration().getDefaultIslandName();
 
-        islandManager.loadPlayerIsland(profileId, defaultIslandName).thenAccept(island -> {
-
-            player.teleport(island.getCenter());
-
-        });
+        islandManager.loadPlayerIsland(profileId, defaultIslandName).thenAccept(island -> player.teleport(island.getCenter()));
     }
 
 }

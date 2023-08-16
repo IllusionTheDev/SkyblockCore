@@ -112,7 +112,7 @@ public class IslandManagerImpl extends AbstractIslandManager {
 
         return register(
             cosmosSetup.getSessionHolder().unloadAutomaticallyIn(SkyblockBukkitAdapter.asCosmosTime(unloadDelay), islandId, save).thenApply(unloaded -> {
-                if (unloaded) {
+                if (Boolean.TRUE.equals(unloaded)) {
                     removeInternal(islandId);
                 }
 

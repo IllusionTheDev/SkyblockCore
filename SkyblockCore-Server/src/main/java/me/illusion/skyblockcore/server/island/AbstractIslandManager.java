@@ -26,7 +26,7 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
     protected final SkyblockPlayerManager playerManager;
     protected final SkyblockPlatform platform;
 
-    public AbstractIslandManager(SkyblockServerPlatform platform) {
+    protected AbstractIslandManager(SkyblockServerPlatform platform) {
         this.platform = platform;
 
         this.database = platform.getDatabaseRegistry().getChosenDatabase();

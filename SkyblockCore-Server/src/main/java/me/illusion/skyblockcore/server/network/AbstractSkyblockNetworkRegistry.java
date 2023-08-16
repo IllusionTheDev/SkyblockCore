@@ -2,6 +2,7 @@ package me.illusion.skyblockcore.server.network;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
@@ -20,7 +21,7 @@ public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetwork
     private String desiredStructure;
     private boolean loaded = false;
 
-    public AbstractSkyblockNetworkRegistry(SkyblockServerPlatform platform, ReadOnlyConfigurationSection config) {
+    protected AbstractSkyblockNetworkRegistry(SkyblockServerPlatform platform, ReadOnlyConfigurationSection config) {
         this.platform = platform;
         this.config = config;
     }
@@ -73,16 +74,16 @@ public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetwork
             throw new IllegalStateException("Network structure already initialized!");
         }
 
-        String desiredStructure = config.getString("network-type", "undefined");
+        String desired = config.getString("network-type", "undefined");
 
-        SkyblockNetworkStructure structure = structures.get(desiredStructure);
+        SkyblockNetworkStructure structure = structures.get(desired);
 
         if (structure == null) {
-            failToEnable(desiredStructure);
+            failToEnable(desired);
             return;
         }
 
-        this.desiredStructure = desiredStructure;
+        this.desiredStructure = desired;
         structure.load();
     }
 
@@ -96,8 +97,8 @@ public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetwork
         }
 
         loaded = true;
-        SkyblockNetworkStructure desiredStructure = getActiveStructure();
-        desiredStructure.enable();
+        SkyblockNetworkStructure structure = getActiveStructure();
+        structure.enable();
     }
 
     /**
@@ -108,7 +109,7 @@ public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetwork
     protected void failToEnable(String name) {
         Logger logger = platform.getLogger();
 
-        logger.severe("Failed to enable network structure " + name + "!");
+        logger.log(Level.SEVERE, "Failed to enable network structure {0}!", name);
         logger.severe("Please check your configuration file and try again.");
         logger.severe("Disabling plugin...");
     }

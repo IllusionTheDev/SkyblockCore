@@ -1,12 +1,5 @@
 package me.illusion.skyblockcore.common.communication.packet.processor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
@@ -29,9 +22,7 @@ public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor
 
         this.channelBytes = channel.getBytes(StandardCharsets.UTF_8);
 
-        new Thread(() -> {
-            controller.getJedis().subscribe(this, channelBytes, "global".getBytes(StandardCharsets.UTF_8));
-        }).start();
+        new Thread(() -> controller.getJedis().subscribe(this, channelBytes, "global".getBytes(StandardCharsets.UTF_8))).start();
     }
 
     @Override
@@ -58,31 +49,5 @@ public class RedisProcessor extends BinaryJedisPubSub implements PacketProcessor
         }
 
         callback.accept(message);
-    }
-
-
-    private byte[] createKey(String message) {
-        return (new String(channelBytes) + ":" + message).getBytes(StandardCharsets.UTF_8);
-    }
-
-    private byte[] serialize(Serializable object) {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); ObjectOutput out = new ObjectOutputStream(bos)) {
-            out.writeObject(object);
-            return bos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private <T extends Serializable> T deserialize(byte[] bytes) {
-        try {
-            return (T) new ObjectInputStream(new ByteArrayInputStream(bytes)).readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 }

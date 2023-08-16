@@ -7,7 +7,7 @@ public abstract class AbstractSkyblockPlayer implements SkyblockPlayer {
     protected final SkyblockPlayerManager playerManager;
     protected final UUID playerId;
 
-    public AbstractSkyblockPlayer(SkyblockPlayerManager playerManager, UUID playerId) {
+    protected AbstractSkyblockPlayer(SkyblockPlayerManager playerManager, UUID playerId) {
         this.playerManager = playerManager;
         this.playerId = playerId;
     }

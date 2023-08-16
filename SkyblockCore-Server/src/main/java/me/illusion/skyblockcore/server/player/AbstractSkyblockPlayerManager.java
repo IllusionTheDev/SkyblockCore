@@ -20,7 +20,7 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     @Setter
     private Function<UUID, UUID> profileMappingFunction = Function.identity(); // Player ID -> Player ID
 
-    public AbstractSkyblockPlayerManager(SkyblockPlatform platform) {
+    protected AbstractSkyblockPlayerManager(SkyblockPlatform platform) {
         this.platform = platform;
         this.database = platform.getDatabaseRegistry().getChosenDatabase();
     }
@@ -28,9 +28,7 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     // Player management stuff
 
     protected void handleJoin(UUID playerId) {
-        cacheProfileId(playerId).thenAccept(profileId -> {
-            playerIdMap.put(profileId, createPlayer(playerId));
-        });
+        cacheProfileId(playerId).thenAccept(profileId -> playerIdMap.put(profileId, createPlayer(playerId)));
     }
 
     protected void handleQuit(UUID playerId) {
@@ -106,8 +104,6 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     }
 
     protected void setIdInternally(UUID playerId, UUID profileId) {
-        if (!profileMap.containsKey(playerId)) {
-            profileMap.put(playerId, profileId);
-        }
+        profileMap.computeIfAbsent(playerId, id -> profileId);
     }
 }

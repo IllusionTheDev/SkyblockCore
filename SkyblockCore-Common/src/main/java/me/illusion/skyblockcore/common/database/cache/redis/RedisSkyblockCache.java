@@ -23,6 +23,8 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
     private RedisController controller;
 
+    private static final String ISLAND_SERVERS_KEY = "island-servers";
+
     @Override
     public String getName() {
         return "redis";
@@ -44,22 +46,22 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
 
     @Override
     public CompletableFuture<String> getIslandServer(UUID islandId) {
-        return associate(jedis -> jedis.hget("island-servers", islandId.toString()));
+        return associate(jedis -> jedis.hget(ISLAND_SERVERS_KEY, islandId.toString()));
     }
 
     @Override
     public CompletableFuture<Void> updateIslandServer(UUID islandId, String serverId) {
-        return associateTask(jedis -> jedis.hset("island-servers", islandId.toString(), serverId));
+        return associateTask(jedis -> jedis.hset(ISLAND_SERVERS_KEY, islandId.toString(), serverId));
     }
 
     @Override
     public CompletableFuture<Void> removeServer(String serverId) {
-        return associateTask(jedis -> jedis.hdel("island-servers", serverId));
+        return associateTask(jedis -> jedis.hdel(ISLAND_SERVERS_KEY, serverId));
     }
 
     @Override
     public CompletableFuture<Collection<UUID>> getIslands(String serverId) {
-        return associate(jedis -> jedis.hkeys("island-servers")).thenApply(strings -> {
+        return associate(jedis -> jedis.hkeys(ISLAND_SERVERS_KEY)).thenApply(strings -> {
             List<UUID> islands = new ArrayList<>();
 
             for (String string : strings) {
@@ -72,7 +74,7 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
 
     @Override
     public CompletableFuture<Map<String, Collection<UUID>>> getAllIslands() {
-        return associate(jedis -> jedis.hgetAll("island-servers")).thenApply(stringMap -> {
+        return associate(jedis -> jedis.hgetAll(ISLAND_SERVERS_KEY)).thenApply(stringMap -> {
             Map<String, Collection<UUID>> map = new ConcurrentHashMap<>();
 
             for (Map.Entry<String, String> entry : stringMap.entrySet()) {
@@ -88,7 +90,7 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
 
     @Override
     public CompletableFuture<Void> removeIsland(UUID islandId) {
-        return associateTask(jedis -> jedis.hdel("island-servers", islandId.toString()));
+        return associateTask(jedis -> jedis.hdel(ISLAND_SERVERS_KEY, islandId.toString()));
     }
 
     @Override

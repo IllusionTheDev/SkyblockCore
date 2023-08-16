@@ -10,7 +10,7 @@ public abstract class SkyblockPlayerEvent extends SkyblockEvent {
 
     private final SkyblockPlayer player;
 
-    public SkyblockPlayerEvent(SkyblockPlayer player) {
+    protected SkyblockPlayerEvent(SkyblockPlayer player) {
         this.player = player;
     }
 
