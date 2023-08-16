@@ -46,7 +46,10 @@ public class BungeeYMLBase {
                 saveResource();
             } else {
                 try {
-                    this.file.createNewFile();
+                    boolean success = this.file.createNewFile();
+                    if (!success) {
+                        throw new RuntimeException("Failed to create file " + this.file.getAbsolutePath());
+                    }
                 } catch (IOException var4) {
                     var4.printStackTrace();
                 }
@@ -74,7 +77,12 @@ public class BungeeYMLBase {
 
         try (InputStreamReader reader = new InputStreamReader(this.plugin.getResourceAsStream(inputName))) {
             Configuration input = ConfigurationProvider.getProvider(YamlConfiguration.class).load(reader);
-            file.createNewFile();
+            boolean success = file.createNewFile();
+
+            if (!success) {
+                throw new RuntimeException("Failed to create file " + this.file.getAbsolutePath());
+            }
+
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(input, this.file);
         } catch (IOException e) {
             e.printStackTrace();

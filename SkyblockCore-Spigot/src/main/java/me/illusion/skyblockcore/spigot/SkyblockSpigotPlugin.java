@@ -68,7 +68,6 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         gridRegistry = new SkyblockGridRegistry();
 
         configurationProvider = new BukkitConfigurationProvider(this);
-        islandManager = new IslandManagerImpl(this);
         eventManager = new SkyblockEventManagerImpl();
 
         registerNetworks();
@@ -96,12 +95,14 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         initCosmos();
 
         databaseRegistry.tryEnableMultiple(databasesFile, cacheDatabasesFile).thenAccept(success -> {
-            if (!success) {
+            if (Boolean.FALSE.equals(success)) { // The future returns a boxed boolean
                 getLogger().severe("Failed to enable databases, disabling plugin...");
                 Bukkit.getPluginManager().disablePlugin(this);
             }
 
             playerManager = new SkyblockBukkitPlayerManager(this);
+            islandManager = new IslandManagerImpl(this);
+
             networkRegistry.enable();
 
             eventManager.callEvent(new SkyblockPlatformEnabledEvent(this));

@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.bungee;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SimpleSkyblockCommand;
 import me.illusion.skyblockcore.bungee.config.BungeeConfigurationProvider;
@@ -62,7 +63,7 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
         ServerDataComparator comparator = matchmakerComparatorRegistry.getComparator(preferredComparator);
 
         if (comparator == null) {
-            getLogger().warning("Preferred comparator '" + preferredComparator + "' not found. Using default comparator.");
+            getLogger().log(Level.WARNING, "Preferred comparator {0} not found. Using default comparator.", preferredComparator);
             comparator = matchmakerComparatorRegistry.getComparator("least-islands");
         }
 
@@ -71,7 +72,7 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
 
     private void loadDatabase() {
         databaseRegistry.tryEnableMultiple(cacheDatabasesFile, databasesFile).thenAccept(success -> {
-            if (!success) {
+            if (Boolean.FALSE.equals(success)) { // The future returns a boxed boolean
                 getLogger().severe("Failed to enable databases. Disabling plugin.");
                 ProxyServer.getInstance().getPluginManager().unregisterListeners(this);
                 ProxyServer.getInstance().getPluginManager().unregisterCommands(this);

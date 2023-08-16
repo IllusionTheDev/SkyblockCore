@@ -35,7 +35,7 @@ public class SimpleSkyblockCommand extends Command { // TODO: Write a platform-i
     }
 
     private CompletableFuture<UUID> fetchIslandId(UUID playerId) {
-        return platform.getProfileCache().fetchProfileId(playerId).thenCompose(uuid -> {
+        return platform.getDatabaseRegistry().getChosenDatabase().getProfileId(playerId).thenCompose(uuid -> {
             if (uuid == null) {
                 return CompletableFuture.completedFuture(null);
             } else {

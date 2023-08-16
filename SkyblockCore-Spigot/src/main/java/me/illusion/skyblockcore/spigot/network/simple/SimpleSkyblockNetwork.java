@@ -5,11 +5,8 @@ import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
-import me.illusion.skyblockcore.server.network.simple.listener.SimplePlayerJoinListener;
-import me.illusion.skyblockcore.server.network.simple.listener.SimplePlayerQuitListener;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.network.simple.command.SimpleIslandCommand;
-import me.illusion.skyblockcore.spigot.network.simple.config.SimpleNetworkConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -27,7 +24,6 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void enable() {
-        registerListeners();
         registerCommands();
     }
 
@@ -42,12 +38,6 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     // Main startup logic
-
-
-    private void registerListeners() {
-        new SimplePlayerJoinListener(this);
-        new SimplePlayerQuitListener(this);
-    }
 
     private void registerCommands() {
         registerCommand(new SimpleIslandCommand(this));
@@ -73,10 +63,6 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     public MessagesFile getMessages() {
         return plugin.getMessages();
-    }
-
-    public SimpleNetworkConfiguration getConfiguration() {
-        return configuration;
     }
 
     public SkyblockEventManager getEventManager() {

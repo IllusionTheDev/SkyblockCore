@@ -87,12 +87,7 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
     public CompletableFuture<UUID> fetchIslandId(UUID profileId) {
         return associate(() -> {
             Document filter = new Document("ownerId", profileId);
-
-            for (UUID id : islandIdCollection.find(filter)) {
-                return id;
-            }
-
-            return null; // What if there is no island id?
+            return islandIdCollection.find(filter).first();
         });
     }
 
@@ -100,12 +95,7 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
     public CompletableFuture<IslandData> fetchIslandData(UUID islandId) {
         return associate(() -> {
             Document filter = new Document("islandId", islandId);
-
-            for (IslandData data : islandDataCollection.find(filter)) {
-                return data;
-            }
-
-            return null; // What if there is no island data?
+            return islandDataCollection.find(filter).first();
         });
     }
 
@@ -134,12 +124,7 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
     public CompletableFuture<UUID> getProfileId(UUID playerId) {
         return associate(() -> {
             Document filter = new Document("playerId", playerId);
-
-            for (UUID id : profileIdCollection.find(filter)) {
-                return id;
-            }
-
-            return null; // What if there is no profile id?
+            return profileIdCollection.find(filter).first();
         });
     }
 
