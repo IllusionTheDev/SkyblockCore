@@ -102,12 +102,7 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
         CompletableFuture<T> future = controller.supply(function);
 
         futures.add(future);
-
-        future.thenRun(() -> futures.remove(future));
-        future.exceptionally(throwable -> {
-            throwable.printStackTrace();
-            return null;
-        });
+        future.whenComplete((aVoid, throwable) -> futures.remove(future));
 
         return future;
     }
@@ -116,12 +111,7 @@ public class RedisSkyblockCache implements SkyblockCacheDatabase {
         CompletableFuture<Void> future = controller.borrow(consumer);
 
         futures.add(future);
-
-        future.thenRun(() -> futures.remove(future));
-        future.exceptionally(throwable -> {
-            throwable.printStackTrace();
-            return null;
-        });
+        future.whenComplete((aVoid, throwable) -> futures.remove(future));
 
         return future;
     }

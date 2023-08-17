@@ -8,4 +8,8 @@ public interface ConfigurationProvider {
 
     ReadOnlyConfigurationSection loadConfiguration(File file);
 
+    default ReadOnlyConfigurationSection loadConfiguration(String fileName) {
+        return loadConfiguration(new File(getDataFolder(), fileName));
+    }
+
 }

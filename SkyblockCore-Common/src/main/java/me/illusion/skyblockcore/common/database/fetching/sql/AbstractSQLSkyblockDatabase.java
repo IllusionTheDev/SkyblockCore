@@ -212,8 +212,8 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
             if (connection == null || !connection.isValid(5)) {
                 connection = createConnection();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ignored) {
+            // The exception is thrown if the field passed in isValid is less than 0, which is not the case here
         }
 
         return connection;

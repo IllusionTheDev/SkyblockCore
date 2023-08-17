@@ -21,9 +21,10 @@ public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetwork
     private String desiredStructure;
     private boolean loaded = false;
 
-    protected AbstractSkyblockNetworkRegistry(SkyblockServerPlatform platform, ReadOnlyConfigurationSection config) {
+    protected AbstractSkyblockNetworkRegistry(SkyblockServerPlatform platform) {
         this.platform = platform;
-        this.config = config;
+
+        this.config = platform.getConfigurationProvider().loadConfiguration("network-settings.yml");
     }
 
     /**

@@ -5,6 +5,8 @@ import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.cosmos.utilities.command.command.CommandManager;
 import me.illusion.cosmos.utilities.storage.MessagesFile;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
+import me.illusion.skyblockcore.common.config.impl.SkyblockCacheDatabasesFile;
+import me.illusion.skyblockcore.common.config.impl.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.impl.SkyblockPlatformEnabledEvent;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
@@ -15,8 +17,6 @@ import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistry;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
 import me.illusion.skyblockcore.spigot.config.BukkitConfigurationProvider;
-import me.illusion.skyblockcore.spigot.config.SkyblockCacheDatabasesFile;
-import me.illusion.skyblockcore.spigot.config.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
@@ -133,4 +133,8 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         cosmosSetup = cosmosSetupFile.getSetup();
     }
 
+    @Override
+    public void disableExceptionally() {
+        Bukkit.getPluginManager().disablePlugin(this);
+    }
 }

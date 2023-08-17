@@ -14,29 +14,13 @@ public class BungeeYMLBase {
     private final Plugin plugin;
 
     protected File file;
-    private Configuration configuration;
-
-    public BungeeYMLBase(Plugin plugin, String name) {
-        this(plugin, new File(plugin.getDataFolder(), name), true);
-    }
-
-    public BungeeYMLBase(Plugin plugin, File file) {
-        this(plugin, file, true);
-    }
+    private final Configuration configuration;
 
     public BungeeYMLBase(Plugin plugin, File file, boolean existsOnSource) {
         this.plugin = plugin;
         this.file = file;
         this.existsOnSource = existsOnSource;
         this.configuration = this.loadConfiguration();
-    }
-
-    public void save() {
-        try {
-            ConfigurationProvider.getProvider(YamlConfiguration.class).save(this.configuration, this.file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private Configuration loadConfiguration() {
@@ -88,35 +72,6 @@ public class BungeeYMLBase {
             e.printStackTrace();
         }
 
-    }
-
-    public void writeUnsetValues() {
-        if (!this.existsOnSource) {
-            return;
-        }
-
-        String inputName = this.file.getAbsolutePath().replace(this.plugin.getDataFolder().getAbsolutePath() + File.separator, "");
-
-        try (InputStreamReader reader = new InputStreamReader(this.plugin.getResourceAsStream(inputName))) {
-            Configuration input = ConfigurationProvider.getProvider(YamlConfiguration.class).load(reader);
-
-            for (String key : input.getKeys()) {
-                if (!this.configuration.contains(key)) {
-                    this.configuration.set(key, input.get(key));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void reload() {
-        this.configuration = this.loadConfiguration();
-    }
-
-    public File getFile() {
-        return this.file;
     }
 
     public Configuration getConfiguration() {

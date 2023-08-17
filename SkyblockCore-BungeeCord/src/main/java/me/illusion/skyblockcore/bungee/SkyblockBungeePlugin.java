@@ -5,14 +5,14 @@ import java.util.logging.Level;
 import lombok.Getter;
 import me.illusion.skyblockcore.bungee.command.SimpleSkyblockCommand;
 import me.illusion.skyblockcore.bungee.config.BungeeConfigurationProvider;
-import me.illusion.skyblockcore.bungee.config.SkyblockCacheDatabasesFile;
-import me.illusion.skyblockcore.bungee.config.SkyblockDatabasesFile;
-import me.illusion.skyblockcore.bungee.config.SkyblockMatchmakingFile;
 import me.illusion.skyblockcore.bungee.instance.BungeeSkyblockMatchmaker;
+import me.illusion.skyblockcore.common.config.impl.SkyblockCacheDatabasesFile;
+import me.illusion.skyblockcore.common.config.impl.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
+import me.illusion.skyblockcore.proxy.config.SkyblockMatchmakingFile;
 import me.illusion.skyblockcore.proxy.matchmaking.comparator.ServerDataComparator;
 import me.illusion.skyblockcore.proxy.matchmaking.comparator.SkyblockServerComparatorRegistry;
 import me.illusion.skyblockcore.proxy.matchmaking.comparator.SkyblockServerComparatorRegistryImpl;
@@ -90,4 +90,9 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
         databaseRegistry.getChosenDatabase().flush().join();
     }
 
+    @Override
+    public void disableExceptionally() {
+        ProxyServer.getInstance().getPluginManager().unregisterListeners(this);
+        ProxyServer.getInstance().getPluginManager().unregisterCommands(this);
+    }
 }

@@ -47,5 +47,10 @@ public interface SkyblockPlatform {
      */
     ConfigurationProvider getConfigurationProvider();
 
+    /**
+     * Disables the platform due to an initialization error (e.g. incorrect configuration)
+     */
+    void disableExceptionally();
+
 
 }

@@ -74,7 +74,7 @@ public class SkyblockDatabaseRegistry {
      *
      * @return The chosen database
      */
-    public <DataType extends SkyblockDatabase> DataType getChosenDatabase(Class<DataType> databaseClass) {
+    public <T extends SkyblockDatabase> T getChosenDatabase(Class<T> databaseClass) {
         String name = chosenDatabases.get(databaseClass);
 
         if (name == null) {
@@ -125,7 +125,7 @@ public class SkyblockDatabaseRegistry {
 
         for (SkyblockDatabaseSetup<?> databaseSetup : setup) {
             futures.add(tryEnable(databaseSetup).thenApply(success -> {
-                if (!success) {
+                if (!Boolean.TRUE.equals(success) && !future.isDone()) {
                     future.complete(false);
                 }
 
@@ -142,7 +142,7 @@ public class SkyblockDatabaseRegistry {
         return future;
     }
 
-    public <DataType extends SkyblockDatabase> CompletableFuture<Boolean> tryEnable(SkyblockDatabaseSetup<DataType> setup) {
+    public <T extends SkyblockDatabase> CompletableFuture<Boolean> tryEnable(SkyblockDatabaseSetup<T> setup) {
         String preferred = setup.getPreferredDatabase();
 
         SkyblockDatabase database = databases.get(preferred);
