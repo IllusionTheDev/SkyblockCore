@@ -6,6 +6,9 @@ import me.illusion.skyblockcore.proxy.instance.ProxyServerData;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
+/**
+ * Bungee implementation of {@link ProxyServerData}.
+ */
 public class BungeeProxyServerData implements ProxyServerData {
 
     private final String serverName;

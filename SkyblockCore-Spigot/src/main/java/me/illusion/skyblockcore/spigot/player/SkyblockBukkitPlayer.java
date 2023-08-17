@@ -10,6 +10,9 @@ import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+/**
+ * Adapter class for {@link me.illusion.skyblockcore.server.player.SkyblockPlayer} for Bukkit.
+ */
 public class SkyblockBukkitPlayer extends AbstractSkyblockPlayer {
 
     public SkyblockBukkitPlayer(SkyblockPlayerManager playerManager, UUID playerId) {

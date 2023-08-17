@@ -11,7 +11,7 @@ import me.illusion.skyblockcore.server.SkyblockServerPlatform;
  * The skyblock network registry is responsible for loading the correct skyblock network structure. It is expected that separate plugins hook into this registry
  * and register their own skyblock network structures on startup. The network is loaded after all plugins enable.
  */
-public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetworkRegistry {
+public class SkyblockNetworkRegistryImpl implements SkyblockNetworkRegistry {
 
     private final Map<String, SkyblockNetworkStructure> structures = new ConcurrentHashMap<>();
 
@@ -21,7 +21,7 @@ public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetwork
     private String desiredStructure;
     private boolean loaded = false;
 
-    protected AbstractSkyblockNetworkRegistry(SkyblockServerPlatform platform) {
+    public SkyblockNetworkRegistryImpl(SkyblockServerPlatform platform) {
         this.platform = platform;
 
         this.config = platform.getConfigurationProvider().loadConfiguration("network-settings.yml");
@@ -113,6 +113,8 @@ public abstract class AbstractSkyblockNetworkRegistry implements SkyblockNetwork
         logger.log(Level.SEVERE, "Failed to enable network structure {0}!", name);
         logger.severe("Please check your configuration file and try again.");
         logger.severe("Disabling plugin...");
+
+        platform.disableExceptionally();
     }
 
 }

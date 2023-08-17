@@ -9,13 +9,16 @@ import lombok.Setter;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
+/**
+ * Represents a base implementation of {@link SkyblockPlayerManager}.
+ */
 public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerManager {
 
     protected final SkyblockPlatform platform;
     protected final SkyblockFetchingDatabase database;
 
     private final Map<UUID, UUID> profileMap = new ConcurrentHashMap<>(); // Player ID -> Profile ID
-    private final Map<UUID, SkyblockPlayer> playerIdMap = new ConcurrentHashMap<>(); // Profile ID -> T
+    private final Map<UUID, SkyblockPlayer> playerIdMap = new ConcurrentHashMap<>();
 
     @Setter
     private Function<UUID, UUID> profileMappingFunction = Function.identity(); // Player ID -> Player ID

@@ -7,6 +7,9 @@ import me.illusion.skyblockcore.bungee.utilities.storage.BungeeYMLBase;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 
+/**
+ * Bungee implementation of {@link ConfigurationProvider}.
+ */
 public class BungeeConfigurationProvider implements ConfigurationProvider {
 
     private final SkyblockBungeePlugin plugin;

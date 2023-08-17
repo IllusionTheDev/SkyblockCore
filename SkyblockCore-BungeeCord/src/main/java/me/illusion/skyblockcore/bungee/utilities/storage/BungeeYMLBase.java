@@ -8,6 +8,9 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
+/**
+ * Represents a YML wrapper for BungeeCord. Other than reading the configuration, this class also handles the copying of the default configuration file.
+ */
 public class BungeeYMLBase {
 
     private final boolean existsOnSource;

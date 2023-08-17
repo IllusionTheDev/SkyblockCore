@@ -6,6 +6,9 @@ import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabaseSetup;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
+/**
+ * Represents the cache database configuration file.
+ */
 public class SkyblockCacheDatabasesFile extends AbstractConfiguration implements SkyblockCacheDatabaseSetup {
 
     public SkyblockCacheDatabasesFile(SkyblockPlatform platform) {

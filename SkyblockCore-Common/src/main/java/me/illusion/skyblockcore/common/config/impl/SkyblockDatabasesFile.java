@@ -6,6 +6,9 @@ import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabas
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabaseSetup;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
+/**
+ * Represents the database configuration file.
+ */
 public class SkyblockDatabasesFile extends AbstractConfiguration implements SkyblockFetchingDatabaseSetup {
 
     private boolean supportsFileBased = true;

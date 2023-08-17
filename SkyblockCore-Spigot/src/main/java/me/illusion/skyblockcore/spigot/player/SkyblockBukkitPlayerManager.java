@@ -10,6 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+/**
+ * Bukkit implementation of {@link me.illusion.skyblockcore.server.player.SkyblockPlayerManager}.
+ */
 public class SkyblockBukkitPlayerManager extends AbstractSkyblockPlayerManager implements Listener {
 
     public SkyblockBukkitPlayerManager(SkyblockSpigotPlugin plugin) {

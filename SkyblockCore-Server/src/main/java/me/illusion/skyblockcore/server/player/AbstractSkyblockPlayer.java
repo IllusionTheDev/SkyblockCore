@@ -2,6 +2,9 @@ package me.illusion.skyblockcore.server.player;
 
 import java.util.UUID;
 
+/**
+ * Represents a base implementation of {@link SkyblockPlayer}.
+ */
 public abstract class AbstractSkyblockPlayer implements SkyblockPlayer {
 
     protected final SkyblockPlayerManager playerManager;

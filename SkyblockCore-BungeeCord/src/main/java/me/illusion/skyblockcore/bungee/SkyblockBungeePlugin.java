@@ -20,6 +20,9 @@ import me.illusion.skyblockcore.proxy.matchmaking.data.SkyblockServerMatchmaker;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+/**
+ * Bungee implementation of {@link SkyblockProxyPlatform}.
+ */
 @Getter
 public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatform {
 
@@ -74,8 +77,7 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
         databaseRegistry.tryEnableMultiple(cacheDatabasesFile, databasesFile).thenAccept(success -> {
             if (Boolean.FALSE.equals(success)) { // The future returns a boxed boolean
                 getLogger().severe("Failed to enable databases. Disabling plugin.");
-                ProxyServer.getInstance().getPluginManager().unregisterListeners(this);
-                ProxyServer.getInstance().getPluginManager().unregisterCommands(this);
+                disableExceptionally();
                 return;
             }
 

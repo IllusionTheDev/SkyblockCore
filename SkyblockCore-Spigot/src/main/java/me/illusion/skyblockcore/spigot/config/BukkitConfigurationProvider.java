@@ -7,6 +7,9 @@ import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.utilities.config.BukkitConfigurationAdapter;
 
+/**
+ * Bukkit implementation of {@link ConfigurationProvider}.
+ */
 public class BukkitConfigurationProvider implements ConfigurationProvider {
 
     private final SkyblockSpigotPlugin plugin;

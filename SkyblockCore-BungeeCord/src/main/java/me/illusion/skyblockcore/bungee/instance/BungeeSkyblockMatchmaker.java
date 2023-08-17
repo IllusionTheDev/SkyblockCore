@@ -6,6 +6,9 @@ import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.instance.ProxyServerData;
 import me.illusion.skyblockcore.proxy.matchmaking.data.AbstractSkyblockServerMatchmaker;
 
+/**
+ * Bungee factory for {@link ProxyServerData}.
+ */
 public class BungeeSkyblockMatchmaker extends AbstractSkyblockServerMatchmaker {
 
     public BungeeSkyblockMatchmaker(SkyblockProxyPlatform platform) {

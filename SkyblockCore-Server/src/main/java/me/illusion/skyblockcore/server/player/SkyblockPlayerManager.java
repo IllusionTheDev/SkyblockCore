@@ -3,10 +3,25 @@ package me.illusion.skyblockcore.server.player;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Represents a managing class for player and profile data.
+ */
 public interface SkyblockPlayerManager {
 
+    /**
+     * This method is used to get a skyblock player from a player ID.
+     *
+     * @param playerId The player ID to get the skyblock player for.
+     * @return The skyblock player.
+     */
     SkyblockPlayer getPlayer(UUID playerId);
 
+    /**
+     * This method is used to get a skyblock player from a profile ID.
+     *
+     * @param profileId The profile ID to get the skyblock player for.
+     * @return The skyblock player.
+     */
     SkyblockPlayer getPlayerFromProfile(UUID profileId);
 
     /**
