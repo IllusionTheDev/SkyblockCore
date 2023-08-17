@@ -11,6 +11,9 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.ChunkGenerator;
 
+/**
+ * Base provider for a {@link SingleWorldGrid}.
+ */
 public class SingleWorldGridProvider implements SkyblockGridProvider {
 
     @Override

@@ -8,28 +8,28 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * A drop table is a collection of items with a weight, the higher the weight, the more likely it is to be chosen.
  *
- * @param <Type> The type of the item
+ * @param <T> The type of the item
  */
-public class DropTable<Type> {
+public class DropTable<T> {
 
     private final Random random = ThreadLocalRandom.current();
 
-    private final Map<Type, Double> weights = new ConcurrentHashMap<>();
+    private final Map<T, Double> weights = new ConcurrentHashMap<>();
     private double totalWeight = 0;
 
-    public void add(Type type, double weight) {
+    public void add(T type, double weight) {
         weights.put(type, weight);
         totalWeight += weight;
     }
 
-    public void remove(Type type) {
+    public void remove(T type) {
         totalWeight -= weights.remove(type);
     }
 
-    public Type get() {
+    public T get() {
         double value = random.nextDouble() * totalWeight;
 
-        for (Map.Entry<Type, Double> entry : weights.entrySet()) {
+        for (Map.Entry<T, Double> entry : weights.entrySet()) {
             value -= entry.getValue();
 
             if (value <= 0) {
@@ -40,7 +40,7 @@ public class DropTable<Type> {
         return null;
     }
 
-    public Map<Type, Double> getWeights() {
+    public Map<T, Double> getWeights() {
         return new ConcurrentHashMap<>(weights);
     }
 

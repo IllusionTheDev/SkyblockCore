@@ -12,6 +12,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.Vector;
 
+/**
+ * Base provider for a {@link WorldPerAreaGrid}.
+ */
 public class WorldPerAreaGridProvider implements SkyblockGridProvider {
 
     @Override

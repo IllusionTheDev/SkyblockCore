@@ -1,14 +1,11 @@
 package me.illusion.skyblockcore.spigot.network.complex.listener;
 
 import java.util.UUID;
-import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
 import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
-import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 /**
  * This class is responsible for loading the player's island when they join the server. If another instance is responsible for the island, we do not load it.
@@ -27,17 +24,13 @@ public class ComplexPlayerJoinListener {
     }
 
     private void handle(SkyblockPlayerJoinEvent event) {
-        Player player = Bukkit.getPlayer(event.getPlayerId());
-        UUID profileId = event.getProfileId();
-
-        if (player == null) {
-            return;
-        }
+        SkyblockPlayer player = event.getPlayer();
+        UUID profileId = player.getSelectedProfileId();
 
         SkyblockIsland cached = islandManager.getProfileIsland(profileId);
 
         if (cached != null) {
-            player.teleport(SkyblockBukkitAdapter.toBukkitLocation(cached.getCenter()));
+            player.teleport(cached.getCenter());
             return;
         }
 
@@ -46,17 +39,13 @@ public class ComplexPlayerJoinListener {
             .fetchIslandId(profileId) // Fetch the island id
             .thenCompose(islandId -> network.getCommunicationsHandler().canLoad(islandId)) // Check if we can load the island
             .thenAccept(allowed -> { // If we can load the island, we load it.
-                if (allowed) {
+                if (Boolean.TRUE.equals(allowed)) { // CF returns a boxed boolean, let's prevent null pointer exceptions.
                     tryLoadDefault(profileId, player);
                 }
             });
     }
 
-    private void tryLoadDefault(UUID profileId, Player player) {
-        islandManager.loadPlayerIsland(profileId, "default").thenAcceptAsync(island -> {
-
-            player.teleport(SkyblockBukkitAdapter.toBukkitLocation(island.getCenter()));
-
-        }, MainThreadExecutor.INSTANCE);
+    private void tryLoadDefault(UUID profileId, SkyblockPlayer player) {
+        islandManager.loadPlayerIsland(profileId, "default").thenAccept(island -> player.teleport(island.getCenter()));
     }
 }

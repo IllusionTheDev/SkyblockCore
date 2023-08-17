@@ -66,8 +66,7 @@ public class SQLiteSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
         try (Connection connection = getConnection()) {
             return connection.isValid(5);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception expected) {
             return false;
         }
     }

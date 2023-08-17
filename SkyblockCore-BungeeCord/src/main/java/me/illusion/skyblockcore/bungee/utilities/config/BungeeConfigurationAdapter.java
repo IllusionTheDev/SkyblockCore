@@ -5,7 +5,11 @@ import java.util.Map;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import net.md_5.bungee.config.Configuration;
 
-public class BungeeConfigurationAdapter {
+public final class BungeeConfigurationAdapter {
+
+    private BungeeConfigurationAdapter() {
+
+    }
 
     /**
      * Adapt a {@link Configuration} to a {@link ReadOnlyConfigurationSection}, flattening the section

@@ -8,31 +8,22 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
+/**
+ * Represents a YML wrapper for BungeeCord. Other than reading the configuration, this class also handles the copying of the default configuration file.
+ */
 public class BungeeYMLBase {
 
     private final boolean existsOnSource;
     private final Plugin plugin;
 
     protected File file;
-    private Configuration configuration;
-
-    public BungeeYMLBase(Plugin plugin, String name) {
-        this(plugin, new File(plugin.getDataFolder(), name), true);
-    }
+    private final Configuration configuration;
 
     public BungeeYMLBase(Plugin plugin, File file, boolean existsOnSource) {
         this.plugin = plugin;
         this.file = file;
         this.existsOnSource = existsOnSource;
         this.configuration = this.loadConfiguration();
-    }
-
-    public void save() {
-        try {
-            ConfigurationProvider.getProvider(YamlConfiguration.class).save(this.configuration, this.file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private Configuration loadConfiguration() {
@@ -42,7 +33,10 @@ public class BungeeYMLBase {
                 saveResource();
             } else {
                 try {
-                    this.file.createNewFile();
+                    boolean success = this.file.createNewFile();
+                    if (!success) {
+                        throw new RuntimeException("Failed to create file " + this.file.getAbsolutePath());
+                    }
                 } catch (IOException var4) {
                     var4.printStackTrace();
                 }
@@ -70,41 +64,17 @@ public class BungeeYMLBase {
 
         try (InputStreamReader reader = new InputStreamReader(this.plugin.getResourceAsStream(inputName))) {
             Configuration input = ConfigurationProvider.getProvider(YamlConfiguration.class).load(reader);
-            file.createNewFile();
+            boolean success = file.createNewFile();
+
+            if (!success) {
+                throw new RuntimeException("Failed to create file " + this.file.getAbsolutePath());
+            }
+
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(input, this.file);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-    }
-
-    public void writeUnsetValues() {
-        if (!this.existsOnSource) {
-            return;
-        }
-
-        String inputName = this.file.getAbsolutePath().replace(this.plugin.getDataFolder().getAbsolutePath() + File.separator, "");
-
-        try (InputStreamReader reader = new InputStreamReader(this.plugin.getResourceAsStream(inputName))) {
-            Configuration input = ConfigurationProvider.getProvider(YamlConfiguration.class).load(reader);
-
-            for (String key : input.getKeys()) {
-                if (!this.configuration.contains(key)) {
-                    this.configuration.set(key, input.get(key));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void reload() {
-        this.configuration = this.loadConfiguration();
-    }
-
-    public File getFile() {
-        return this.file;
     }
 
     public Configuration getConfiguration() {

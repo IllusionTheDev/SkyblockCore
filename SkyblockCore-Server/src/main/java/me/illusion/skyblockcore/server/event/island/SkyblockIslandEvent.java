@@ -10,7 +10,7 @@ public abstract class SkyblockIslandEvent extends SkyblockEvent {
 
     private final SkyblockIsland island;
 
-    public SkyblockIslandEvent(SkyblockIsland island) {
+    protected SkyblockIslandEvent(SkyblockIsland island) {
         this.island = island;
     }
 

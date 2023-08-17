@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -23,11 +23,11 @@ import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabas
 public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
-    private final AtomicReference<Connection> connection = new AtomicReference<>();
+    private final AtomicReference<Connection> connectionReference = new AtomicReference<>();
 
     @Override
     public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
-        return associate(() -> enableDriver(properties)).thenCompose((__) -> createTables());
+        return associate(() -> enableDriver(properties)).thenCompose(unused -> createTables());
     }
 
     @Override
@@ -206,14 +206,14 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
      * @return The connection to the database.
      */
     protected Connection getConnection() {
-        Connection connection = this.connection.get();
+        Connection connection = connectionReference.get();
 
         try {
             if (connection == null || !connection.isValid(5)) {
                 connection = createConnection();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ignored) {
+            // The exception is thrown if the field passed in isValid is less than 0, which is not the case here
         }
 
         return connection;
@@ -246,7 +246,7 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
     }
 
     protected Map<SkyblockSQLQuery, String> of(Object... objects) {
-        Map<SkyblockSQLQuery, String> map = new HashMap<>();
+        Map<SkyblockSQLQuery, String> map = new EnumMap<>(SkyblockSQLQuery.class);
 
         for (int index = 0; index < objects.length; index += 2) {
             Object key = objects[index];

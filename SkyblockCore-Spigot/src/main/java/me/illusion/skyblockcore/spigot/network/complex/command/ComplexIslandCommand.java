@@ -52,7 +52,7 @@ public class ComplexIslandCommand extends AdvancedCommand {
             }
 
             network.getCommunicationsHandler().attemptTeleportToIsland(player, islandId).thenAccept(success -> {
-                if (!success) {
+                if (Boolean.FALSE.equals(success)) {
                     messages.sendMessage(player, "no-island-loaded");
                 }
 

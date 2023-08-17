@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.server.event.player;
 
-import java.util.UUID;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 
 /**
  * This event is called when a player quits the server. Contains the player and their chosen profile ID. This event may be called multiple times for the same
@@ -8,8 +8,8 @@ import java.util.UUID;
  */
 public class SkyblockPlayerQuitEvent extends SkyblockPlayerEvent {
 
-    public SkyblockPlayerQuitEvent(UUID playerId, UUID profileId) {
-        super(playerId, profileId);
+    public SkyblockPlayerQuitEvent(SkyblockPlayer player) {
+        super(player);
     }
 
 }

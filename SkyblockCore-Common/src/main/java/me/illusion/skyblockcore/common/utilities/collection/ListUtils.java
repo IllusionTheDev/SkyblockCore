@@ -100,18 +100,18 @@ public final class ListUtils {
     /**
      * Inserts a value into the list at the specified index, moving all other elements up
      *
-     * @param list       The list
-     * @param index      The index
-     * @param value      The value
-     * @param <ListType> The list type
+     * @param list  The list
+     * @param index The index
+     * @param value The value
+     * @param <T>   The list type
      */
-    public static <ListType> void insertInList(List<ListType> list, int index, ListType value) {
+    public static <T> void insertInList(List<T> list, int index, T value) {
         if (index >= list.size()) {
             list.add(value);
             return;
         }
 
-        List<ListType> newList = new ArrayList<>();
+        List<T> newList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             if (i == index) {
                 newList.add(value);

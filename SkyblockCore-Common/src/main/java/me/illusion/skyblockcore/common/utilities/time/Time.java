@@ -7,11 +7,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class Time {
 
-    private final int time;
+    private final int duration;
     private final TimeUnit unit;
 
-    public Time(int time, TimeUnit unit) {
-        this.time = time;
+    public Time(int duration, TimeUnit unit) {
+        this.duration = duration;
         this.unit = unit;
     }
 
@@ -22,7 +22,7 @@ public class Time {
      * @return The converted time
      */
     public long as(TimeUnit unit) {
-        return unit.convert(time, this.unit);
+        return unit.convert(duration, this.unit);
     }
 
     /**
@@ -36,7 +36,7 @@ public class Time {
 
     @Override
     public String toString() {
-        return time + " " + unit.name().toLowerCase();
+        return duration + " " + unit.name().toLowerCase();
     }
 
 }

@@ -12,6 +12,9 @@ import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+/**
+ * Represents the cosmos setup file. This is used to load the cosmos setup.
+ */
 public class SkyblockCosmosSetupFile extends YMLBase {
 
     private final SkyblockCosmosSetup setup;

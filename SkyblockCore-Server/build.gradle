@@ -11,6 +11,9 @@ repositories {
 }
 
 dependencies {
+    annotationProcessor('org.projectlombok:lombok:1.18.28')
+    implementation('org.projectlombok:lombok:1.18.28')
+
     implementation(project(":SkyblockCore-Common"))
 }
 

@@ -9,7 +9,11 @@ import org.bukkit.configuration.ConfigurationSection;
  *
  * @see ReadOnlyConfigurationSection
  */
-public class BukkitConfigurationAdapter {
+public final class BukkitConfigurationAdapter {
+
+    private BukkitConfigurationAdapter() {
+
+    }
 
     /**
      * Adapt a {@link ConfigurationSection} to a {@link ReadOnlyConfigurationSection}, flattening the section

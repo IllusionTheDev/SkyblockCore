@@ -36,9 +36,7 @@ public class ItemPDCWrapper extends PDCWrapper { // ugly wrapper class because p
 
     @Override
     protected <T> void set(String key, PersistentDataType<T, T> type, T value) {
-        modifyMeta(meta -> {
-            meta.getPersistentDataContainer().set(createKey(key), type, value);
-        });
+        modifyMeta(meta -> meta.getPersistentDataContainer().set(createKey(key), type, value));
     }
 
     public ItemStack getModifiedItem() {

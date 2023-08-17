@@ -1,35 +1,30 @@
-package me.illusion.skyblockcore.bungee.config;
+package me.illusion.skyblockcore.common.config.impl;
 
-import me.illusion.skyblockcore.bungee.utilities.config.BungeeConfigurationAdapter;
-import me.illusion.skyblockcore.bungee.utilities.storage.BungeeYMLBase;
+import me.illusion.skyblockcore.common.config.AbstractConfiguration;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabaseSetup;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.config.Configuration;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
-public class SkyblockDatabasesFile extends BungeeYMLBase implements SkyblockFetchingDatabaseSetup {
+/**
+ * Represents the database configuration file.
+ */
+public class SkyblockDatabasesFile extends AbstractConfiguration implements SkyblockFetchingDatabaseSetup {
 
-    public SkyblockDatabasesFile(Plugin plugin) {
-        super(plugin, "database.yml");
+    private boolean supportsFileBased = true;
+
+    public SkyblockDatabasesFile(SkyblockPlatform platform) {
+        super(platform, "database.yml");
     }
 
     @Override
     public ReadOnlyConfigurationSection getProperties(String databaseType) {
-        Configuration config = getConfiguration();
-        Configuration section = config.getSection(databaseType);
-
-        if (section == null) {
-            return null;
-        }
-
-        return BungeeConfigurationAdapter.adapt(databaseType, section);
+        return getConfiguration().getSection(databaseType);
     }
 
     @Override
     public String getFallback(String databaseType) {
-        Configuration config = getConfiguration();
-        Configuration databaseSection = config.getSection(databaseType);
+        ReadOnlyConfigurationSection databaseSection = getProperties(databaseType);
 
         if (databaseSection == null) {
             return null;
@@ -50,6 +45,10 @@ public class SkyblockDatabasesFile extends BungeeYMLBase implements SkyblockFetc
 
     @Override
     public boolean supportsFileBased() {
-        return false;
+        return supportsFileBased;
+    }
+
+    public void setSupportsFileBased(boolean supportsFileBased) { // This can be set by the network type
+        this.supportsFileBased = supportsFileBased;
     }
 }

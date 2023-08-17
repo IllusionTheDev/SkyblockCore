@@ -8,7 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
-import me.illusion.skyblockcore.common.profile.SkyblockProfileCache;
+import me.illusion.skyblockcore.server.SkyblockServerPlatform;
+import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
 
 /**
@@ -22,14 +23,14 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
     protected final Set<CompletableFuture<?>> pending = ConcurrentHashMap.newKeySet();
 
     protected final SkyblockFetchingDatabase database;
-    protected final SkyblockProfileCache profileCache;
+    protected final SkyblockPlayerManager playerManager;
     protected final SkyblockPlatform platform;
 
-    public AbstractIslandManager(SkyblockPlatform platform) {
+    protected AbstractIslandManager(SkyblockServerPlatform platform) {
         this.platform = platform;
 
         this.database = platform.getDatabaseRegistry().getChosenDatabase();
-        this.profileCache = platform.getProfileCache();
+        this.playerManager = platform.getPlayerManager();
     }
 
     /**
@@ -138,7 +139,7 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
      */
     @Override
     public SkyblockIsland getPlayerIsland(UUID playerId) {
-        UUID cachedProfileId = profileCache.getCachedProfileId(playerId);
+        UUID cachedProfileId = playerManager.getCachedProfileId(playerId);
 
         if (cachedProfileId == null) { // If the player's profile isn't cached, their island isn't loaded.
             return null;

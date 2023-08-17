@@ -1,6 +1,6 @@
 package me.illusion.skyblockcore.server.event.player;
 
-import java.util.UUID;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 
 /**
  * This event is called when a player joins the server. Contains the player and their chosen profile ID. This event may be called multiple times for the same
@@ -8,8 +8,8 @@ import java.util.UUID;
  */
 public class SkyblockPlayerJoinEvent extends SkyblockPlayerEvent {
 
-    public SkyblockPlayerJoinEvent(UUID playerId, UUID profileId) {
-        super(playerId, profileId);
+    public SkyblockPlayerJoinEvent(SkyblockPlayer player) {
+        super(player);
     }
 
 }
