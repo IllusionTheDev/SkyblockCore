@@ -220,21 +220,14 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
     }
 
     private <T> CompletableFuture<T> associate(Supplier<T> supplier) {
-        CompletableFuture<T> future = CompletableFuture.supplyAsync(supplier);
-
-        future.thenRun(() -> futures.remove(future));
-        future.exceptionally(throwable -> {
-            throwable.printStackTrace();
-            return null;
-        });
-
-        futures.add(future);
-        return future;
+        return registerFuture(CompletableFuture.supplyAsync(supplier));
     }
 
     private CompletableFuture<Void> associate(Runnable runnable) {
-        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable);
+        return registerFuture(CompletableFuture.runAsync(runnable));
+    }
 
+    private <T> CompletableFuture<T> registerFuture(CompletableFuture<T> future) {
         future.thenRun(() -> futures.remove(future));
         future.exceptionally(throwable -> {
             throwable.printStackTrace();

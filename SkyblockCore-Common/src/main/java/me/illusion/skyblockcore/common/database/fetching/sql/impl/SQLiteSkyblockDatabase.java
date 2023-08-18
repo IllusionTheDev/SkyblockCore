@@ -62,6 +62,7 @@ public class SQLiteSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     @Override
     protected boolean enableDriver(ReadOnlyConfigurationSection properties) {
         String fileName = properties.getString("file-name", "database");
+
         databaseFile = new File(dataFolder, fileName + ".db");
 
         try (Connection connection = getConnection()) {

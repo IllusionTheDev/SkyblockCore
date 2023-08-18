@@ -2,16 +2,15 @@ package me.illusion.skyblockcore.common.database.fetching.sql.impl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Map;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.database.fetching.sql.AbstractRemoteSQLDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
 /**
  * The mysql implementation of {@link AbstractSQLSkyblockDatabase}
  */
-public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
+public class MySQLSkyblockDatabase extends AbstractRemoteSQLDatabase {
 
     private static final String FETCH_ISLAND_ID = "SELECT island_id FROM skyblock_ids WHERE owner_id = ?";
     private static final String FETCH_ISLAND_DATA = "SELECT * FROM skyblock_data WHERE island_id = ?";
@@ -24,12 +23,6 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
     private static final String CREATE_ISLAND_DATA_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_data (island_id VARCHAR(36) PRIMARY KEY, owner_id VARCHAR(36))";
     private static final String CREATE_ISLAND_ID_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_ids (owner_id VARCHAR(36) PRIMARY KEY, island_id VARCHAR(36))";
     private static final String CREATE_PROFILE_TABLE = "CREATE TABLE IF NOT EXISTS skyblock_profiles (owner_id VARCHAR(36) PRIMARY KEY, profile_id VARCHAR(36))";
-
-    private String host;
-    private int port;
-    private String database;
-    private String username;
-    private String password;
 
     @Override
     protected Map<SkyblockSQLQuery, String> getQueries() {
@@ -55,21 +48,6 @@ public class MySQLSkyblockDatabase extends AbstractSQLSkyblockDatabase {
             return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
         } catch (Exception expected) { // The driver will throw an exception if it fails to connect
             return null;
-        }
-    }
-
-    @Override
-    protected boolean enableDriver(ReadOnlyConfigurationSection properties) {
-        host = properties.getString("host", "localhost");
-        port = properties.getInt("port", 3306);
-        database = properties.getString("database", "skyblock");
-        username = properties.getString("username", "root");
-        password = properties.getString("password", "password");
-
-        try (Connection connection = createConnection()) {
-            return connection != null && connection.isValid(5);
-        } catch (SQLException e) {
-            return false;
         }
     }
 
