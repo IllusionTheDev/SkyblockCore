@@ -1,0 +1,27 @@
+package me.illusion.skyblockcore.common.command.context.arg;
+
+import me.illusion.skyblockcore.common.command.context.CommandArgument;
+import me.illusion.skyblockcore.common.command.context.CommandContext;
+
+public class LiteralArgument implements CommandArgument {
+
+    private final String name;
+
+    public LiteralArgument(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public Object parse(CommandContext context) {
+        if (context.getLastInput().equalsIgnoreCase(name)) {
+            return name;
+        }
+
+        return null;
+    }
+}

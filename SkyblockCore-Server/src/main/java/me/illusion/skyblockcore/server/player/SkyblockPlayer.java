@@ -1,12 +1,13 @@
 package me.illusion.skyblockcore.server.player;
 
 import java.util.UUID;
+import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
 
 /**
  * Represents a Skyblock player on the server.
  */
-public interface SkyblockPlayer {
+public interface SkyblockPlayer extends SkyblockAudience {
 
     /**
      * Obtains the name of the player.
