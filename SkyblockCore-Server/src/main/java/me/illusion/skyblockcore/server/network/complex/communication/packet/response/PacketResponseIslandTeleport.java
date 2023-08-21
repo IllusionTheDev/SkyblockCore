@@ -1,8 +1,8 @@
-package me.illusion.skyblockcore.spigot.network.complex.communication.packet.response;
+package me.illusion.skyblockcore.server.network.complex.communication.packet.response;
 
 import java.util.UUID;
 import me.illusion.skyblockcore.common.communication.packet.Packet;
-import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
+import me.illusion.skyblockcore.server.network.complex.communication.packet.request.PacketRequestIslandTeleport;
 
 /**
  * Packet sent to another instance in response to a {@link PacketRequestIslandTeleport}.

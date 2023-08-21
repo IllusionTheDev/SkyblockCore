@@ -4,6 +4,7 @@ import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
+import me.illusion.skyblockcore.server.network.simple.command.SimpleIslandCommand;
 import me.illusion.skyblockcore.server.network.simple.config.SimpleNetworkConfiguration;
 import me.illusion.skyblockcore.server.network.simple.listener.SimplePlayerJoinListener;
 import me.illusion.skyblockcore.server.network.simple.listener.SimplePlayerQuitListener;
@@ -49,17 +50,10 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     private void registerCommands() {
-        // registerCommand(new SimpleIslandCommand(this));
+        new SimpleIslandCommand(this);
     }
 
     // Utility stuff
-
-    /*
-    private void registerCommand(AdvancedCommand command) {
-        plugin.getCommandManager().registerCommand(command);
-    }
-
-     */
 
     public SkyblockServerPlatform getPlatform() {
         return platform;
@@ -68,13 +62,6 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
     public SkyblockIslandManager getIslandManager() {
         return platform.getIslandManager();
     }
-
-    /*
-    public MessagesFile getMessages() {
-        return plugin.getMessages();
-    }
-
-     */
 
     public SimpleNetworkConfiguration getConfiguration() {
         return configuration;

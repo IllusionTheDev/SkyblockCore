@@ -1,21 +1,18 @@
-package me.illusion.skyblockcore.spigot.network.complex.config;
+package me.illusion.skyblockcore.server.network.complex.config;
 
-import me.illusion.cosmos.utilities.storage.YMLBase;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
+import me.illusion.skyblockcore.common.config.impl.AbstractDatabaseConfiguration;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
 /**
  * This class is responsible for loading the configuration for the complex skyblock network. It is expected that the configuration file is present in the
  * plugin's data folder.
  */
-public class ComplexNetworkConfiguration extends YMLBase {
+public class ComplexNetworkConfiguration extends AbstractDatabaseConfiguration {
 
     private final String serverId;
 
-    public ComplexNetworkConfiguration(JavaPlugin plugin) {
-        super(plugin, "network/complex-network.yml");
-
-        FileConfiguration configuration = getConfiguration();
+    public ComplexNetworkConfiguration(SkyblockPlatform platform) {
+        super(platform, "network/complex-network.yml");
 
         serverId = configuration.getString("server-id", "skyblock1");
     }

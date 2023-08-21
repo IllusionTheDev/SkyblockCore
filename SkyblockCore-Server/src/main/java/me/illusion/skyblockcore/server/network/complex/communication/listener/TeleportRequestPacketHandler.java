@@ -1,24 +1,21 @@
-package me.illusion.skyblockcore.spigot.network.complex.communication.listener;
+package me.illusion.skyblockcore.server.network.complex.communication.listener;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.illusion.skyblockcore.common.communication.packet.PacketHandler;
+import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
-import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
-import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
-import me.illusion.skyblockcore.spigot.network.complex.communication.packet.response.PacketResponseIslandTeleport;
-import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
+import me.illusion.skyblockcore.server.network.complex.communication.packet.request.PacketRequestIslandTeleport;
+import me.illusion.skyblockcore.server.network.complex.communication.packet.response.PacketResponseIslandTeleport;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 
 /**
  * Handles island teleport requests. This will keep a 30 second cache of player requests.
  */
-public class TeleportRequestPacketHandler implements PacketHandler<PacketRequestIslandTeleport>, Listener {
+public class TeleportRequestPacketHandler implements PacketHandler<PacketRequestIslandTeleport> {
 
     private final ComplexSkyblockNetwork network;
 
@@ -28,7 +25,7 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
 
     public TeleportRequestPacketHandler(ComplexSkyblockNetwork network) {
         this.network = network;
-        network.registerListener(this);
+        network.getEventManager().subscribe(SkyblockPlayerJoinEvent.class, this::onJoin);
     }
 
     @Override
@@ -51,9 +48,8 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
         }
     }
 
-    @EventHandler
-    private void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+    private void onJoin(SkyblockPlayerJoinEvent event) {
+        SkyblockPlayer player = event.getPlayer();
         UUID playerId = player.getUniqueId();
         UUID islandId = teleportRequests.getIfPresent(playerId);
 
@@ -68,6 +64,6 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
             return;
         }
 
-        player.teleport(SkyblockBukkitAdapter.toBukkitLocation(island.getCenter()));
+        player.teleport(island.getCenter());
     }
 }

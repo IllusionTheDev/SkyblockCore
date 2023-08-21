@@ -23,11 +23,11 @@ public class SimplePlayerJoinListener {
 
     private void handle(SkyblockPlayerJoinEvent event) {
         SkyblockPlayer player = event.getPlayer();
-        UUID profileId = player.getUniqueId();
+        UUID profileId = player.getSelectedProfileId();
 
-        String defaultIslandName = network.getConfiguration().getDefaultIslandName();
+        String fallback = network.getConfiguration().getDefaultIslandName();
 
-        islandManager.loadPlayerIsland(profileId, defaultIslandName).thenAccept(island -> player.teleport(island.getCenter()));
+        islandManager.loadPlayerIsland(profileId, fallback).thenAccept(island -> player.teleport(island.getCenter()));
     }
 
 }

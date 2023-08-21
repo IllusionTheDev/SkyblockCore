@@ -1,11 +1,11 @@
-package me.illusion.skyblockcore.spigot.network.complex.listener;
+package me.illusion.skyblockcore.server.network.complex.listener;
 
 import java.util.UUID;
 import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
+import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.server.player.SkyblockPlayer;
-import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
 
 /**
  * This class is responsible for loading the player's island when they join the server. If another instance is responsible for the island, we do not load it.

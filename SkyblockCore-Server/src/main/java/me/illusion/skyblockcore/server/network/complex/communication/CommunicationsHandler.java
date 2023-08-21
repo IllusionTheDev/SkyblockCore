@@ -1,17 +1,15 @@
-package me.illusion.skyblockcore.spigot.network.complex.communication;
+package me.illusion.skyblockcore.server.network.complex.communication;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
-import me.illusion.skyblockcore.spigot.network.complex.ComplexSkyblockNetwork;
-import me.illusion.skyblockcore.spigot.network.complex.communication.packet.request.PacketRequestIslandTeleport;
-import me.illusion.skyblockcore.spigot.network.complex.communication.packet.response.PacketResponseIslandTeleport;
-import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
-import org.bukkit.entity.Player;
+import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
+import me.illusion.skyblockcore.server.network.complex.communication.packet.request.PacketRequestIslandTeleport;
+import me.illusion.skyblockcore.server.network.complex.communication.packet.response.PacketResponseIslandTeleport;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 
 /**
  * Handles communications between instances. This class is responsible for handling island requests, teleport requests, and other communications.
@@ -107,7 +105,7 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
      * @param islandId The island ID
      * @return A future containing the result of the teleport
      */
-    public CompletableFuture<Boolean> attemptTeleportToIsland(Player player, UUID islandId) {
+    public CompletableFuture<Boolean> attemptTeleportToIsland(SkyblockPlayer player, UUID islandId) {
         boolean cached = tryTeleportExisting(player, islandId);
 
         if (cached) {
@@ -116,8 +114,7 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
 
         return getIslandServer(islandId).thenCompose(instanceId -> {
             if (instanceId == null || instanceId.equals(serverId)) {
-                return network.getIslandManager().loadIsland(islandId)
-                    .thenApplyAsync(island -> tryTeleportExisting(player, islandId), MainThreadExecutor.INSTANCE);
+                return network.getIslandManager().loadIsland(islandId).thenApply(island -> tryTeleportExisting(player, islandId));
             }
 
             packetManager.send(serverId,
@@ -138,11 +135,11 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
      * @param islandId The island ID
      * @return Whether or not the player was teleported
      */
-    private boolean tryTeleportExisting(Player player, UUID islandId) {
+    private boolean tryTeleportExisting(SkyblockPlayer player, UUID islandId) {
         SkyblockIsland cached = network.getIslandManager().getLoadedIsland(islandId);
 
         if (cached != null) {
-            player.teleport(SkyblockBukkitAdapter.toBukkitLocation(cached.getCenter()));
+            player.teleport(cached.getCenter());
             return true;
         }
 

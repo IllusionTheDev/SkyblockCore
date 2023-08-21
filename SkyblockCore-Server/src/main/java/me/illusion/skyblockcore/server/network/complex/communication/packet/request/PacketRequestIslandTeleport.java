@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.spigot.network.complex.communication.packet.request;
+package me.illusion.skyblockcore.server.network.complex.communication.packet.request;
 
 import java.util.UUID;
 import me.illusion.skyblockcore.common.communication.packet.Packet;
