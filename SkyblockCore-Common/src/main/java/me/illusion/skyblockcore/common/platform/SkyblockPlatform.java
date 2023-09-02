@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
+import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.config.impl.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
@@ -63,6 +64,13 @@ public interface SkyblockPlatform {
      * @return The database setup
      */
     SkyblockDatabasesFile getDatabasesFile();
+
+    /**
+     * Gets the messages file for the platform. Each platform may have its own messages file, and access to this is required.
+     *
+     * @return The messages file
+     */
+    SkyblockMessagesFile getMessagesFile();
 
     /**
      * Disables the platform due to an initialization error (e.g. incorrect configuration)

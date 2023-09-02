@@ -1,6 +1,8 @@
 package me.illusion.skyblockcore.server.network.complex;
 
+import lombok.Getter;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
+import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
@@ -20,6 +22,7 @@ import me.illusion.skyblockcore.server.network.complex.listener.ComplexPlayerJoi
  * Represents a complex SkyblockNetworkStructure. A complex structure is one that has multiple instances, where each instance claims ownership over a group of
  * islands, and handles all the communication belonging to that group.
  */
+@Getter
 public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     private final SkyblockServerPlatform platform;
@@ -78,31 +81,19 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     // Utility stuff
 
-    public SkyblockServerPlatform getPlatform() {
-        return platform;
-    }
-
     public SkyblockIslandManager getIslandManager() {
         return platform.getIslandManager();
-    }
-
-    public CommunicationsHandler getCommunicationsHandler() {
-        return communicationsHandler;
-    }
-
-    public SkyblockFetchingDatabase getDatabase() {
-        return database;
     }
 
     public SkyblockCacheDatabase getCacheDatabase() {
         return platform.getDatabaseRegistry().getChosenCacheDatabase();
     }
 
-    public ComplexNetworkConfiguration getConfiguration() {
-        return configuration;
-    }
-
     public SkyblockEventManager getEventManager() {
         return platform.getEventManager();
+    }
+
+    public SkyblockMessagesFile getMessages() {
+        return platform.getMessagesFile();
     }
 }

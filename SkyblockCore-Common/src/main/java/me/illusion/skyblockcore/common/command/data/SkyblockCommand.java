@@ -10,6 +10,8 @@ public interface SkyblockCommand<T extends SkyblockAudience> {
 
     SkyblockCommandHandler<T> getHandler();
 
-    void register();
+    Class<T> getAudience();
+
+    String getPermission();
 
 }

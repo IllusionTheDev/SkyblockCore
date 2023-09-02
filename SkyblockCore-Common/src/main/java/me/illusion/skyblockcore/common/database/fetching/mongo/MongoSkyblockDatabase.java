@@ -28,9 +28,9 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
 
     private MongoClient mongoClient;
 
-    private MongoCollection<IslandData> islandDataCollection;
-    private MongoCollection<UUID> islandIdCollection;
-    private MongoCollection<UUID> profileIdCollection;
+    private MongoCollection<IslandData> islandDataCollection; // Island ID : Island Data
+    private MongoCollection<UUID> islandIdCollection; // Profile ID : Island ID
+    private MongoCollection<UUID> profileIdCollection; // Player ID : Profile ID
 
     @Override
     public String getName() {

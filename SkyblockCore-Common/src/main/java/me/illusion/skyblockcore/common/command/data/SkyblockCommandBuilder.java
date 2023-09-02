@@ -9,6 +9,8 @@ public interface SkyblockCommandBuilder<T extends SkyblockAudience> {
 
     SkyblockCommandBuilder<T> handler(SkyblockCommandHandler<T> handler);
 
+    SkyblockCommandBuilder<T> permission(String permission);
+
     <V extends SkyblockAudience> SkyblockCommandBuilder<V> audience(Class<V> audience);
 
     SkyblockCommand<T> build();

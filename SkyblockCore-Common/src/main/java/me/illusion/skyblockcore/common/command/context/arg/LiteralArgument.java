@@ -1,5 +1,7 @@
 package me.illusion.skyblockcore.common.command.context.arg;
 
+import java.util.Collections;
+import java.util.List;
 import me.illusion.skyblockcore.common.command.context.CommandArgument;
 import me.illusion.skyblockcore.common.command.context.CommandContext;
 
@@ -23,5 +25,10 @@ public class LiteralArgument implements CommandArgument {
         }
 
         return null;
+    }
+
+    @Override
+    public List<String> tabComplete(CommandContext context) {
+        return Collections.singletonList(name);
     }
 }

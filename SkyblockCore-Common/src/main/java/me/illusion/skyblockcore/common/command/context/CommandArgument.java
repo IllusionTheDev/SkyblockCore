@@ -13,7 +13,6 @@ public interface CommandArgument {
         return null;
     }
 
-
     default CommandArgument orDefault(Object defaultValue) {
         return new ProxiedDefaultArgument(this, defaultValue);
     }

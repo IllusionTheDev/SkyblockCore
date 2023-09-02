@@ -1,5 +1,7 @@
 package me.illusion.skyblockcore.server.network.simple;
 
+import lombok.Getter;
+import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
@@ -13,6 +15,7 @@ import me.illusion.skyblockcore.server.network.simple.listener.SimplePlayerQuitL
  * This is a "simple" skyblock network, which is targeted at a single-instance network setup. The simple network will load islands when the player joins,
  * without doing any instance checks, and unload when the player quits.
  */
+@Getter
 public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     private final SkyblockServerPlatform platform;
@@ -55,19 +58,15 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
 
     // Utility stuff
 
-    public SkyblockServerPlatform getPlatform() {
-        return platform;
-    }
-
     public SkyblockIslandManager getIslandManager() {
         return platform.getIslandManager();
     }
 
-    public SimpleNetworkConfiguration getConfiguration() {
-        return configuration;
-    }
-
     public SkyblockEventManager getEventManager() {
         return platform.getEventManager();
+    }
+
+    public SkyblockCommandManager<?> getCommandManager() {
+        return platform.getCommandManager();
     }
 }
