@@ -7,5 +7,7 @@ public interface SkyblockCommandManager<T extends SkyblockAudience> {
 
     SkyblockCommandBuilder<T> newCommand(String name);
 
+    void syncCommands();
+
 
 }

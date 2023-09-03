@@ -30,5 +30,7 @@ public interface SkyblockDatabase {
      */
     CompletableFuture<Void> flush();
 
+    boolean isFileBased();
+
 
 }

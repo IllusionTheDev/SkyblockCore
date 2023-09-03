@@ -1,0 +1,10 @@
+name: SkyblockCore
+version: "INDEV"
+main: me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin
+
+depend:
+  - Cosmos
+
+libraries:
+  - "redis.clients:jedis:4.4.3"
+  - "org.mongodb:mongodb-driver-sync:4.10.2"

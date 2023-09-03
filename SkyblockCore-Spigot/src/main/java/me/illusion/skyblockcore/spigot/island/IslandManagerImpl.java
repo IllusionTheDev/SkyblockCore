@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.cosmos.session.CosmosSession;
 import me.illusion.cosmos.template.TemplatedArea;
+import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.utilities.time.Time;
 import me.illusion.skyblockcore.server.event.island.SkyblockIslandLoadEvent;
@@ -76,13 +77,24 @@ public class IslandManagerImpl extends AbstractIslandManager {
         TemplatedArea cachedArea = cosmosSetup.getTemplateCache().get(template);
 
         if (cachedArea == null) {
-            throw new IllegalStateException("Template not found, improper setup!");
+            // We can still try and get it from cosmos itself
+            return cosmosSetup.getIslandContainer().fetchTemplate(template).thenCompose(result -> {
+                if (result == null) {
+                    return CompletableFuture.failedFuture(new IllegalStateException("Template " + template + " was not found, improper setup!"));
+                }
+
+                cosmosSetup.getTemplateCache().register(template, result);
+                return createIsland(template, profileId);
+            });
         }
+
+        System.out.println("Creating island for " + profileId);
 
         UUID islandId = UUID.randomUUID();
         IslandData data = new IslandData(islandId, profileId);
 
-        return register(database.saveIslandData(data).thenCompose(irrelevant -> loadFromTemplate(islandId, data, cachedArea)));
+        return register(
+            database.saveIslandData(data).thenComposeAsync(irrelevant -> loadFromTemplate(islandId, data, cachedArea), MainThreadExecutor.INSTANCE));
     }
 
     /**

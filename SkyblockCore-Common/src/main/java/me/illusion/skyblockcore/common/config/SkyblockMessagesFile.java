@@ -10,6 +10,6 @@ public class SkyblockMessagesFile extends AbstractConfiguration {
     }
 
     public void sendMessage(SkyblockAudience audience, String message) {
-
+        audience.sendMessage(configuration.getString(message));
     }
 }

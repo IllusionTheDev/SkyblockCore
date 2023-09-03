@@ -60,4 +60,13 @@ public interface SkyblockCacheDatabase extends SkyblockDatabase {
      */
     CompletableFuture<Map<String, Collection<UUID>>> getAllIslands();
 
+    /**
+     * Indicates whether or not the database is file based. Some network structures may refuse to load in this occasion.
+     *
+     * @return TRUE if the database is file based, FALSE otherwise
+     */
+    default boolean isFileBased() {
+        return false;
+    }
+
 }

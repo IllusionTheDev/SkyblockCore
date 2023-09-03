@@ -20,7 +20,7 @@ public class SimpleIslandCommand {
         commandManager.newCommand("island")
             .audience(SkyblockPlayer.class)
             .handler((player, context) -> {
-                SkyblockIsland island = islandManager.getPlayerIsland(player.getUniqueId());
+                SkyblockIsland island = islandManager.getPlayerIsland(player);
 
                 if (island == null) {
                     messages.sendMessage(player, "no-island-loaded");

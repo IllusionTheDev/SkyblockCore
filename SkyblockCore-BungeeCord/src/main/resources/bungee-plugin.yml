@@ -1,0 +1,3 @@
+name: Skyblock-Bungee
+version: INDEV
+main: me.illusion.skyblockcore.bungee.SkyblockBungeePlugin

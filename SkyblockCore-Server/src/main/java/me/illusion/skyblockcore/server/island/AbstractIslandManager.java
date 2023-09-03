@@ -93,7 +93,13 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
      */
     protected <T> CompletableFuture<T> register(CompletableFuture<T> task) {
         pending.add(task);
-        return task.whenComplete((result, error) -> pending.remove(task));
+        return task.whenComplete((result, error) -> {
+            pending.remove(task);
+
+            if (error != null) {
+                error.printStackTrace();
+            }
+        });
     }
 
     @Override

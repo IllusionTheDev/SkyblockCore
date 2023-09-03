@@ -52,4 +52,21 @@ public class SkyblockBukkitPlayer extends AbstractSkyblockPlayer {
     private Player getBukkitPlayer() {
         return Bukkit.getPlayer(playerId);
     }
+
+    @Override
+    public void sendMessage(String message) {
+        verifyOnline();
+        getBukkitPlayer().sendMessage(message);
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        verifyOnline();
+        return getBukkitPlayer().hasPermission(permission);
+    }
+
+    @Override
+    public boolean isConsole() {
+        return false;
+    }
 }

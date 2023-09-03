@@ -1,7 +1,9 @@
 package me.illusion.skyblockcore.server.network.simple;
 
 import lombok.Getter;
+import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
+import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
@@ -66,7 +68,12 @@ public class SimpleSkyblockNetwork implements SkyblockNetworkStructure {
         return platform.getEventManager();
     }
 
-    public SkyblockCommandManager<?> getCommandManager() {
+    public SkyblockCommandManager<SkyblockAudience> getCommandManager() {
         return platform.getCommandManager();
     }
+
+    public SkyblockMessagesFile getMessages() {
+        return platform.getMessagesFile();
+    }
+
 }

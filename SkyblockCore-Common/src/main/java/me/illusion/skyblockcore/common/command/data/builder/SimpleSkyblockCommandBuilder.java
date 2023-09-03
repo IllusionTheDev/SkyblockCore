@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.context.CommandArgument;
+import me.illusion.skyblockcore.common.command.context.arg.LiteralArgument;
 import me.illusion.skyblockcore.common.command.data.SkyblockCommand;
 import me.illusion.skyblockcore.common.command.data.SkyblockCommandBuilder;
 import me.illusion.skyblockcore.common.command.data.SkyblockCommandHandler;
@@ -15,23 +16,25 @@ public class SimpleSkyblockCommandBuilder<T extends SkyblockAudience> implements
     private final String name;
     private final Class<T> audienceClass;
 
-    private final AbstractSkyblockCommandManager<?> manager;
+    private final AbstractSkyblockCommandManager manager;
 
     private SkyblockCommandHandler<T> handler;
     private String permission;
 
-    public SimpleSkyblockCommandBuilder(AbstractSkyblockCommandManager<?> manager, String name, Class<T> audienceClass, List<CommandArgument> arguments) {
+    public SimpleSkyblockCommandBuilder(AbstractSkyblockCommandManager manager, String name, Class<T> audienceClass, List<CommandArgument> arguments) {
         this.manager = manager;
         this.name = name;
         this.audienceClass = audienceClass;
         this.arguments = arguments;
+
+        arguments.add(new LiteralArgument(name));
     }
 
-    public SimpleSkyblockCommandBuilder(AbstractSkyblockCommandManager<?> manager, String name) {
+    public SimpleSkyblockCommandBuilder(AbstractSkyblockCommandManager manager, String name, Class<T> audienceClass) {
         this(
             manager,
             name,
-            (Class<T>) SkyblockAudience.class,
+            audienceClass,
             new LinkedList<>()
         );
     }

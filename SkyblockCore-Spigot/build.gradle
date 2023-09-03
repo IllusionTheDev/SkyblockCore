@@ -44,20 +44,19 @@ repositories {
 }
 
 dependencies {
-    implementation('org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT')
+    compileOnly('org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT')
 
-    implementation('org.projectlombok:lombok:1.18.28')
+    compileOnly('org.projectlombok:lombok:1.18.28')
     annotationProcessor('org.projectlombok:lombok:1.18.28')
 
-    implementation 'redis.clients:jedis:4.4.3'
+    compileOnly('redis.clients:jedis:4.4.3')
 
-    implementation 'com.mojang:authlib:1.6.25'
+    compileOnly('com.mojang:authlib:1.6.25')
 
-    implementation 'me.clip:placeholderapi:2.11.3'
-    implementation("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
+    compileOnly('me.clip:placeholderapi:2.11.3')
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
 
     implementation("me.illusion:cosmos-plugin:1.0")
-
 
     implementation(project(":SkyblockCore-Common"))
     implementation(project(":SkyblockCore-Server"))
@@ -90,7 +89,7 @@ processResources {
 
 shadowJar {
     dependencies {
-        // only include the AudioPlayer-Protocol jar in the shadow jar
         include(dependency('me.illusion:SkyblockCore-Common:1.0-SNAPSHOT'))
+        include(dependency('me.illusion:SkyblockCore-Server:1.0-SNAPSHOT'))
     }
 }

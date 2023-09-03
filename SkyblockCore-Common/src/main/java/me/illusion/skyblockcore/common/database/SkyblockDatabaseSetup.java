@@ -10,6 +10,13 @@ import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 public interface SkyblockDatabaseSetup<T extends SkyblockDatabase> {
 
     /**
+     * Gets whether the setuo supports file based databases
+     *
+     * @return TRUE if we should load file based databases, FALSE otherwise
+     */
+    boolean supportsFileBased();
+
+    /**
      * Gets the properties for a database type, this is used for loading the database
      *
      * @param databaseType The database type

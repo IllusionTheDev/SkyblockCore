@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.utilities.time.Time;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
 
 /**
@@ -112,6 +113,16 @@ public interface SkyblockIslandManager {
      * @return The player's island.
      */
     SkyblockIsland getPlayerIsland(UUID playerId);
+
+    /**
+     * Get a player's island.
+     *
+     * @param player The SkyblockPlayer.
+     * @return The player's island.
+     */
+    default SkyblockIsland getPlayerIsland(SkyblockPlayer player) {
+        return getPlayerIsland(player.getUniqueId());
+    }
 
     /**
      * Get the island at a location.

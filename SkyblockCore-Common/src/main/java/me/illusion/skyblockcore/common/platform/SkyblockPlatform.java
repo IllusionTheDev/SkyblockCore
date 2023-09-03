@@ -56,7 +56,7 @@ public interface SkyblockPlatform {
      *
      * @return The command manager
      */
-    SkyblockCommandManager<? extends SkyblockAudience> getCommandManager();
+    SkyblockCommandManager<SkyblockAudience> getCommandManager();
 
     /**
      * Gets the database setup for the platform. Certain parts of the platform may require a specific database setup, and access to this is required.

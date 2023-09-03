@@ -1,9 +1,8 @@
 package me.illusion.skyblockcore.server.network.complex.communication.listener;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 import me.illusion.skyblockcore.common.communication.packet.PacketHandler;
 import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
@@ -19,9 +18,7 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
 
     private final ComplexSkyblockNetwork network;
 
-    private final Cache<UUID, UUID> teleportRequests = CacheBuilder.newBuilder()
-        .expireAfterWrite(30, TimeUnit.SECONDS)
-        .build();
+    private final Map<UUID, UUID> teleportRequests = new ConcurrentHashMap<>(); // TODO: Make a cache out of this. I don't want to shade guava yet.
 
     public TeleportRequestPacketHandler(ComplexSkyblockNetwork network) {
         this.network = network;
@@ -51,7 +48,7 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
     private void onJoin(SkyblockPlayerJoinEvent event) {
         SkyblockPlayer player = event.getPlayer();
         UUID playerId = player.getUniqueId();
-        UUID islandId = teleportRequests.getIfPresent(playerId);
+        UUID islandId = teleportRequests.get(playerId);
 
         if (islandId == null) {
             return;

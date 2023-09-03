@@ -12,12 +12,19 @@ import me.illusion.skyblockcore.common.command.context.CommandArgument;
 import me.illusion.skyblockcore.common.command.context.CommandContext;
 import me.illusion.skyblockcore.common.command.context.impl.MutatingCommandContext;
 import me.illusion.skyblockcore.common.command.data.SkyblockCommand;
+import me.illusion.skyblockcore.common.command.manager.AbstractSkyblockCommandManager;
 import me.illusion.skyblockcore.common.command.node.ArgumentCommandNode;
 import me.illusion.skyblockcore.common.command.node.CommandNode;
 
 public class CommandTree {
 
     private final Map<String, CommandNode> roots = new ConcurrentHashMap<>();
+
+    private final AbstractSkyblockCommandManager manager;
+
+    public CommandTree(AbstractSkyblockCommandManager manager) {
+        this.manager = manager;
+    }
 
     public CommandNode getRoot(String name) {
         return roots.get(name);
@@ -45,13 +52,12 @@ public class CommandTree {
             CommandNode child = null;
 
             for (CommandNode nodeChild : children) {
-                if (nodeChild.getName().equalsIgnoreCase(word)) {
+                CommandArgument argument = nodeChild.getArgument();
+
+                if (context.addArgument(word, argument)) {
                     child = nodeChild;
                     break;
                 }
-
-                CommandArgument argument = nodeChild.getArgument();
-                context.addArgument(word, argument);
             }
 
             if (child == null) {
@@ -90,7 +96,7 @@ public class CommandTree {
             CommandNode targetChild = null;
 
             for (CommandNode child : children) {
-                if (child.getName().equalsIgnoreCase(s) || (!isLast && context.addArgument(s, child.getArgument()))) {
+                if ((!isLast && context.addArgument(s, child.getArgument()))) {
                     targetChild = child;
                     break;
                 }
@@ -133,6 +139,7 @@ public class CommandTree {
         }
 
         roots.put(name, node);
+        manager.registerRoot(name);
     }
 
     public void registerCommand(SkyblockCommand<?> command) {

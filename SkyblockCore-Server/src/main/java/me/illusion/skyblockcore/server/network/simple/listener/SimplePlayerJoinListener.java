@@ -27,7 +27,10 @@ public class SimplePlayerJoinListener {
 
         String fallback = network.getConfiguration().getDefaultIslandName();
 
-        islandManager.loadPlayerIsland(profileId, fallback).thenAccept(island -> player.teleport(island.getCenter()));
+        islandManager.loadPlayerIsland(profileId, fallback).thenAccept(island -> player.teleport(island.getCenter())).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
+        });
     }
 
 }

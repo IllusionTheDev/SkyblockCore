@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.database.cache.redis.MemorySkyblockCache;
 import me.illusion.skyblockcore.common.database.cache.redis.RedisSkyblockCache;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.mongo.MongoSkyblockDatabase;
@@ -38,7 +39,10 @@ public class SkyblockDatabaseRegistry {
      * @param database The database to register
      */
     public void register(SkyblockDatabase database) {
-        databases.put(database.getName(), database);
+        String name = database.getName();
+
+        System.out.println("Registering database " + name + " of type " + database.getClass().getSimpleName());
+        databases.put(name, database);
     }
 
     /**
@@ -48,6 +52,7 @@ public class SkyblockDatabaseRegistry {
      * @return The database, or null if it does not exist
      */
     public SkyblockDatabase get(String name) {
+        System.out.println("Getting database " + name);
         return databases.get(name);
     }
 
@@ -96,6 +101,7 @@ public class SkyblockDatabaseRegistry {
      * @param platform The platform to register the databases for
      */
     private void registerDefaultDatabases(SkyblockPlatform platform) {
+        System.out.println("Registering default databases");
         // non-sql databases
         register(new MongoSkyblockDatabase());
 
@@ -109,6 +115,9 @@ public class SkyblockDatabaseRegistry {
 
         // cache databases
         register(new RedisSkyblockCache());
+
+        System.out.println("MEMORY MAN");
+        register(new MemorySkyblockCache());
     }
 
     /**
@@ -126,6 +135,7 @@ public class SkyblockDatabaseRegistry {
         for (SkyblockDatabaseSetup<?> databaseSetup : setup) {
             futures.add(tryEnable(databaseSetup).thenApply(success -> {
                 if (!Boolean.TRUE.equals(success) && !future.isDone()) {
+                    System.out.println("Failed to enable database " + databaseSetup.getPreferredDatabase() + ", disabling plugin...");
                     future.complete(false);
                 }
 
@@ -145,13 +155,22 @@ public class SkyblockDatabaseRegistry {
     public <T extends SkyblockDatabase> CompletableFuture<Boolean> tryEnable(SkyblockDatabaseSetup<T> setup) {
         String preferred = setup.getPreferredDatabase();
 
-        SkyblockDatabase database = databases.get(preferred);
+        SkyblockDatabase database = get(preferred);
 
         if (database == null) {
-            return tryEnableFallback(setup, setup.getFallback(preferred));
+            System.out.println("Database " + preferred + " is null, trying fallback");
+            return tryEnableFallback(setup, setup.getFallback(preferred)).exceptionally(error -> {
+                warning("Failed to enable database {0}, disabling plugin...", preferred);
+                error.printStackTrace();
+                return false;
+            });
         }
 
-        return tryEnableFallback(setup, preferred);
+        return tryEnableFallback(setup, preferred).exceptionally(error -> {
+            warning("Failed to enable database {0}, disabling plugin...", preferred);
+            error.printStackTrace();
+            return false;
+        });
     }
 
     /**
@@ -164,6 +183,7 @@ public class SkyblockDatabaseRegistry {
      */
     private <T extends SkyblockDatabase> CompletableFuture<Boolean> tryEnableFallback(SkyblockDatabaseSetup<T> setup, String type) {
         if (type == null) { // If the fallback is null, we can't do anything, so we just return false
+            System.out.println("Type is null");
             return CompletableFuture.completedFuture(false);
         }
 

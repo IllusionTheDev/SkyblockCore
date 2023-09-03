@@ -2,8 +2,10 @@ package me.illusion.skyblockcore.spigot;
 
 import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
-import me.illusion.cosmos.utilities.storage.MessagesFile;
+import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
+import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
+import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.config.impl.SkyblockCacheDatabasesFile;
 import me.illusion.skyblockcore.common.config.impl.SkyblockDatabasesFile;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
@@ -18,6 +20,7 @@ import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
 import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.server.network.simple.SimpleSkyblockNetwork;
 import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
+import me.illusion.skyblockcore.spigot.command.SkyblockBukkitCommandManager;
 import me.illusion.skyblockcore.spigot.config.BukkitConfigurationProvider;
 import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
@@ -33,17 +36,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPlatform {
 
-    // Non-platform spigot specific things
-    private MessagesFile messages;
-
     // Spigot-specific things
     private SkyblockCosmosSetup cosmosSetup;
     private SkyblockGridRegistry gridRegistry;
 
-    private SkyblockDatabasesFile databasesFile;
-    private SkyblockCacheDatabasesFile cacheDatabasesFile;
 
     // Server-platform specific things
+    private SkyblockDatabasesFile databasesFile;
+    private SkyblockCacheDatabasesFile cacheDatabasesFile;
+    private SkyblockMessagesFile messagesFile;
+
     private ConfigurationProvider configurationProvider;
 
     private SkyblockDatabaseRegistry databaseRegistry;
@@ -51,24 +53,33 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     private SkyblockNetworkRegistry networkRegistry;
     private SkyblockEventManager eventManager;
     private SkyblockPlayerManager playerManager;
+    private SkyblockCommandManager<SkyblockAudience> commandManager;
 
     @Override
     public void onEnable() {
-        messages = new MessagesFile(this);
+        System.out.println("Loading configuration provider");
+        configurationProvider = new BukkitConfigurationProvider(this);
 
+        System.out.println("Loading network registry");
         networkRegistry = new SkyblockNetworkRegistryImpl(this);
 
+        System.out.println("Loading configuration files");
         databasesFile = new SkyblockDatabasesFile(this);
         cacheDatabasesFile = new SkyblockCacheDatabasesFile(this);
-        databaseRegistry = new SkyblockDatabaseRegistry(this);
+        messagesFile = new SkyblockMessagesFile(this, "server-messages");
 
+        System.out.println("Loading database & grid");
+        databaseRegistry = new SkyblockDatabaseRegistry(this);
         gridRegistry = new SkyblockGridRegistry();
 
-        configurationProvider = new BukkitConfigurationProvider(this);
+        System.out.println("Loading events & commands");
         eventManager = new SkyblockEventManagerImpl();
+        commandManager = new SkyblockBukkitCommandManager(this);
 
+        System.out.println("Registering networks");
         registerNetworks();
 
+        System.out.println("Finishing loading");
         Bukkit.getScheduler().runTask(this, this::finishLoading);
     }
 
@@ -80,29 +91,44 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
             network.disable();
         }
 
-        islandManager.disable(true, false).join();
-        islandManager.flush().join();
+        if (islandManager != null) {
+            islandManager.disable(true, false).join();
+            islandManager.flush().join();
+        }
+
 
         databaseRegistry.getChosenDatabase().flush().join();
         databaseRegistry.getChosenCacheDatabase().flush().join();
     }
 
     private void finishLoading() {
+        System.out.println("Loading networks");
         networkRegistry.load();
+
+        System.out.println("Initializing cosmos");
         initCosmos();
 
+        System.out.println("Enabling databases");
         databaseRegistry.tryEnableMultiple(databasesFile, cacheDatabasesFile).thenAccept(success -> {
             if (Boolean.FALSE.equals(success)) { // The future returns a boxed boolean
                 getLogger().severe("Failed to enable databases, disabling plugin...");
                 Bukkit.getPluginManager().disablePlugin(this);
+                return;
             }
 
+            System.out.println("Enabling island manager");
             playerManager = new SkyblockBukkitPlayerManager(this);
             islandManager = new IslandManagerImpl(this);
 
             networkRegistry.enable();
 
+            commandManager.syncCommands();
             eventManager.callEvent(new SkyblockPlatformEnabledEvent(this));
+        }).exceptionally(throwable -> {
+            getLogger().severe("Failed to enable databases, disabling plugin...");
+            throwable.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+            return null;
         });
 
     }
@@ -128,6 +154,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         SkyblockCosmosSetupFile cosmosSetupFile = new SkyblockCosmosSetupFile(cosmosPlugin, this);
         cosmosSetup = cosmosSetupFile.getSetup();
+
+        cosmosPlugin.getGridRegistry().register(cosmosSetup.getIslandGrid());
+        cosmosPlugin.getSessionHolderRegistry().registerHolder("skyblock", cosmosSetup.getSessionHolder());
     }
 
     @Override

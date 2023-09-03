@@ -164,18 +164,26 @@ public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDat
         return associate(() -> {
             String query = getQueries().get(SkyblockSQLQuery.CREATE_ISLAND_DATA_TABLE);
             String query2 = getQueries().get(SkyblockSQLQuery.CREATE_ISLAND_ID_TABLE);
+            String query3 = getQueries().get(SkyblockSQLQuery.CREATE_PROFILE_TABLE);
 
-            try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(
-                query); PreparedStatement statement2 = connection.prepareStatement(query2)) {
-                statement.execute();
-                statement2.execute();
+            try (Connection connection = getConnection()) {
+                return createTable(connection, query) && createTable(connection, query2) && createTable(connection, query3);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return false;
             }
-
-            return true;
         });
+    }
+
+    private boolean createTable(Connection connection, String query) {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.execute();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
     /**

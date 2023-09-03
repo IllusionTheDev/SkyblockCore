@@ -8,6 +8,8 @@ import java.util.function.Function;
 import lombok.Setter;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
+import me.illusion.skyblockcore.server.event.player.SkyblockPlayerQuitEvent;
 
 /**
  * Represents a base implementation of {@link SkyblockPlayerManager}.
@@ -31,7 +33,12 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     // Player management stuff
 
     protected void handleJoin(UUID playerId) {
-        cacheProfileId(playerId).thenAccept(profileId -> playerIdMap.put(profileId, createPlayer(playerId)));
+        System.out.println("Handling join for " + playerId);
+        cacheProfileId(playerId).thenAccept(profileId -> {
+            SkyblockPlayer player = createPlayer(playerId);
+            playerIdMap.put(profileId, player);
+            platform.getEventManager().callEvent(new SkyblockPlayerJoinEvent(player));
+        });
     }
 
     protected void handleQuit(UUID playerId) {
@@ -41,6 +48,13 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
             return;
         }
 
+        SkyblockPlayer player = getPlayerFromProfile(profileId);
+
+        if (player == null) {
+            return;
+        }
+
+        platform.getEventManager().callEvent(new SkyblockPlayerQuitEvent(player));
         playerIdMap.remove(profileId);
     }
 
@@ -68,6 +82,8 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
 
     private CompletableFuture<UUID> cacheProfileId(UUID playerId) {
         return fetchProfileId(playerId).thenCompose(profileId -> {
+            System.out.println("Profile ID for " + playerId + " is " + profileId);
+
             if (profileId == null) {
                 profileId = createProfileId(playerId);
                 setIdInternally(playerId, profileId);
@@ -107,6 +123,6 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     }
 
     protected void setIdInternally(UUID playerId, UUID profileId) {
-        profileMap.computeIfAbsent(playerId, id -> profileId);
+        profileMap.put(playerId, profileId);
     }
 }
