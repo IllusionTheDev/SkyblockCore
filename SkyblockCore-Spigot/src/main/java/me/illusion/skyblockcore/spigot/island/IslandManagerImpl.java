@@ -51,12 +51,6 @@ public class IslandManagerImpl extends AbstractIslandManager {
 
         String id = islandId.toString();
 
-        TemplatedArea cachedArea = cosmosSetup.getTemplateCache().get(id);
-
-        if (cachedArea != null) {
-            return register(loadFromTemplate(islandId, data, cachedArea));
-        }
-
         return register(cosmosSetup.getIslandContainer().fetchTemplate(id).thenCompose(template -> {
             if (template == null) {
                 throw new IllegalStateException("Template not found, database is corrupted!");
