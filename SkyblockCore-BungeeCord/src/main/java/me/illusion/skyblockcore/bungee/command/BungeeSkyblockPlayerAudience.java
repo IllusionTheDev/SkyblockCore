@@ -5,6 +5,9 @@ import me.illusion.skyblockcore.proxy.audience.SkyblockProxyPlayerAudience;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+/**
+ * Represents a SkyblockAudience for any BungeeCord ProxiedPlayer
+ */
 public class BungeeSkyblockPlayerAudience implements SkyblockProxyPlayerAudience {
 
     private final UUID playerId;

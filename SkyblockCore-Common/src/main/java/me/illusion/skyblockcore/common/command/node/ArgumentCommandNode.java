@@ -5,9 +5,12 @@ import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.context.CommandArgument;
 import me.illusion.skyblockcore.common.command.data.SkyblockCommand;
 
+/**
+ * Represents a command node version of a CommandArgument.
+ */
+@Getter
 public class ArgumentCommandNode extends AbstractCommandNode {
 
-    @Getter
     private final SkyblockCommand<?> command;
     private final CommandArgument argument;
 

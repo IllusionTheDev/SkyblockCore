@@ -6,6 +6,12 @@ import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseSetup;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
+/**
+ * Represents an abstract version of a database configuration. This provides the ability to get the properties of a database, as well as the ability to get the
+ * preferred database type and filter out unsupported databases.
+ *
+ * @param <T> The database type.
+ */
 public abstract class AbstractDatabaseConfiguration<T extends SkyblockDatabase> extends AbstractConfiguration implements SkyblockDatabaseSetup<T> {
 
     private boolean supportsFileBased = true;

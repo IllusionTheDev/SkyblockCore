@@ -9,6 +9,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
+/**
+ * Represents a BungeeCord implementation of a SkyblockCommandManager.
+ */
 public class BungeeSkyblockCommandManager extends AbstractSkyblockCommandManager {
 
     private final SkyblockBungeePlugin platform;

@@ -12,6 +12,9 @@ import me.illusion.skyblockcore.common.command.structure.CommandTree;
 import me.illusion.skyblockcore.common.command.structure.CommandTree.TargetResult;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
+/**
+ * Represents an abstract implementation of a SkyblockCommandManager. This implementation provides the command tree logic, and the command handling logic.
+ */
 public abstract class AbstractSkyblockCommandManager implements SkyblockCommandManager<SkyblockAudience> {
 
     private final CommandTree commandTree = new CommandTree(this);

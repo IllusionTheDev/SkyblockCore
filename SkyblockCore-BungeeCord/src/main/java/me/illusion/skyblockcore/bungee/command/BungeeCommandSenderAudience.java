@@ -3,6 +3,9 @@ package me.illusion.skyblockcore.bungee.command;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import net.md_5.bungee.api.CommandSender;
 
+/**
+ * Represents a SkyblockAudience for any generic BungeeCord CommandSender
+ */
 public class BungeeCommandSenderAudience implements SkyblockAudience {
 
     private final CommandSender sender;

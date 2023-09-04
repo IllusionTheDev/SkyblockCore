@@ -10,6 +10,11 @@ import me.illusion.skyblockcore.common.command.data.SkyblockCommandBuilder;
 import me.illusion.skyblockcore.common.command.data.SkyblockCommandHandler;
 import me.illusion.skyblockcore.common.command.manager.AbstractSkyblockCommandManager;
 
+/**
+ * Represents a simple implementation of a SkyblockCommandBuilder.
+ *
+ * @param <T> The audience type.
+ */
 public class SimpleSkyblockCommandBuilder<T extends SkyblockAudience> implements SkyblockCommandBuilder<T> {
 
     private final List<CommandArgument> arguments;

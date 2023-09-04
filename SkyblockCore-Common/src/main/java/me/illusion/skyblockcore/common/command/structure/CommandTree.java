@@ -16,6 +16,9 @@ import me.illusion.skyblockcore.common.command.manager.AbstractSkyblockCommandMa
 import me.illusion.skyblockcore.common.command.node.ArgumentCommandNode;
 import me.illusion.skyblockcore.common.command.node.CommandNode;
 
+/**
+ * Represents a parsed command tree.
+ */
 public class CommandTree {
 
     private final Map<String, CommandNode> roots = new ConcurrentHashMap<>();
@@ -26,10 +29,21 @@ public class CommandTree {
         this.manager = manager;
     }
 
+    /**
+     * Gets the root node for a command.
+     *
+     * @param name The name of the command.
+     * @return The root node.
+     */
     public CommandNode getRoot(String name) {
         return roots.get(name);
     }
 
+    /**
+     * Gets the target node and context for a command.
+     * @param fullInput The full input of the command.
+     * @return The target node and context.
+     */
     public TargetResult getTargetNode(String fullInput) {
         String[] split = fullInput.split(" ");
         CommandNode node = getRoot(split[0]);
@@ -70,6 +84,12 @@ public class CommandTree {
         return new TargetResult(target, context);
     }
 
+    /**
+     * Tab completes a command.
+     * @param audience The audience to tab complete for.
+     * @param fullInput The full input of the command.
+     * @return The tab completions.
+     */
     public List<String> tabComplete(SkyblockAudience audience, String fullInput) {
         String[] split = fullInput.split(" ");
         CommandNode node = getRoot(split[0]);
@@ -90,7 +110,7 @@ public class CommandTree {
             boolean isLast = index == split.length - 1;
 
             if (children == null) {
-                return Collections.emptyList();
+                break;
             }
 
             CommandNode targetChild = null;
@@ -111,6 +131,12 @@ public class CommandTree {
                     continue;
                 }
 
+                Class<? extends SkyblockAudience> targetAudience = child.getTargetAudience();
+
+                if (targetAudience != null && !targetAudience.isAssignableFrom(audience.getClass())) {
+                    continue;
+                }
+
                 List<String> tabComplete = argument.tabComplete(context);
 
                 if (tabComplete == null) {
@@ -121,16 +147,34 @@ public class CommandTree {
             }
 
             if (targetChild == null) {
-                return Collections.emptyList();
+                break;
             }
 
             target = targetChild;
         }
 
-        return completions;
+        String lastWord = split[split.length - 1];
+
+        // filter
+        if (lastWord.isEmpty()) {
+            return completions;
+        }
+
+        List<String> filtered = new ArrayList<>();
+
+        for (String completion : completions) {
+            if (completion.startsWith(lastWord)) {
+                filtered.add(completion);
+            }
+        }
+
+        return filtered;
     }
 
-
+    /**
+     * Registers a root node to the tree.
+     * @param node The node to register.
+     */
     public void registerNode(CommandNode node) {
         String name = node.getName();
 
@@ -142,6 +186,10 @@ public class CommandTree {
         manager.registerRoot(name);
     }
 
+    /**
+     * Registers a command to the tree.
+     * @param command The command to register.
+     */
     public void registerCommand(SkyblockCommand<?> command) {
         List<CommandNode> nodes = new LinkedList<>();
 

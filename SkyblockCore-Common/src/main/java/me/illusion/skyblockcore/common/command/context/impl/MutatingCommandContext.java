@@ -5,6 +5,10 @@ import java.util.Map;
 import me.illusion.skyblockcore.common.command.context.CommandArgument;
 import me.illusion.skyblockcore.common.command.context.CommandContext;
 
+/**
+ * Represents a mutable command context. The mutable part is important when handling tab completion, as we slowly build up the arguments and can use the
+ * arguments for further completion.
+ */
 public class MutatingCommandContext implements CommandContext {
 
     private final String fullInput;

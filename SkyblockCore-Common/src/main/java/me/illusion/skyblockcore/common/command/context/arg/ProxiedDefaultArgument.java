@@ -3,6 +3,9 @@ package me.illusion.skyblockcore.common.command.context.arg;
 import me.illusion.skyblockcore.common.command.context.CommandArgument;
 import me.illusion.skyblockcore.common.command.context.CommandContext;
 
+/**
+ * Represents a command argument with a default value.
+ */
 public class ProxiedDefaultArgument implements CommandArgument {
 
     private final CommandArgument argument;

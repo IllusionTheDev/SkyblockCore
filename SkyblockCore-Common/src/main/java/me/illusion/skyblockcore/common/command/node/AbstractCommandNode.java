@@ -3,6 +3,9 @@ package me.illusion.skyblockcore.common.command.node;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a command node. This is used to build the command tree. This abstract implementation provides the parent-child logic.
+ */
 public abstract class AbstractCommandNode implements CommandNode {
 
     private final List<CommandNode> children = new ArrayList<>();

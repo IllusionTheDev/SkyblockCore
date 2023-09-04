@@ -9,6 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 
+/**
+ * Represents an in-memory implementation of a SkyblockCacheDatabase. This should not be used for anything other than a "simple" network structure.
+ */
 public class MemorySkyblockCache implements SkyblockCacheDatabase {
 
     private final Map<UUID, String> islandServers = new ConcurrentHashMap<>();

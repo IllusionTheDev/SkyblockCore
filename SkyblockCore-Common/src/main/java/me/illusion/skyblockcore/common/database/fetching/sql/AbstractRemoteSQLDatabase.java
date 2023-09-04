@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 
+/**
+ * Represents a remote SQL database.
+ */
 public abstract class AbstractRemoteSQLDatabase extends AbstractSQLSkyblockDatabase {
 
     protected String host;

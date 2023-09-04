@@ -5,6 +5,9 @@ import java.util.List;
 import me.illusion.skyblockcore.common.command.context.CommandArgument;
 import me.illusion.skyblockcore.common.command.context.CommandContext;
 
+/**
+ * Represents a "literal" argument, which matches the input exactly.
+ */
 public class LiteralArgument implements CommandArgument {
 
     private final String name;

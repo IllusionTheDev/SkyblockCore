@@ -9,6 +9,10 @@ import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabas
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.audience.SkyblockProxyPlayerAudience;
 
+/**
+ * Represents a simple play-skyblock command. This will attempt to matchmake the player and connect them to the server. If no server is found, the player will
+ * be notified.
+ */
 public class PlaySkyblockCommand {
 
     private final SkyblockProxyPlatform platform;

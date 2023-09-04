@@ -1,5 +1,8 @@
 package me.illusion.skyblockcore.common.command.audience;
 
+/**
+ * Represents a console audience. This allows us to filter console-only commands.
+ */
 public abstract class SkyblockConsoleAudience implements SkyblockAudience {
 
     @Override
