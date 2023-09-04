@@ -27,7 +27,8 @@ This project's backbone is [Cosmos](https://github.com/IllusionTheDev/Cosmos/), 
 - MongoDB
 
 #### Plugin Hooks
-- FastAsyncWorldEdit
+- Cosmos (Handles all the loading/saving logic, hooks with WorldEdit, SWM support is planned)
+
 
 
 ------------
