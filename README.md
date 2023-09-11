@@ -11,7 +11,7 @@
 
 #### This project consists on an advanced Skyblock core made to scale massively.
 
-This project is currently being rewritten. This rewrite is due to just a massive change in code architecture with new knowledge that I've learned by writing scalable plugins for the past 3 years.
+This project is currently in ALPHA. Feel free to test it by compiling the code yourself. Basic island loading functionality is tested and working.
 
 This project's backbone is [Cosmos](https://github.com/IllusionTheDev/Cosmos/), and at the moment is under heavy development, with no builds available.
 
@@ -27,7 +27,8 @@ This project's backbone is [Cosmos](https://github.com/IllusionTheDev/Cosmos/), 
 - MongoDB
 
 #### Plugin Hooks
-- FastAsyncWorldEdit
+- Cosmos (Handles all the loading/saving logic, hooks with WorldEdit, SWM support is planned)
+
 
 
 ------------
