@@ -10,6 +10,7 @@ import me.illusion.skyblockcore.common.command.node.ArgumentCommandNode;
 import me.illusion.skyblockcore.common.command.node.CommandNode;
 import me.illusion.skyblockcore.common.command.structure.CommandTree;
 import me.illusion.skyblockcore.common.command.structure.CommandTree.TargetResult;
+import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
 /**
@@ -44,8 +45,10 @@ public abstract class AbstractSkyblockCommandManager implements SkyblockCommandM
 
     protected <T extends SkyblockAudience> void handle(SkyblockAudience audience, String input) {
         TargetResult result = commandTree.getTargetNode(input);
+        SkyblockMessagesFile messages = platform.getMessagesFile();
 
         if (result == null) {
+            messages.sendMessage(audience, "invalid-command");
             return;
         }
 
@@ -64,12 +67,12 @@ public abstract class AbstractSkyblockCommandManager implements SkyblockCommandM
         boolean hasPermission = permission == null || audience.hasPermission(permission);
 
         if (!hasPermission) {
-            platform.getMessagesFile().sendMessage(audience, "no-permission");
+            messages.sendMessage(audience, "no-permission");
             return;
         }
 
         if (!audienceClass.isAssignableFrom(audience.getClass())) {
-            platform.getMessagesFile().sendMessage(audience, "invalid-audience");
+            messages.sendMessage(audience, "invalid-audience");
             return;
         }
 
@@ -77,11 +80,7 @@ public abstract class AbstractSkyblockCommandManager implements SkyblockCommandM
     }
 
     protected List<String> tabComplete(SkyblockAudience audience, String label, String[] args) {
-        return tabComplete(audience, createInput(label, args));
-    }
-
-    protected List<String> tabComplete(SkyblockAudience audience, String input) {
-        return commandTree.tabComplete(audience, input);
+        return commandTree.tabComplete(audience, label, args);
     }
 
     public abstract void registerRoot(String name);

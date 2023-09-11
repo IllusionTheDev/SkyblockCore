@@ -52,12 +52,19 @@ public class CommandTree {
             return null;
         }
 
+        if (node.getChildren().isEmpty() && fullInput.equalsIgnoreCase(node.getName())) {
+            return new TargetResult(node, new MutatingCommandContext(fullInput));
+        }
+
         CommandNode target = node;
         MutatingCommandContext context = new MutatingCommandContext(fullInput);
+
+        boolean valid = false;
 
         for (int index = 1; index < split.length; index++) {
             String word = split[index];
             List<? extends CommandNode> children = target.getChildren();
+            boolean isLast = index == split.length - 1;
 
             if (children == null) {
                 return null;
@@ -70,6 +77,10 @@ public class CommandTree {
 
                 if (context.addArgument(word, argument)) {
                     child = nodeChild;
+
+                    if (isLast && child.getChildren().isEmpty()) {
+                        valid = true;
+                    }
                     break;
                 }
             }
@@ -81,18 +92,23 @@ public class CommandTree {
             target = child;
         }
 
+        if (!valid) {
+            return null;
+        }
+
         return new TargetResult(target, context);
     }
 
     /**
      * Tab completes a command.
      * @param audience The audience to tab complete for.
-     * @param fullInput The full input of the command.
+     * @param commandName The name of the command.
+     * @param split The argument array.
      * @return The tab completions.
      */
-    public List<String> tabComplete(SkyblockAudience audience, String fullInput) {
-        String[] split = fullInput.split(" ");
-        CommandNode node = getRoot(split[0]);
+    public List<String> tabComplete(SkyblockAudience audience, String commandName, String[] split) {
+        CommandNode node = getRoot(commandName);
+        String fullInput = commandName + " " + String.join(" ", split);
 
         if (node == null) {
             return Collections.emptyList();
@@ -103,7 +119,7 @@ public class CommandTree {
 
         MutatingCommandContext context = new MutatingCommandContext(fullInput);
 
-        for (int index = 1; index < split.length; index++) {
+        for (int index = 0; index < split.length; index++) {
             String s = split[index];
             List<? extends CommandNode> children = target.getChildren();
 
@@ -127,7 +143,9 @@ public class CommandTree {
 
                 CommandArgument argument = child.getArgument();
 
-                if (!audience.hasPermission(child.getPermission())) {
+                String permission = child.getPermission();
+
+                if (permission != null && !audience.hasPermission(child.getPermission())) {
                     continue;
                 }
 

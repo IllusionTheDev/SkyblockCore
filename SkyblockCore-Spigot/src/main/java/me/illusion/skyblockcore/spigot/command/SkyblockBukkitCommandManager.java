@@ -115,7 +115,7 @@ public class SkyblockBukkitCommandManager extends AbstractSkyblockCommandManager
         @Override
         public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
             if (sender instanceof ConsoleCommandSender) {
-                return tabComplete(new SkyblockBukkitConsoleAudience(), s);
+                return tabComplete(new SkyblockBukkitConsoleAudience(), s, strings);
             }
 
             if (!(sender instanceof Player player)) {
@@ -123,7 +123,7 @@ public class SkyblockBukkitCommandManager extends AbstractSkyblockCommandManager
             }
 
             SkyblockAudience audience = platform.getPlayerManager().getPlayer(player.getUniqueId());
-            return tabComplete(audience, s);
+            return tabComplete(audience, s, strings);
         }
     }
 }

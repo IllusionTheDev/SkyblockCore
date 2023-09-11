@@ -26,13 +26,13 @@ public class SimpleSkyblockCommandBuilder<T extends SkyblockAudience> implements
     private SkyblockCommandHandler<T> handler;
     private String permission;
 
-    public SimpleSkyblockCommandBuilder(AbstractSkyblockCommandManager manager, String name, Class<T> audienceClass, List<CommandArgument> arguments) {
+    public SimpleSkyblockCommandBuilder(AbstractSkyblockCommandManager manager, String name, Class<T> audienceClass, List<CommandArgument> arguments,
+        String permission) {
         this.manager = manager;
         this.name = name;
         this.audienceClass = audienceClass;
         this.arguments = arguments;
-
-        arguments.add(new LiteralArgument(name));
+        this.permission = permission;
     }
 
     public SimpleSkyblockCommandBuilder(AbstractSkyblockCommandManager manager, String name, Class<T> audienceClass) {
@@ -40,7 +40,8 @@ public class SimpleSkyblockCommandBuilder<T extends SkyblockAudience> implements
             manager,
             name,
             audienceClass,
-            new LinkedList<>()
+            new LinkedList<>(),
+            null
         );
     }
 
@@ -64,12 +65,17 @@ public class SimpleSkyblockCommandBuilder<T extends SkyblockAudience> implements
 
     @Override
     public <V extends SkyblockAudience> SkyblockCommandBuilder<V> audience(Class<V> audience) {
-        return new SimpleSkyblockCommandBuilder<>(manager, name, audience, arguments);
+        return new SimpleSkyblockCommandBuilder<>(manager, name, audience, arguments, permission);
     }
 
     @Override
     public SkyblockCommand<T> build() {
-        SkyblockCommand<T> command = new SimpleSkyblockCommand<>(arguments, handler, audienceClass, permission);
+        List<CommandArgument> realArguments = new LinkedList<>();
+
+        realArguments.add(new LiteralArgument(name));
+        realArguments.addAll(arguments);
+
+        SkyblockCommand<T> command = new SimpleSkyblockCommand<>(realArguments, handler, audienceClass, permission);
         manager.registerCommand(command);
 
         return command;
