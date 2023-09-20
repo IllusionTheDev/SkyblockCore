@@ -14,16 +14,22 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.data.IslandData;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.database.fetching.AbstractSkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 
 /**
  * The abstract sql implementation of {@link SkyblockFetchingDatabase}. Certain methods are left abstract to allow for different implementations, as queries may
  * differ. For example, Postgres uses BYTEA for binary data, while MySQL uses BLOB.
  */
-public abstract class AbstractSQLSkyblockDatabase implements SkyblockFetchingDatabase {
+public abstract class AbstractSQLSkyblockDatabase extends AbstractSkyblockFetchingDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
     private final AtomicReference<Connection> connectionReference = new AtomicReference<>();
+
+    public AbstractSQLSkyblockDatabase() {
+        addTag(SkyblockDatabaseTag.SQL);
+    }
 
     @Override
     public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {

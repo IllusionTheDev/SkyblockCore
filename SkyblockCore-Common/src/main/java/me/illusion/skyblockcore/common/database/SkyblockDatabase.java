@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.common.database;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 
@@ -30,7 +31,18 @@ public interface SkyblockDatabase {
      */
     CompletableFuture<Void> flush();
 
-    boolean isFileBased();
+    /**
+     * Gets the tags of this database. Tags are used to identify the database type. For example, a database that has the tag "FILE" will not be compatible with
+     * a sharded setup.
+     * <p>
+     *
+     * @return The tags, or an empty collection if there are no tags
+     */
+    Collection<SkyblockDatabaseTag> getTags();
+
+    default boolean hasTag(SkyblockDatabaseTag tag) {
+        return getTags().contains(tag);
+    }
 
 
 }

@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.data.IslandData;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.database.fetching.AbstractSkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.database.fetching.mongo.codec.MongoIslandDataCodec;
 import me.illusion.skyblockcore.common.database.fetching.mongo.codec.MongoUUIDCodec;
@@ -22,7 +24,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 /**
  * The mongodb implementation of {@link SkyblockFetchingDatabase}.
  */
-public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
+public class MongoSkyblockDatabase extends AbstractSkyblockFetchingDatabase {
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
 
@@ -31,6 +33,11 @@ public class MongoSkyblockDatabase implements SkyblockFetchingDatabase {
     private MongoCollection<IslandData> islandDataCollection; // Island ID : Island Data
     private MongoCollection<UUID> islandIdCollection; // Profile ID : Island ID
     private MongoCollection<UUID> profileIdCollection; // Player ID : Profile ID
+
+    public MongoSkyblockDatabase() {
+        addTag(SkyblockDatabaseTag.REMOTE);
+        addTag(SkyblockDatabaseTag.NO_SQL);
+    }
 
     @Override
     public String getName() {

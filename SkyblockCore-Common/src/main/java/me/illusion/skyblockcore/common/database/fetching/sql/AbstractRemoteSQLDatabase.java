@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.common.database.fetching.sql;
 import java.sql.Connection;
 import java.sql.SQLException;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
 
 /**
  * Represents a remote SQL database.
@@ -14,6 +15,10 @@ public abstract class AbstractRemoteSQLDatabase extends AbstractSQLSkyblockDatab
     protected String database;
     protected String username;
     protected String password;
+
+    public AbstractRemoteSQLDatabase() {
+        addTag(SkyblockDatabaseTag.REMOTE);
+    }
 
     @Override
     protected boolean enableDriver(ReadOnlyConfigurationSection properties) {

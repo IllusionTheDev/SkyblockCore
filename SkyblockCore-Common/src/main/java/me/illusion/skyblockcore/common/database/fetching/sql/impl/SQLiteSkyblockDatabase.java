@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Map;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.database.fetching.sql.AbstractSQLSkyblockDatabase;
 import me.illusion.skyblockcore.common.database.fetching.sql.SkyblockSQLQuery;
 
@@ -30,6 +31,9 @@ public class SQLiteSkyblockDatabase extends AbstractSQLSkyblockDatabase {
 
     public SQLiteSkyblockDatabase(File dataFolder) {
         this.dataFolder = dataFolder;
+
+        addTag(SkyblockDatabaseTag.FILE_BASED);
+        addTag(SkyblockDatabaseTag.LOCAL);
     }
 
     @Override

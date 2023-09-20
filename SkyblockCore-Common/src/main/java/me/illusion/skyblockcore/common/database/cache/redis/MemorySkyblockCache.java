@@ -7,12 +7,18 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
-import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.database.cache.AbstractSkyblockCacheDatabase;
 
 /**
  * Represents an in-memory implementation of a SkyblockCacheDatabase. This should not be used for anything other than a "simple" network structure.
  */
-public class MemorySkyblockCache implements SkyblockCacheDatabase {
+public class MemorySkyblockCache extends AbstractSkyblockCacheDatabase {
+
+    public MemorySkyblockCache() {
+        addTag(SkyblockDatabaseTag.CACHE);
+        addTag(SkyblockDatabaseTag.LOCAL);
+    }
 
     private final Map<UUID, String> islandServers = new ConcurrentHashMap<>();
 

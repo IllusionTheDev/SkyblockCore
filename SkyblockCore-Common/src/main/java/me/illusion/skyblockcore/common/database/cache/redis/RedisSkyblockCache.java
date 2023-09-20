@@ -12,13 +12,20 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import me.illusion.skyblockcore.common.communication.redis.RedisController;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.database.cache.AbstractSkyblockCacheDatabase;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
 import redis.clients.jedis.Jedis;
 
 /**
  * A redis implementation of {@link SkyblockCacheDatabase}
  */
-public class RedisSkyblockCache implements SkyblockCacheDatabase {
+public class RedisSkyblockCache extends AbstractSkyblockCacheDatabase {
+
+    public RedisSkyblockCache() {
+        addTag(SkyblockDatabaseTag.CACHE);
+        addTag(SkyblockDatabaseTag.REMOTE);
+    }
 
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
     private RedisController controller;
