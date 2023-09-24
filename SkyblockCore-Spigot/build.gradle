@@ -53,7 +53,7 @@ dependencies {
 
     compileOnly('com.mojang:authlib:1.6.25')
 
-    compileOnly('me.clip:placeholderapi:2.11.3')
+    compileOnly('me.clip:placeholderapi:2.11.4')
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
 
     implementation("me.illusion:cosmos-plugin:1.0")
