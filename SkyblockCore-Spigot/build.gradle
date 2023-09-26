@@ -49,7 +49,7 @@ dependencies {
     compileOnly('org.projectlombok:lombok:1.18.28')
     annotationProcessor('org.projectlombok:lombok:1.18.28')
 
-    compileOnly('redis.clients:jedis:4.4.3')
+    compileOnly('redis.clients:jedis:5.0.1')
 
     compileOnly('com.mojang:authlib:1.6.25')
 
