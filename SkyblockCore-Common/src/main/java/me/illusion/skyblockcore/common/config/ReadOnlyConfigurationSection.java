@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.common.config;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -103,5 +104,11 @@ public class ReadOnlyConfigurationSection {
     public float getFloat(String path) {
         return get(path, Float.class, 0f);
     }
+
+    public Collection<String> getKeys() {
+        return internalMap.keySet();
+    }
+
+
 
 }

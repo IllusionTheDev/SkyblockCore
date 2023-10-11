@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'net.ltgt.errorprone' version "3.1.0"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 group = 'me.illusion'
@@ -11,6 +13,16 @@ repositories {
 }
 
 dependencies {
+    errorprone("com.google.errorprone:error_prone_core:3.1.0")
+
+    // shadowjar all modules
+    implementation(project(":SkyblockCore-Common"))
+    implementation(project(":SkyblockCore-Proxy"))
+    implementation(project(":SkyblockCore-Server"))
+    implementation(project(":SkyblockCore-Spigot")) {
+        exclude group: 'me.illusion', module: 'cosmos-plugin'
+    }
+    implementation(project(":SkyblockCore-BungeeCord"))
 }
 
 def targetJavaVersion = 17

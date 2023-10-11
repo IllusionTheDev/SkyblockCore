@@ -6,7 +6,7 @@ public enum SkyblockDatabaseTag {
 
     FETCHING,
     CACHE,
-    // METRICS,
+    METRICS,
 
     // Implementation details
 

@@ -16,13 +16,13 @@ repositories {
 }
 
 dependencies {
-    implementation('org.projectlombok:lombok:1.18.28')
-    annotationProcessor('org.projectlombok:lombok:1.18.28')
+    compileOnly('org.projectlombok:lombok:1.18.30')
+    annotationProcessor('org.projectlombok:lombok:1.18.30')
 
-    implementation 'com.google.guava:guava:32.1.1-jre'
-    implementation 'redis.clients:jedis:4.4.3'
+    compileOnly 'com.google.guava:guava:32.1.1-jre'
+    compileOnly 'redis.clients:jedis:4.4.3'
 
-    implementation 'org.mongodb:mongodb-driver-sync:4.10.2'
+    compileOnly 'org.mongodb:mongodb-driver-sync:4.10.2'
 }
 
 def targetJavaVersion = 17

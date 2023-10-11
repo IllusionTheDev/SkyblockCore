@@ -16,7 +16,7 @@ public abstract class AbstractRemoteSQLDatabase extends AbstractSQLSkyblockDatab
     protected String username;
     protected String password;
 
-    public AbstractRemoteSQLDatabase() {
+    protected AbstractRemoteSQLDatabase() {
         addTag(SkyblockDatabaseTag.REMOTE);
     }
 

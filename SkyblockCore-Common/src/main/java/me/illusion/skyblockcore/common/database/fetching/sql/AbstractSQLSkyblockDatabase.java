@@ -27,7 +27,7 @@ public abstract class AbstractSQLSkyblockDatabase extends AbstractSkyblockFetchi
     private final Set<CompletableFuture<?>> futures = ConcurrentHashMap.newKeySet();
     private final AtomicReference<Connection> connectionReference = new AtomicReference<>();
 
-    public AbstractSQLSkyblockDatabase() {
+    protected AbstractSQLSkyblockDatabase() {
         addTag(SkyblockDatabaseTag.SQL);
     }
 

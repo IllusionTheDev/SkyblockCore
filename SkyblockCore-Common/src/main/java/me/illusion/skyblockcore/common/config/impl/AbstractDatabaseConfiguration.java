@@ -4,6 +4,7 @@ import me.illusion.skyblockcore.common.config.AbstractConfiguration;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 import me.illusion.skyblockcore.common.database.SkyblockDatabaseSetup;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
 /**
@@ -47,7 +48,8 @@ public abstract class AbstractDatabaseConfiguration<T extends SkyblockDatabase> 
     }
 
     public boolean isSupported(T database) {
-        return !database.isFileBased() || supportsFileBased(); // If the database is file based, we must also support file based databases
+        return !database.hasTag(SkyblockDatabaseTag.FILE_BASED)
+            || supportsFileBased; // If the database is file based, we must also support file based databases
     }
 
 }

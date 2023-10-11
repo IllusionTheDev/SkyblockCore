@@ -1,7 +1,8 @@
-package me.illusion.skyblockcore.common.database.fetching.mongo.codec;
+package me.illusion.skyblockcore.common.storage.island.mongo.codec;
 
 import java.util.UUID;
 import me.illusion.skyblockcore.common.data.IslandData;
+import me.illusion.skyblockcore.common.storage.island.mongo.MongoIslandStorage;
 import org.bson.BsonBinary;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
@@ -23,8 +24,8 @@ public class MongoIslandDataCodec implements Codec<IslandData> {
     public IslandData decode(BsonReader reader, DecoderContext decoderContext) {
         reader.readStartDocument();
 
-        UUID islandId = readUUID("islandId", reader);
-        UUID ownerId = readUUID("ownerId", reader);
+        UUID islandId = readUUID(MongoIslandStorage.ISLAND_ID, reader);
+        UUID ownerId = readUUID(MongoIslandStorage.PROFILE_ID, reader);
 
         reader.readEndDocument();
 
@@ -35,8 +36,8 @@ public class MongoIslandDataCodec implements Codec<IslandData> {
     public void encode(BsonWriter writer, IslandData value, EncoderContext encoderContext) {
         writer.writeStartDocument();
 
-        writeUUID("islandId", value.getIslandId(), writer);
-        writeUUID("ownerId", value.getOwnerId(), writer);
+        writeUUID(MongoIslandStorage.ISLAND_ID, value.getIslandId(), writer);
+        writeUUID(MongoIslandStorage.PROFILE_ID, value.getOwnerId(), writer);
 
         writer.writeEndDocument();
     }
