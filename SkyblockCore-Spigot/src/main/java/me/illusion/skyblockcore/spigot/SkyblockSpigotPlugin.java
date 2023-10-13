@@ -1,17 +1,18 @@
 package me.illusion.skyblockcore.spigot;
 
+import java.io.File;
 import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.config.impl.SkyblockCacheDatabasesFile;
-import me.illusion.skyblockcore.common.config.impl.SkyblockDatabasesFile;
-import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.databaserewrite.registry.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.impl.SkyblockPlatformEnabledEvent;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistry;
@@ -28,6 +29,7 @@ import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
 import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -42,8 +44,6 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
 
     // Server-platform specific things
-    private SkyblockDatabasesFile databasesFile;
-    private SkyblockCacheDatabasesFile cacheDatabasesFile;
     private SkyblockMessagesFile messagesFile;
 
     private ConfigurationProvider configurationProvider;
@@ -56,6 +56,11 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     private SkyblockCommandManager<SkyblockAudience> commandManager;
 
     @Override
+    public void onLoad() {
+        Bukkit.getServicesManager().register(SkyblockPlatform.class, this, this, ServicePriority.Normal);
+    }
+
+    @Override
     public void onEnable() {
         System.out.println("Loading configuration provider");
         configurationProvider = new BukkitConfigurationProvider(this);
@@ -64,8 +69,6 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         networkRegistry = new SkyblockNetworkRegistryImpl(this);
 
         System.out.println("Loading configuration files");
-        databasesFile = new SkyblockDatabasesFile(this);
-        cacheDatabasesFile = new SkyblockCacheDatabasesFile(this);
         messagesFile = new SkyblockMessagesFile(this, "server-messages");
 
         System.out.println("Loading database & grid");
@@ -80,7 +83,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         registerNetworks();
 
         System.out.println("Finishing loading");
-        Bukkit.getScheduler().runTask(this, this::finishLoading);
+        Bukkit.getScheduler().runTask(this, this::load);
     }
 
     @Override
@@ -96,12 +99,10 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
             islandManager.flush().join();
         }
 
-
-        databaseRegistry.getChosenDatabase().flush().join();
-        databaseRegistry.getChosenCacheDatabase().flush().join();
+        databaseRegistry.shutdown().join();
     }
 
-    private void finishLoading() {
+    private void load() {
         System.out.println("Loading networks");
         networkRegistry.load();
 
@@ -109,28 +110,37 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         initCosmos();
 
         System.out.println("Enabling databases");
-        databaseRegistry.tryEnableMultiple(databasesFile, cacheDatabasesFile).thenAccept(success -> {
-            if (Boolean.FALSE.equals(success)) { // The future returns a boxed boolean
-                getLogger().severe("Failed to enable databases, disabling plugin...");
-                Bukkit.getPluginManager().disablePlugin(this);
+        loadDatabases();
+        databaseRegistry.finishLoading().thenAccept(this::finishLoading);
+    }
+
+    private void loadDatabases() {
+        File databasesFolder = new File(getDataFolder(), "databases");
+
+        IOUtils.traverseAndLoad(databasesFolder, file -> {
+            if (!file.getName().endsWith(".yml")) {
                 return;
             }
 
-            System.out.println("Enabling island manager");
-            playerManager = new SkyblockBukkitPlayerManager(this);
-            islandManager = new IslandManagerImpl(this);
-
-            networkRegistry.enable();
-
-            commandManager.syncCommands();
-            eventManager.callEvent(new SkyblockPlatformEnabledEvent(this));
-        }).exceptionally(throwable -> {
-            getLogger().severe("Failed to enable databases, disabling plugin...");
-            throwable.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(this);
-            return null;
+            databaseRegistry.loadPossible(configurationProvider.loadConfiguration(file));
         });
+    }
 
+    private void finishLoading(boolean databasesLoaded) {
+        if (!databasesLoaded) {
+            getLogger().severe("Failed to enable databases, disabling plugin...");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        System.out.println("Enabling island manager");
+        playerManager = new SkyblockBukkitPlayerManager(this);
+        islandManager = new IslandManagerImpl(this);
+
+        networkRegistry.enable();
+
+        commandManager.syncCommands();
+        eventManager.callEvent(new SkyblockPlatformEnabledEvent(this));
     }
 
     /**

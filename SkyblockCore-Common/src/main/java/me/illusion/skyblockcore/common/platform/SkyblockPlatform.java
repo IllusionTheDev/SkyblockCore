@@ -1,13 +1,11 @@
 package me.illusion.skyblockcore.common.platform;
 
-import java.io.File;
 import java.util.logging.Logger;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.config.impl.SkyblockDatabasesFile;
-import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.databaserewrite.registry.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 
 /**
@@ -22,13 +20,6 @@ public interface SkyblockPlatform {
      * @return The logger
      */
     Logger getLogger();
-
-    /**
-     * Gets the data folder for the platform
-     *
-     * @return The data folder
-     */
-    File getDataFolder();
 
     /**
      * Gets the database registry for the platform
@@ -57,13 +48,6 @@ public interface SkyblockPlatform {
      * @return The command manager
      */
     SkyblockCommandManager<SkyblockAudience> getCommandManager();
-
-    /**
-     * Gets the database setup for the platform. Certain parts of the platform may require a specific database setup, and access to this is required.
-     *
-     * @return The database setup
-     */
-    SkyblockDatabasesFile getDatabasesFile();
 
     /**
      * Gets the messages file for the platform. Each platform may have its own messages file, and access to this is required.

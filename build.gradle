@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'net.ltgt.errorprone' version "3.1.0"
     id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
@@ -13,7 +12,6 @@ repositories {
 }
 
 dependencies {
-    errorprone("com.google.errorprone:error_prone_core:3.1.0")
 
     // shadowjar all modules
     implementation(project(":SkyblockCore-Common"))
@@ -49,3 +47,5 @@ processResources {
         expand props
     }
 }
+
+shadowJar.dependsOn(processResources)

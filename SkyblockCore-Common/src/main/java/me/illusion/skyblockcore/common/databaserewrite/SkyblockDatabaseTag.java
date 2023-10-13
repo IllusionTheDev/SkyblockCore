@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.common.database;
+package me.illusion.skyblockcore.common.databaserewrite;
 
 public enum SkyblockDatabaseTag {
 

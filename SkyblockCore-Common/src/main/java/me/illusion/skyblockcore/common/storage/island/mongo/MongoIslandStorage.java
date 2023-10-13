@@ -3,6 +3,8 @@ package me.illusion.skyblockcore.common.storage.island.mongo;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +19,9 @@ public class MongoIslandStorage extends MongoPersistenceDatabase implements Skyb
 
     public static final String PROFILE_ID = "profileId";
     public static final String ISLAND_ID = "islandId";
+
     private static final ReplaceOptions UPSERT = new ReplaceOptions().upsert(true);
+
     private MongoCollection<UUID> islandIdCollection; // Profile ID : Island ID
     private MongoCollection<IslandData> islandDataCollection; // Island ID : Island Data
 
@@ -44,6 +48,21 @@ public class MongoIslandStorage extends MongoPersistenceDatabase implements Skyb
         return associate(() -> {
             islandIdCollection.deleteOne(Filters.eq(ISLAND_ID, islandId));
             islandDataCollection.deleteOne(Filters.eq(ISLAND_ID, islandId));
+        });
+    }
+
+    @Override
+    public CompletableFuture<Collection<IslandData>> getAllIslandData() {
+        return associate(() -> islandDataCollection.find().into(new ArrayList<>()));
+    }
+
+    @Override
+    public CompletableFuture<Void> saveAllIslandData(Collection<IslandData> data) {
+        return associate(() -> {
+            for (IslandData islandData : data) {
+                islandIdCollection.replaceOne(Filters.eq(PROFILE_ID, islandData.getOwnerId()), islandData.getIslandId(), UPSERT);
+                islandDataCollection.replaceOne(Filters.eq(ISLAND_ID, islandData.getIslandId()), islandData, UPSERT);
+            }
         });
     }
 

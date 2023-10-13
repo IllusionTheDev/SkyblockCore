@@ -1,5 +1,7 @@
 package me.illusion.skyblockcore.common.databaserewrite.registry;
 
+import com.google.common.collect.Sets;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -9,20 +11,75 @@ import java.util.logging.Level;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.storage.SkyblockStorage;
+import me.illusion.skyblockcore.common.storage.island.mongo.MongoIslandStorage;
+import me.illusion.skyblockcore.common.storage.island.sql.MySQLIslandStorage;
+import me.illusion.skyblockcore.common.storage.island.sql.SQLiteIslandStorage;
 
 public class SkyblockDatabaseRegistry {
 
-    private final Map<String, RegisteredDatabase<?>> registeredDatabases = new ConcurrentHashMap<>();
     private final SkyblockDatabaseCredentialRegistry credentialRegistry = new SkyblockDatabaseCredentialRegistry();
+    private final Collection<CompletableFuture<?>> futures = Sets.newConcurrentHashSet();
+
+    private final Map<String, RegisteredDatabase<?>> registeredDatabases = new ConcurrentHashMap<>();
 
     private final SkyblockPlatform platform;
 
     public SkyblockDatabaseRegistry(SkyblockPlatform platform) {
         this.platform = platform;
+
+        registerDefaults();
     }
+
+    private void registerDefaults() {
+        register("island", SkyblockDatabaseProvider.of(
+            new MongoIslandStorage(),
+            new MySQLIslandStorage(),
+            new SQLiteIslandStorage()
+        ));
+    }
+
+    // --- CORE LOGIC ---
 
     public <T extends SkyblockDatabase> void register(String name, SkyblockDatabaseProvider<T> provider) {
         registeredDatabases.put(name, new RegisteredDatabase<>(provider, name));
+        tryLoad(registeredDatabases.get(name));
+    }
+
+    public <T extends SkyblockStorage<T>> T getStorage(Class<T> clazz) {
+        for (RegisteredDatabase<?> registeredDatabase : registeredDatabases.values()) {
+            SkyblockDatabase database = registeredDatabase.getDatabase();
+
+            if (clazz.isInstance(database)) {
+                return clazz.cast(database);
+            }
+        }
+
+        return null;
+    }
+
+    public <T extends SkyblockStorage<T>> T getStorage(String name) {
+        SkyblockDatabase database = getDatabase(name);
+
+        if (database == null) {
+            return null;
+        }
+
+        if (database instanceof SkyblockStorage) {
+            return (T) database;
+        }
+
+        return null;
+    }
+
+    public SkyblockDatabase getDatabase(String name) {
+        RegisteredDatabase<?> registeredDatabase = registeredDatabases.get(name);
+
+        if (registeredDatabase == null) {
+            return null;
+        }
+
+        return registeredDatabase.getDatabase();
     }
 
     public CompletableFuture<Void> loadPossible(ReadOnlyConfigurationSection section) {
@@ -36,32 +93,45 @@ public class SkyblockDatabaseRegistry {
                 continue;
             }
 
-            ReadOnlyConfigurationSection credentials = credentialRegistry.getCredentials(registeredDatabase.getName());
-
-            if (credentials == null) {
-                continue;
-            }
-
-            String type = credentials.getString("type");
-
-            if (type == null) {
-                warn("No type specified for database credentials of name {0}", registeredDatabase.getName());
-                continue;
-            }
-
-            registeredDatabase.setSpecifiedType(type);
-            SkyblockDatabase database = registeredDatabase.getDatabase();
-
-            if (database == null) {
-                warn("No database found for name {0}", registeredDatabase.getName());
-                continue;
-            }
-
-            registeredDatabase.setEnabled(true);
-            futures.add(database.enable(credentials));
+            futures.add(tryLoad(registeredDatabase));
         }
 
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    private CompletableFuture<Boolean> tryLoad(RegisteredDatabase<?> registeredDatabase) {
+        if (registeredDatabase.isEnabled()) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        ReadOnlyConfigurationSection credentials = credentialRegistry.getCredentials(registeredDatabase.getName());
+
+        if (credentials == null) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        String type = credentials.getString("type");
+
+        if (type == null) {
+            warn("No type specified for database credentials of name {0}", registeredDatabase.getName());
+            return CompletableFuture.completedFuture(false);
+        }
+
+        registeredDatabase.setSpecifiedType(type);
+        SkyblockDatabase database = registeredDatabase.getDatabase();
+
+        if (database == null) {
+            warn("No database found for name {0}", registeredDatabase.getName());
+            return CompletableFuture.completedFuture(false);
+        }
+
+        return addFuture(database.enable(credentials).thenApply((success) -> {
+            if (Boolean.TRUE.equals(success)) {
+                registeredDatabase.setEnabled(true);
+            }
+
+            return success;
+        }));
     }
 
     private void loadSection(ReadOnlyConfigurationSection section) {
@@ -88,8 +158,29 @@ public class SkyblockDatabaseRegistry {
         return true;
     }
 
+    public CompletableFuture<Boolean> finishLoading() {
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply((v) -> areAllLoaded());
+    }
+
+    public CompletableFuture<Void> shutdown() {
+        for (RegisteredDatabase<?> registeredDatabase : registeredDatabases.values()) {
+            if (!registeredDatabase.isEnabled()) {
+                continue;
+            }
+
+            addFuture(registeredDatabase.getDatabase().flush());
+        }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
     private void warn(String message, Object... args) {
         platform.getLogger().log(Level.WARNING, message, args);
+    }
+
+    private <T> CompletableFuture<T> addFuture(CompletableFuture<T> future) {
+        futures.add(future);
+        return future.whenComplete((v, e) -> futures.remove(future));
     }
 }
 

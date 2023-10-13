@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
-import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
 public abstract class AbstractSkyblockDatabase implements SkyblockDatabase {
 
@@ -54,5 +54,14 @@ public abstract class AbstractSkyblockDatabase implements SkyblockDatabase {
 
     protected <T> CompletableFuture<T> associate(CompletableFuture<T> future) {
         return addFuture(future);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> enable(SkyblockPlatform platform, ReadOnlyConfigurationSection properties) {
+        return enable(properties);
+    }
+
+    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+        throw new IllegalStateException("You must override at least one enable method!");
     }
 }

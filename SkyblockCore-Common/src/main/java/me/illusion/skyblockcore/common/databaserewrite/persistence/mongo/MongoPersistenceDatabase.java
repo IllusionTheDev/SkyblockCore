@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
-import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.databaserewrite.persistence.AbstractPersistenceDatabase;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -66,6 +66,11 @@ public abstract class MongoPersistenceDatabase extends AbstractPersistenceDataba
                 return false;
             }
         });
+    }
+
+    @Override
+    public CompletableFuture<Void> wipe() {
+        return associate(() -> database.getCollection(collectionName).drop());
     }
 
     protected String getDefaultDatabase() {

@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.bungee;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import lombok.Getter;
@@ -9,11 +10,10 @@ import me.illusion.skyblockcore.bungee.instance.BungeeSkyblockMatchmaker;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.config.impl.SkyblockCacheDatabasesFile;
-import me.illusion.skyblockcore.common.config.impl.SkyblockDatabasesFile;
-import me.illusion.skyblockcore.common.database.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.databaserewrite.registry.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
+import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.command.PlaySkyblockCommand;
 import me.illusion.skyblockcore.proxy.config.SkyblockMatchmakingFile;
@@ -30,8 +30,6 @@ import net.md_5.bungee.api.plugin.Plugin;
 @Getter
 public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatform {
 
-    private SkyblockCacheDatabasesFile cacheDatabasesFile;
-    private SkyblockDatabasesFile databasesFile;
     private SkyblockMatchmakingFile matchmakingFile;
 
     private SkyblockDatabaseRegistry databaseRegistry;
@@ -51,8 +49,6 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
 
         commandManager = new BungeeSkyblockCommandManager(this);
 
-        cacheDatabasesFile = new SkyblockCacheDatabasesFile(this);
-        databasesFile = new SkyblockDatabasesFile(this);
         matchmakingFile = new SkyblockMatchmakingFile(this);
         messagesFile = new SkyblockMessagesFile(this, "proxy-messages");
 
@@ -84,22 +80,25 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
     }
 
     private void loadDatabase() {
-        databaseRegistry.tryEnableMultiple(cacheDatabasesFile, databasesFile).thenAccept(success -> {
-            if (Boolean.FALSE.equals(success)) { // The future returns a boxed boolean
-                getLogger().severe("Failed to enable databases. Disabling plugin.");
-                disableExceptionally();
+        File databasesFolder = new File(getDataFolder(), "databases");
+
+        IOUtils.traverseAndLoad(databasesFolder, file -> {
+            if (!file.getName().endsWith(".yml")) {
                 return;
             }
 
-            initMatchmaking();
+            databaseRegistry.loadPossible(configurationProvider.loadConfiguration(file));
+        });
+
+        databaseRegistry.finishLoading().thenRun(() -> {
             finishEnable();
+            initMatchmaking();
         });
     }
 
     @Override
     public void onDisable() {
-        databaseRegistry.getChosenCacheDatabase().flush().join();
-        databaseRegistry.getChosenDatabase().flush().join();
+        databaseRegistry.shutdown().join();
     }
 
     @Override
