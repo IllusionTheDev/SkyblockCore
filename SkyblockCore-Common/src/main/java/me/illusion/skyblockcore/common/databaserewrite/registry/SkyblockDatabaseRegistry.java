@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabase;
+import me.illusion.skyblockcore.common.databaserewrite.cache.SkyblockCache;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.storage.SkyblockStorage;
 import me.illusion.skyblockcore.common.storage.island.mongo.MongoIslandStorage;
@@ -44,6 +45,18 @@ public class SkyblockDatabaseRegistry {
     public <T extends SkyblockDatabase> void register(String name, SkyblockDatabaseProvider<T> provider) {
         registeredDatabases.put(name, new RegisteredDatabase<>(provider, name));
         tryLoad(registeredDatabases.get(name));
+    }
+
+    public <T extends SkyblockCache> T getCache(Class<T> clazz) {
+        for (RegisteredDatabase<?> registeredDatabase : registeredDatabases.values()) {
+            SkyblockDatabase database = registeredDatabase.getDatabase();
+
+            if (clazz.isInstance(database)) {
+                return clazz.cast(database);
+            }
+        }
+
+        return null;
     }
 
     public <T extends SkyblockStorage<T>> T getStorage(Class<T> clazz) {
@@ -86,17 +99,17 @@ public class SkyblockDatabaseRegistry {
         loadSection(section);
         credentialRegistry.checkCyclicDependencies();
 
-        Set<CompletableFuture<?>> futures = new HashSet<>();
+        Set<CompletableFuture<?>> temp = new HashSet<>();
 
         for (RegisteredDatabase<?> registeredDatabase : registeredDatabases.values()) {
             if (registeredDatabase.isEnabled()) {
                 continue;
             }
 
-            futures.add(tryLoad(registeredDatabase));
+            temp.add(tryLoad(registeredDatabase));
         }
 
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        return CompletableFuture.allOf(temp.toArray(new CompletableFuture[0]));
     }
 
     private CompletableFuture<Boolean> tryLoad(RegisteredDatabase<?> registeredDatabase) {
@@ -125,7 +138,7 @@ public class SkyblockDatabaseRegistry {
             return CompletableFuture.completedFuture(false);
         }
 
-        return addFuture(database.enable(credentials).thenApply((success) -> {
+        return addFuture(database.enable(platform, credentials).thenApply((success) -> {
             if (Boolean.TRUE.equals(success)) {
                 registeredDatabase.setEnabled(true);
             }

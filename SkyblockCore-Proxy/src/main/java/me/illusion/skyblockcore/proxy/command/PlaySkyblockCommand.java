@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
+import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.audience.SkyblockProxyPlayerAudience;
 
@@ -42,7 +42,7 @@ public class PlaySkyblockCommand {
     }
 
     private CompletableFuture<UUID> fetchIslandId(UUID playerId) {
-        SkyblockFetchingDatabase database = platform.getDatabaseRegistry().getChosenDatabase();
+        SkyblockIslandStorage database = platform.getDatabaseRegistry().getStorage(SkyblockProfileStorage.class);
 
         return database.getProfileId(playerId).thenCompose(uuid -> {
             if (uuid == null) {

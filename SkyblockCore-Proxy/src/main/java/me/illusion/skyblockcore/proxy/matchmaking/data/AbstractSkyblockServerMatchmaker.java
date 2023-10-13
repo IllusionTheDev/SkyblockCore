@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
+import me.illusion.skyblockcore.common.databaserewrite.cache.island.SkyblockIslandCache;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.instance.ProxyServerData;
 import me.illusion.skyblockcore.proxy.matchmaking.comparator.ServerDataComparator;
@@ -18,11 +18,11 @@ import me.illusion.skyblockcore.proxy.matchmaking.comparator.ServerDataComparato
 public abstract class AbstractSkyblockServerMatchmaker implements SkyblockServerMatchmaker {
 
     private final ServerDataComparator comparator;
-    private final SkyblockCacheDatabase cacheDatabase;
+    private final SkyblockIslandCache cacheDatabase;
 
     protected AbstractSkyblockServerMatchmaker(SkyblockProxyPlatform platform) {
         this.comparator = platform.getMatchmakerComparatorRegistry().getDefaultComparator();
-        this.cacheDatabase = platform.getDatabaseRegistry().getChosenCacheDatabase();
+        this.cacheDatabase = platform.getDatabaseRegistry().getCache();
     }
 
     @Override
