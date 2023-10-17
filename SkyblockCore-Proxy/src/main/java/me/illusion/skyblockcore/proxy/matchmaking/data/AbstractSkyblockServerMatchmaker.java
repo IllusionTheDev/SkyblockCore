@@ -22,7 +22,7 @@ public abstract class AbstractSkyblockServerMatchmaker implements SkyblockServer
 
     protected AbstractSkyblockServerMatchmaker(SkyblockProxyPlatform platform) {
         this.comparator = platform.getMatchmakerComparatorRegistry().getDefaultComparator();
-        this.cacheDatabase = platform.getDatabaseRegistry().getCache();
+        this.cacheDatabase = platform.getDatabaseRegistry().getCache(SkyblockIslandCache.class);
     }
 
     @Override

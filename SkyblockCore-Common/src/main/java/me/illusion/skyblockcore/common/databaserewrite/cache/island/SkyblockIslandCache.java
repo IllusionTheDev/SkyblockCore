@@ -4,8 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.illusion.skyblockcore.common.databaserewrite.cache.SkyblockCache;
 
-public interface SkyblockIslandCache {
+public interface SkyblockIslandCache extends SkyblockCache {
 
     CompletableFuture<Map<String, Collection<UUID>>> getAllIslands();
 
@@ -16,7 +17,5 @@ public interface SkyblockIslandCache {
     CompletableFuture<Void> removeServer(UUID islandId);
 
     CompletableFuture<Void> removeServer(String serverId);
-
-    CompletableFuture<Void> unloadServer();
 
 }

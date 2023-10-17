@@ -1,6 +1,8 @@
 package me.illusion.skyblockcore.common.config;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,11 +36,32 @@ public class ReadOnlyConfigurationSection {
     }
 
     public Object get(String path) {
+        int index = path.indexOf('.');
+
+        if (index != -1) {
+            String key = path.substring(0, index);
+            path = path.substring(index + 1);
+
+            ReadOnlyConfigurationSection section = getSection(key);
+
+            if (section == null) {
+                return null;
+            }
+
+            return section.get(path);
+        }
+
         return internalMap.get(path);
     }
 
     public Object get(String path, Object def) {
-        return internalMap.getOrDefault(path, def);
+        Object obj = get(path);
+
+        if (obj == null) {
+            return def;
+        }
+
+        return obj;
     }
 
     public <T> T get(String path, Class<T> type) {
@@ -48,17 +71,25 @@ public class ReadOnlyConfigurationSection {
             return null;
         }
 
-        return type.cast(obj);
+        if (type.isInstance(obj) || type.isAssignableFrom(obj.getClass())) {
+            return type.cast(obj);
+        }
+
+        throw new IllegalArgumentException("Cannot cast " + obj.getClass().getName() + " to " + type.getName() + " at " + path + " in " + name);
     }
 
     public <T> T get(String path, Class<T> type, T def) {
         Object obj = get(path, def);
 
         if (obj == null) {
-            return null;
+            return def;
         }
 
-        return type.cast(obj);
+        if (type.isInstance(obj) || type.isAssignableFrom(obj.getClass())) {
+            return type.cast(obj);
+        }
+
+        throw new IllegalArgumentException("Cannot cast " + obj.getClass().getName() + " to " + type.getName());
     }
 
     public String getString(String path) {
@@ -69,20 +100,28 @@ public class ReadOnlyConfigurationSection {
         return get(path, String.class, def);
     }
 
+    public Number getNumber(String path) {
+        return get(path, Number.class);
+    }
+
+    public Number getNumber(String path, Number def) {
+        return get(path, Number.class, def);
+    }
+
     public int getInt(String path) {
-        return get(path, Integer.class, 0);
+        return getNumber(path).intValue();
     }
 
     public int getInt(String path, int def) {
-        return get(path, Integer.class, def);
+        return getNumber(path, def).intValue();
     }
 
     public double getDouble(String path) {
-        return get(path, Double.class, 0d);
+        return getNumber(path).doubleValue();
     }
 
     public double getDouble(String path, double def) {
-        return get(path, Double.class, def);
+        return getNumber(path, def).doubleValue();
     }
 
     public boolean getBoolean(String path) {
@@ -94,21 +133,32 @@ public class ReadOnlyConfigurationSection {
     }
 
     public long getLong(String path) {
-        return get(path, Long.class, 0L);
+        return getNumber(path).longValue();
     }
 
     public long getLong(String path, long def) {
-        return get(path, Long.class, def);
+        return getNumber(path, def).longValue();
     }
 
     public float getFloat(String path) {
-        return get(path, Float.class, 0f);
+        return (float) getDouble(path);
+    }
+
+    public float getFloat(String path, float def) {
+        return (float) getDouble(path, def);
     }
 
     public Collection<String> getKeys() {
-        return internalMap.keySet();
+        return new ArrayList<>(internalMap.keySet());
     }
 
+    public List<String> getStringList(String path) {
+        return get(path, List.class, new ArrayList<>());
+    }
+
+    public boolean isSection(String path) {
+        return get(path) instanceof ReadOnlyConfigurationSection;
+    }
 
 
 }

@@ -25,6 +25,7 @@ public class PlaySkyblockCommand {
 
         commandManager.newCommand("play-skyblock")
             .audience(SkyblockProxyPlayerAudience.class)
+            .permission("skyblockproxy.command.play")
             .handler((player, context) -> {
                 UUID playerId = player.getUniqueId();
 
@@ -42,14 +43,15 @@ public class PlaySkyblockCommand {
     }
 
     private CompletableFuture<UUID> fetchIslandId(UUID playerId) {
-        SkyblockIslandStorage database = platform.getDatabaseRegistry().getStorage(SkyblockProfileStorage.class);
+        SkyblockProfileStorage profileStorage = platform.getDatabaseRegistry().getStorage(SkyblockProfileStorage.class);
+        SkyblockIslandStorage islandStorage = platform.getDatabaseRegistry().getStorage(SkyblockIslandStorage.class);
 
-        return database.getProfileId(playerId).thenCompose(uuid -> {
+        return profileStorage.getProfileId(playerId).thenCompose(uuid -> {
             if (uuid == null) {
                 return CompletableFuture.completedFuture(null);
             }
 
-            return database.fetchIslandId(uuid);
+            return islandStorage.getIslandId(uuid);
         });
     }
 
