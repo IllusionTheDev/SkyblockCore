@@ -3,6 +3,7 @@ package me.illusion.skyblockcore.common.databaserewrite.persistence.mongo;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.ReplaceOptions;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,6 +15,8 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 
 public abstract class MongoPersistenceDatabase extends AbstractPersistenceDatabase {
+
+    protected static final ReplaceOptions UPSERT = new ReplaceOptions().upsert(true);
 
     protected MongoClient client;
     protected MongoDatabase database;

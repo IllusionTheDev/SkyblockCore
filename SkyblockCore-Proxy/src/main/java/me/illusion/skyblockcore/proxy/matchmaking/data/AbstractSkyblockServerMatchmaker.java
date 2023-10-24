@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.databaserewrite.cache.island.SkyblockIslandCache;
+import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.instance.ProxyServerData;
 import me.illusion.skyblockcore.proxy.matchmaking.comparator.ServerDataComparator;

@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.common.databaserewrite.cache.island;
+package me.illusion.skyblockcore.common.storage.cache;
 
 import java.util.Collection;
 import java.util.Map;

@@ -13,6 +13,7 @@ import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabase;
 import me.illusion.skyblockcore.common.databaserewrite.cache.SkyblockCache;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.storage.SkyblockStorage;
+import me.illusion.skyblockcore.common.storage.cache.redis.RedisSkyblockIslandCache;
 import me.illusion.skyblockcore.common.storage.island.mongo.MongoIslandStorage;
 import me.illusion.skyblockcore.common.storage.island.sql.MySQLIslandStorage;
 import me.illusion.skyblockcore.common.storage.island.sql.SQLiteIslandStorage;
@@ -37,6 +38,16 @@ public class SkyblockDatabaseRegistry {
             new MongoIslandStorage(),
             new MySQLIslandStorage(),
             new SQLiteIslandStorage()
+        ));
+
+        register("profile", SkyblockDatabaseProvider.of(
+            new MongoIslandStorage(),
+            new MySQLIslandStorage(),
+            new SQLiteIslandStorage()
+        ));
+
+        register("island-cache", SkyblockDatabaseProvider.of(
+            new RedisSkyblockIslandCache()
         ));
     }
 
@@ -63,11 +74,12 @@ public class SkyblockDatabaseRegistry {
         for (RegisteredDatabase<?> registeredDatabase : registeredDatabases.values()) {
             SkyblockDatabase database = registeredDatabase.getDatabase();
 
-            if (clazz.isInstance(database)) {
+            if (clazz.isInstance(database) || clazz.isAssignableFrom(database.getClass())) {
                 return clazz.cast(database);
             }
         }
 
+        warn("Failed to find storage of type {0}", clazz.getSimpleName());
         return null;
     }
 

@@ -3,7 +3,7 @@ package me.illusion.skyblockcore.server.network.complex.communication;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
-import me.illusion.skyblockcore.common.databaserewrite.cache.island.SkyblockIslandCache;
+import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
 import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;

@@ -26,6 +26,8 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
 
     @Override
     public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+        setProperties(properties);
+
         return associate(() -> {
             Connection connection = getConnection();
             boolean valid = validateConnection(connection);
