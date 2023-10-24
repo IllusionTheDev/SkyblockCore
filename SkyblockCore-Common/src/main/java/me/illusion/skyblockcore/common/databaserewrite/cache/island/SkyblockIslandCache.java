@@ -14,7 +14,7 @@ public interface SkyblockIslandCache extends SkyblockCache {
 
     CompletableFuture<Void> setServer(UUID islandId, String serverId);
 
-    CompletableFuture<Void> removeServer(UUID islandId);
+    CompletableFuture<Void> removeIsland(UUID islandId);
 
     CompletableFuture<Void> removeServer(String serverId);
 

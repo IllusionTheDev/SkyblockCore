@@ -6,6 +6,7 @@ import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
+import me.illusion.skyblockcore.common.storage.profiles.SkyblockProfileStorage;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.audience.SkyblockProxyPlayerAudience;
 

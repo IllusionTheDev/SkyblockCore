@@ -3,9 +3,9 @@ package me.illusion.skyblockcore.server.network.complex;
 import lombok.Getter;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
+import me.illusion.skyblockcore.common.databaserewrite.cache.island.SkyblockIslandCache;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
+import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
@@ -27,7 +27,7 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     private final SkyblockServerPlatform platform;
 
-    private SkyblockFetchingDatabase database;
+    private SkyblockIslandStorage database;
     private CommunicationsHandler communicationsHandler;
 
     private ComplexNetworkConfiguration configuration;
@@ -38,12 +38,12 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void load() {
-        platform.getDatabasesFile().setSupportsFileBased(false); // We don't support file-based databases, as they are instance-specific
+        // platform.getDatabasesFile().setSupportsFileBased(false); // We don't support file-based databases, as they are instance-specific
     }
 
     @Override
     public void enable() {
-        database = platform.getDatabaseRegistry().getChosenDatabase();
+        database = platform.getDatabaseRegistry().getStorage(SkyblockIslandStorage.class);
         configuration = new ComplexNetworkConfiguration(platform);
 
         registerListeners();
@@ -85,8 +85,8 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
         return platform.getIslandManager();
     }
 
-    public SkyblockCacheDatabase getCacheDatabase() {
-        return platform.getDatabaseRegistry().getChosenCacheDatabase();
+    public SkyblockIslandCache getCacheDatabase() {
+        return platform.getDatabaseRegistry().getCache(SkyblockIslandCache.class);
     }
 
     public SkyblockEventManager getEventManager() {
