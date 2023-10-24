@@ -19,4 +19,8 @@ public interface SkyblockDatabase {
 
     Collection<SkyblockDatabaseTag> getTags();
 
+    default boolean hasTag(SkyblockDatabaseTag tag) {
+        return getTags().contains(tag);
+    }
+
 }

@@ -13,6 +13,7 @@ import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabase;
 import me.illusion.skyblockcore.common.databaserewrite.cache.SkyblockCache;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.storage.SkyblockStorage;
+import me.illusion.skyblockcore.common.storage.cache.redis.MemorySkyblockIslandCache;
 import me.illusion.skyblockcore.common.storage.cache.redis.RedisSkyblockIslandCache;
 import me.illusion.skyblockcore.common.storage.island.mongo.MongoIslandStorage;
 import me.illusion.skyblockcore.common.storage.island.sql.MySQLIslandStorage;
@@ -47,7 +48,8 @@ public class SkyblockDatabaseRegistry {
         ));
 
         register("island-cache", SkyblockDatabaseProvider.of(
-            new RedisSkyblockIslandCache()
+            new RedisSkyblockIslandCache(),
+            new MemorySkyblockIslandCache()
         ));
     }
 

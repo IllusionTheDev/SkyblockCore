@@ -1,8 +1,11 @@
 package me.illusion.skyblockcore.server.network.complex;
 
+import java.util.Collection;
+import java.util.List;
 import lombok.Getter;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
+import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
 import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
@@ -25,6 +28,10 @@ import me.illusion.skyblockcore.server.network.complex.listener.ComplexPlayerJoi
 @Getter
 public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
+    private static final Collection<SkyblockDatabaseTag> DISALLOWED_TAGS = List.of(
+        SkyblockDatabaseTag.LOCAL
+    );
+
     private final SkyblockServerPlatform platform;
 
     private SkyblockIslandStorage database;
@@ -43,6 +50,8 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
 
     @Override
     public void enable() {
+        checkSetup();
+
         database = platform.getDatabaseRegistry().getStorage(SkyblockIslandStorage.class);
         configuration = new ComplexNetworkConfiguration(platform);
 
@@ -62,6 +71,22 @@ public class ComplexSkyblockNetwork implements SkyblockNetworkStructure {
     }
 
     // Main startup logic
+
+    private void checkSetup() {
+        SkyblockIslandStorage storage = platform.getDatabaseRegistry().getStorage(SkyblockIslandStorage.class);
+
+        if (storage == null) {
+            throw new IllegalStateException("No island storage found");
+        }
+
+        for (SkyblockDatabaseTag tag : DISALLOWED_TAGS) {
+            if (storage.hasTag(tag)) {
+                throw new IllegalStateException(
+                    "Incompatible database of type " + database.getName() + " found. Make sure the database chosen does not match any of the following tags: "
+                        + DISALLOWED_TAGS);
+            }
+        }
+    }
 
     private void registerListeners() {
         new ComplexPlayerJoinListener(this);
