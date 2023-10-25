@@ -3,8 +3,8 @@ package me.illusion.skyblockcore.server.network.complex.communication;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
-import me.illusion.skyblockcore.common.database.cache.SkyblockCacheDatabase;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
+import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
+import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.server.network.complex.communication.packet.request.PacketRequestIslandTeleport;
@@ -18,8 +18,8 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
 
     private final PacketManager packetManager;
     private final String serverId;
-    private final SkyblockCacheDatabase cacheDatabase;
-    private final SkyblockFetchingDatabase database;
+    private final SkyblockIslandCache cacheDatabase;
+    private final SkyblockIslandStorage database;
 
     private final ComplexSkyblockNetwork network;
 
@@ -59,7 +59,7 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
      * @return A future containing the result of the update
      */
     public CompletableFuture<Void> updateIslandServer(UUID islandId, String serverId) {
-        return cacheDatabase.updateIslandServer(islandId, serverId);
+        return cacheDatabase.setServer(islandId, serverId);
     }
 
     /**

@@ -5,7 +5,8 @@ import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
+import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
+import me.illusion.skyblockcore.common.storage.profiles.SkyblockProfileStorage;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.audience.SkyblockProxyPlayerAudience;
 
@@ -25,6 +26,7 @@ public class PlaySkyblockCommand {
 
         commandManager.newCommand("play-skyblock")
             .audience(SkyblockProxyPlayerAudience.class)
+            .permission("skyblockproxy.command.play")
             .handler((player, context) -> {
                 UUID playerId = player.getUniqueId();
 
@@ -42,14 +44,15 @@ public class PlaySkyblockCommand {
     }
 
     private CompletableFuture<UUID> fetchIslandId(UUID playerId) {
-        SkyblockFetchingDatabase database = platform.getDatabaseRegistry().getChosenDatabase();
+        SkyblockProfileStorage profileStorage = platform.getDatabaseRegistry().getStorage(SkyblockProfileStorage.class);
+        SkyblockIslandStorage islandStorage = platform.getDatabaseRegistry().getStorage(SkyblockIslandStorage.class);
 
-        return database.getProfileId(playerId).thenCompose(uuid -> {
+        return profileStorage.getProfileId(playerId).thenCompose(uuid -> {
             if (uuid == null) {
                 return CompletableFuture.completedFuture(null);
             }
 
-            return database.fetchIslandId(uuid);
+            return islandStorage.getIslandId(uuid);
         });
     }
 

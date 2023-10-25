@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import lombok.Setter;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.storage.profiles.SkyblockProfileStorage;
 import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
 import me.illusion.skyblockcore.server.event.player.SkyblockPlayerQuitEvent;
 
@@ -17,7 +17,7 @@ import me.illusion.skyblockcore.server.event.player.SkyblockPlayerQuitEvent;
 public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerManager {
 
     protected final SkyblockPlatform platform;
-    protected final SkyblockFetchingDatabase database;
+    protected final SkyblockProfileStorage database;
 
     private final Map<UUID, UUID> profileMap = new ConcurrentHashMap<>(); // Player ID -> Profile ID
     private final Map<UUID, SkyblockPlayer> playerIdMap = new ConcurrentHashMap<>();
@@ -27,7 +27,7 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
 
     protected AbstractSkyblockPlayerManager(SkyblockPlatform platform) {
         this.platform = platform;
-        this.database = platform.getDatabaseRegistry().getChosenDatabase();
+        this.database = platform.getDatabaseRegistry().getStorage(SkyblockProfileStorage.class);
     }
 
     // Player management stuff

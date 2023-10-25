@@ -1,36 +1,26 @@
 package me.illusion.skyblockcore.common.database;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
-/**
- * This interface represents a template for all databases. Do not implement this interface directly, instead implement one of the sub-interfaces.
- */
 public interface SkyblockDatabase {
 
-    /**
-     * Obtains the name of this database
-     *
-     * @return The name
-     */
     String getName();
 
-    /**
-     * Enables the database
-     *
-     * @param properties The properties, such as the host, port, username, password, etc.
-     * @return A future
-     */
-    CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties);
+    ConfigurationSection getProperties();
 
-    /**
-     * Flushes the database, this is called when the server is shutting down
-     *
-     * @return A future which completes when the database is flushed
-     */
+    CompletableFuture<Boolean> enable(SkyblockPlatform platform, ConfigurationSection properties);
+
     CompletableFuture<Void> flush();
 
-    boolean isFileBased();
+    CompletableFuture<Void> wipe();
 
+    Collection<SkyblockDatabaseTag> getTags();
+
+    default boolean hasTag(SkyblockDatabaseTag tag) {
+        return getTags().contains(tag);
+    }
 
 }

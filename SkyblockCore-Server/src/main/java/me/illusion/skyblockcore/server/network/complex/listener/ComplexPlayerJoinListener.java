@@ -36,7 +36,7 @@ public class ComplexPlayerJoinListener {
 
         // We try to fetch the island id, and see if we can load it. If we can, we load it.
         network.getDatabase()
-            .fetchIslandId(profileId) // Fetch the island id
+            .getIslandId(profileId) // Fetch the island id
             .thenCompose(islandId -> network.getCommunicationsHandler().canLoad(islandId)) // Check if we can load the island
             .thenAccept(allowed -> { // If we can load the island, we load it.
                 if (Boolean.TRUE.equals(allowed)) { // CF returns a boxed boolean, let's prevent null pointer exceptions.

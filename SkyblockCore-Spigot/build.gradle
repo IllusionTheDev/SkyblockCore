@@ -56,7 +56,7 @@ dependencies {
     compileOnly('me.clip:placeholderapi:2.11.4')
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
 
-    implementation("me.illusion:cosmos-plugin:1.0")
+    compileOnly("me.illusion:cosmos-plugin:1.0")
 
     implementation(project(":SkyblockCore-Common"))
     implementation(project(":SkyblockCore-Server"))

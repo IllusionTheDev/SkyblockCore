@@ -28,7 +28,7 @@ public class ComplexIslandCommand {
                     return;
                 }
 
-                network.getDatabase().fetchIslandId(player.getUniqueId()).thenAccept(islandId -> {
+                network.getDatabase().getIslandId(player.getSelectedProfileId()).thenAccept(islandId -> {
                     if (islandId == null) {
                         messages.sendMessage(player, "no-island-loaded");
                         return;

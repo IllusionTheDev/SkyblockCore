@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.common.config;
 
 import java.io.File;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 
 /**
  * Represents a configuration provider, which is used to load configuration files.
@@ -20,7 +21,7 @@ public interface ConfigurationProvider {
      * @param file The file to load the configuration from.
      * @return The configuration section of the file.
      */
-    ReadOnlyConfigurationSection loadConfiguration(File file);
+    ConfigurationSection loadConfiguration(File file);
 
     /**
      * Loads a configuration from a file name.
@@ -28,8 +29,16 @@ public interface ConfigurationProvider {
      * @param fileName The name of the file to load the configuration from.
      * @return The configuration section of the file.
      */
-    default ReadOnlyConfigurationSection loadConfiguration(String fileName) {
+    default ConfigurationSection loadConfiguration(String fileName) {
         return loadConfiguration(new File(getDataFolder(), fileName));
     }
+
+    /**
+     * Saves a configuration to a file.
+     *
+     * @param section The configuration section to save.
+     * @param file    The file to save the configuration to.
+     */
+    void saveConfiguration(ConfigurationSection section, File file);
 
 }

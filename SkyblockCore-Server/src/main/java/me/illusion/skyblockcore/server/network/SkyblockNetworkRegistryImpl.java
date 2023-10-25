@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 
 /**
@@ -16,7 +16,7 @@ public class SkyblockNetworkRegistryImpl implements SkyblockNetworkRegistry {
     private final Map<String, SkyblockNetworkStructure> structures = new ConcurrentHashMap<>();
 
     private final SkyblockServerPlatform platform;
-    private final ReadOnlyConfigurationSection config;
+    private final ConfigurationSection config;
 
     private String desiredStructure;
     private boolean loaded = false;

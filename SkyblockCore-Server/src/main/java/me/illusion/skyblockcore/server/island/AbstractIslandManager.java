@@ -6,8 +6,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import me.illusion.skyblockcore.common.data.IslandData;
-import me.illusion.skyblockcore.common.database.fetching.SkyblockFetchingDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
@@ -22,14 +22,14 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
 
     protected final Set<CompletableFuture<?>> pending = ConcurrentHashMap.newKeySet();
 
-    protected final SkyblockFetchingDatabase database;
+    protected final SkyblockIslandStorage database;
     protected final SkyblockPlayerManager playerManager;
     protected final SkyblockPlatform platform;
 
     protected AbstractIslandManager(SkyblockServerPlatform platform) {
         this.platform = platform;
 
-        this.database = platform.getDatabaseRegistry().getChosenDatabase();
+        this.database = platform.getDatabaseRegistry().getStorage(SkyblockIslandStorage.class);
         this.playerManager = platform.getPlayerManager();
     }
 
@@ -47,7 +47,7 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
             return CompletableFuture.completedFuture(cached);
         }
 
-        return register(database.fetchPlayerIsland(profileId).thenCompose(id -> {
+        return register(database.getIslandId(profileId).thenCompose(id -> {
             if (id == null) {
                 return createIsland(fallback, profileId);
             }
@@ -70,7 +70,7 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
             return CompletableFuture.completedFuture(cached.getData());
         }
 
-        return register(database.fetchPlayerIsland(profileId));
+        return register(database.getIslandId(profileId).thenCompose(database::getIslandData));
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
      */
     @Override
     public CompletableFuture<SkyblockIsland> loadIsland(UUID islandId) {
-        return register(database.fetchIslandData(islandId).thenCompose(this::loadIsland));
+        return register(database.getIslandData(islandId).thenCompose(this::loadIsland));
     }
 
 

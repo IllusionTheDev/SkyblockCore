@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 group = 'me.illusion'
@@ -11,6 +12,15 @@ repositories {
 }
 
 dependencies {
+
+    // shadowjar all modules
+    implementation(project(":SkyblockCore-Common"))
+    implementation(project(":SkyblockCore-Proxy"))
+    implementation(project(":SkyblockCore-Server"))
+    implementation(project(":SkyblockCore-Spigot")) {
+        exclude group: 'me.illusion', module: 'cosmos-plugin'
+    }
+    implementation(project(":SkyblockCore-BungeeCord"))
 }
 
 def targetJavaVersion = 17
@@ -37,3 +47,5 @@ processResources {
         expand props
     }
 }
+
+shadowJar.dependsOn(processResources)

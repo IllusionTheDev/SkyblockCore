@@ -22,7 +22,7 @@ dependencies {
     implementation 'com.google.guava:guava:32.1.1-jre'
     implementation 'redis.clients:jedis:5.0.1'
 
-    implementation 'org.mongodb:mongodb-driver-sync:4.10.2'
+    compileOnly 'org.mongodb:mongodb-driver-sync:4.10.2'
 }
 
 def targetJavaVersion = 17

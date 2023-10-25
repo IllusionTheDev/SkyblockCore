@@ -1,0 +1,13 @@
+# This is a separate file for the cache database credentials
+# The whole reason why this file exists is so that we can be organized and split priorities
+# You can add as many files as you want on this folder, and as many databases as you want on each file
+
+redis:
+  type: redis
+  host: localhost
+  port: 6379
+  password: 12345
+
+island-cache:
+  type: memory # Redis/memory available by default
+
