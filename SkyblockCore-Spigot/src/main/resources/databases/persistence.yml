@@ -4,34 +4,16 @@
 
 # Sample credentials format:
 
-postgres: remote-sql # Postgres inherits remote-sql's credentials
-mysql: remote-sql # MySQL inherits remote-sql's credentials
-mariadb: remote-sql # MariaDB inherits remote-sql's credentials
-
-remote-sql: # This can be anything (other than the storage identifiers), represents the name of the credentials
-  host: localhost
-  port: 3306
-  database: island
-  username: root
-  password: 12345
-
-mongo: # Instead of inheriting, we can also define the credentials directly
-  host: localhost
-  port: 27017
-  database: island
-  username: root
-  password: 12345
-
-sqlite: # SQLite doesn't connect to a remote server, so we need to specify the file path instead
+global:
+  type: sqlite # postgres/mysql/mariadb/sqlite/mongo available by default
   name: island-storage/database # .db extension is added automatically
 
+# mysql:
+#   host: localhost
+#   port: 3306
+#   database: island
+#   username: root
+#   password: 12345
 
-# Sample storage format, these names are hardcoded and cannot be changed:
-# Hardcoded storage identifiers: island, profile, island-cache (found in the cache.yml file)
-
-island:
-  type: sqlite # postgres/mysql/mariadb/sqlite/mongo available by default
-
-profile:
-  type: sqlite
-
+island: global
+profile: global

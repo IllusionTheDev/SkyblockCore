@@ -2,20 +2,20 @@ package me.illusion.skyblockcore.common.databaserewrite.registry;
 
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabase;
 
-public class RegisteredDatabase<T extends SkyblockDatabase> {
+public class RegisteredDatabase {
 
-    private final SkyblockDatabaseProvider<T> provider;
+    private final SkyblockDatabaseProvider provider;
     private final String name;
 
-    private T database;
+    private SkyblockDatabase database;
     private boolean enabled;
 
-    public RegisteredDatabase(SkyblockDatabaseProvider<T> provider, String name) {
+    public RegisteredDatabase(SkyblockDatabaseProvider provider, String name) {
         this.provider = provider;
         this.name = name;
     }
 
-    public T getDatabase() {
+    public SkyblockDatabase getDatabase() {
         if (database == null) {
             database = provider.getDatabase(name);
         }
@@ -39,5 +39,9 @@ public class RegisteredDatabase<T extends SkyblockDatabase> {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public SkyblockDatabaseProvider getProvider() {
+        return provider;
     }
 }

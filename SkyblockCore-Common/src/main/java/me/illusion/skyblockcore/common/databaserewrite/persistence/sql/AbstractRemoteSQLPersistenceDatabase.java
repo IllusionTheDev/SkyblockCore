@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.common.databaserewrite.persistence.sql;
 
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
 
 public abstract class AbstractRemoteSQLPersistenceDatabase extends AbstractSQLPersistenceDatabase {
@@ -17,7 +17,7 @@ public abstract class AbstractRemoteSQLPersistenceDatabase extends AbstractSQLPe
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(ConfigurationSection properties) {
         host = properties.getString("host");
         port = properties.getInt("port");
         database = properties.getString("database");

@@ -4,7 +4,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.persistence.sql.AbstractSQLPersistenceDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
@@ -14,7 +14,7 @@ public abstract class SQLitePersistenceDatabase extends AbstractSQLPersistenceDa
     private File file;
 
     @Override
-    public CompletableFuture<Boolean> enable(SkyblockPlatform platform, ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(SkyblockPlatform platform, ConfigurationSection properties) {
         String name = properties.getString("name");
         File folder = platform.getConfigurationProvider().getDataFolder();
 

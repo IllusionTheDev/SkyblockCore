@@ -3,9 +3,11 @@ package me.illusion.skyblockcore.spigot.config;
 import java.io.File;
 import me.illusion.cosmos.utilities.storage.YMLBase;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.utilities.config.BukkitConfigurationAdapter;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 /**
  * Bukkit implementation of {@link ConfigurationProvider}.
@@ -24,8 +26,20 @@ public class BukkitConfigurationProvider implements ConfigurationProvider {
     }
 
     @Override
-    public ReadOnlyConfigurationSection loadConfiguration(File file) {
+    public ConfigurationSection loadConfiguration(File file) {
         YMLBase base = new YMLBase(plugin, file, true);
-        return BukkitConfigurationAdapter.adapt(base.getConfiguration());
+        return BukkitConfigurationAdapter.adapt(file, this, base.getConfiguration());
+    }
+
+    @Override
+    public void saveConfiguration(ConfigurationSection section, File file) {
+        FileConfiguration configuration = new YamlConfiguration();
+        BukkitConfigurationAdapter.writeTo(section, configuration);
+
+        try {
+            configuration.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,21 +1,32 @@
-package me.illusion.skyblockcore.common.config;
+package me.illusion.skyblockcore.common.config.section;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents a read-only configuration section. This is similar to bukkit's system, but it is not tied to bukkit, and can be adapted to other systems, like
  * json
  */
-public class ReadOnlyConfigurationSection {
+public class MemoryConfigurationSection implements ConfigurationSection {
 
-    private final Map<String, Object> internalMap;
+    protected final Map<String, Object> internalMap;
     private final String name;
 
-    public ReadOnlyConfigurationSection(String name, Map<String, Object> internalMap) {
+    public MemoryConfigurationSection(String name, Map<String, Object> internalMap) {
         this.name = name;
+        this.internalMap = internalMap;
+    }
+
+    public MemoryConfigurationSection() {
+        this.name = "";
+        this.internalMap = new ConcurrentHashMap<>();
+    }
+
+    public MemoryConfigurationSection(Map<String, Object> internalMap) {
+        this.name = "";
         this.internalMap = internalMap;
     }
 
@@ -31,8 +42,8 @@ public class ReadOnlyConfigurationSection {
         return contains(path);
     }
 
-    public ReadOnlyConfigurationSection getSection(String path) {
-        return get(path, ReadOnlyConfigurationSection.class);
+    public ConfigurationSection getSection(String path) {
+        return get(path, ConfigurationSection.class);
     }
 
     public Object get(String path) {
@@ -42,7 +53,7 @@ public class ReadOnlyConfigurationSection {
             String key = path.substring(0, index);
             path = path.substring(index + 1);
 
-            ReadOnlyConfigurationSection section = getSection(key);
+            ConfigurationSection section = getSection(key);
 
             if (section == null) {
                 return null;
@@ -152,13 +163,25 @@ public class ReadOnlyConfigurationSection {
         return new ArrayList<>(internalMap.keySet());
     }
 
+    @Override
+    public ConfigurationSection cloneWithName(String name) {
+        return new MemoryConfigurationSection(name, new ConcurrentHashMap<>(internalMap));
+    }
+
     public List<String> getStringList(String path) {
         return get(path, List.class, new ArrayList<>());
     }
 
     public boolean isSection(String path) {
-        return get(path) instanceof ReadOnlyConfigurationSection;
+        return get(path) instanceof ConfigurationSection;
     }
 
-
+    @Override
+    public String toString() {
+        return "ReadOnlyConfigurationSection{" +
+            "internalMap=" + internalMap +
+            ", name='" + name + '\'' +
+            '}';
+    }
 }
+

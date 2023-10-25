@@ -3,7 +3,7 @@ package me.illusion.skyblockcore.common.databaserewrite.cache.redis;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.databaserewrite.cache.AbstractCacheDatabase;
 import redis.clients.jedis.Jedis;
@@ -45,7 +45,7 @@ public abstract class AbstractRedisCacheDatabase extends AbstractCacheDatabase {
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(ConfigurationSection properties) {
         setProperties(properties);
 
         String host = properties.getString("host");

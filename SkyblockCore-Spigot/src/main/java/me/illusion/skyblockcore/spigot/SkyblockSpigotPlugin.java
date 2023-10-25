@@ -117,6 +117,8 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     private void loadDatabases() {
         File databasesFolder = new File(getDataFolder(), "databases");
 
+        IOUtils.copyFolder(this, getFile(), databasesFolder.getName());
+
         IOUtils.traverseAndLoad(databasesFolder, file -> {
             if (!file.getName().endsWith(".yml")) {
                 return;

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.AbstractSkyblockDatabase;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
@@ -20,7 +20,7 @@ public class MemorySkyblockIslandCache extends AbstractSkyblockDatabase implemen
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(ConfigurationSection properties) {
         setProperties(properties);
         return CompletableFuture.completedFuture(true); // Prevent any exceptions regarding not overriding the enable method
     }

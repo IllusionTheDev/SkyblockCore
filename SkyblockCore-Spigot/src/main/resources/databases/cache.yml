@@ -3,6 +3,7 @@
 # You can add as many files as you want on this folder, and as many databases as you want on each file
 
 redis:
+  type: redis
   host: localhost
   port: 6379
   password: 12345

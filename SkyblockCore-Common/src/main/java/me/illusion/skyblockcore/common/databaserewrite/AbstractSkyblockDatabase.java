@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 
 public abstract class AbstractSkyblockDatabase implements SkyblockDatabase {
@@ -14,18 +14,18 @@ public abstract class AbstractSkyblockDatabase implements SkyblockDatabase {
     private final Set<SkyblockDatabaseTag> tags = Sets.newConcurrentHashSet();
     private final Set<CompletableFuture<?>> futures = Sets.newConcurrentHashSet();
 
-    private ReadOnlyConfigurationSection properties; // Only initialized on the enable method
+    private ConfigurationSection properties; // Only initialized on the enable method
 
     public void addTag(SkyblockDatabaseTag tag) {
         tags.add(tag);
     }
 
     @Override
-    public ReadOnlyConfigurationSection getProperties() {
+    public ConfigurationSection getProperties() {
         return properties;
     }
 
-    protected void setProperties(ReadOnlyConfigurationSection properties) {
+    protected void setProperties(ConfigurationSection properties) {
         this.properties = properties;
     }
 
@@ -57,11 +57,11 @@ public abstract class AbstractSkyblockDatabase implements SkyblockDatabase {
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(SkyblockPlatform platform, ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(SkyblockPlatform platform, ConfigurationSection properties) {
         return enable(properties);
     }
 
-    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(ConfigurationSection properties) {
         throw new IllegalStateException("You must override at least one enable method!");
     }
 }

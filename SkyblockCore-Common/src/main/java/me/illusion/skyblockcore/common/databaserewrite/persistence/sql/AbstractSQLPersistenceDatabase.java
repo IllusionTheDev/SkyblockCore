@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import lombok.SneakyThrows;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.databaserewrite.persistence.AbstractPersistenceDatabase;
 import me.illusion.skyblockcore.common.databaserewrite.sql.functional.ResultSetFunction;
@@ -25,7 +25,7 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(ConfigurationSection properties) {
         setProperties(properties);
 
         return associate(() -> {

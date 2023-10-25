@@ -6,18 +6,18 @@ import java.util.Map;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabase;
 import me.illusion.skyblockcore.common.databaserewrite.registry.SkyblockDatabaseProvider;
 
-public class MappedDatabaseProvider<T extends SkyblockDatabase> implements SkyblockDatabaseProvider<T> {
+public class MappedDatabaseProvider implements SkyblockDatabaseProvider {
 
-    private final Map<String, T> map;
+    private final Map<String, SkyblockDatabase> map;
 
-    public MappedDatabaseProvider(Map<String, T> map) {
+    public MappedDatabaseProvider(Map<String, SkyblockDatabase> map) {
         this.map = ImmutableMap.copyOf(map);
     }
 
-    public MappedDatabaseProvider(T... databases) {
-        Map<String, T> temp = new HashMap<>();
+    public MappedDatabaseProvider(SkyblockDatabase... databases) {
+        Map<String, SkyblockDatabase> temp = new HashMap<>();
 
-        for (T database : databases) {
+        for (SkyblockDatabase database : databases) {
             temp.put(database.getName(), database);
         }
 
@@ -25,7 +25,7 @@ public class MappedDatabaseProvider<T extends SkyblockDatabase> implements Skybl
     }
 
     @Override
-    public T getDatabase(String name) {
+    public SkyblockDatabase getDatabase(String name) {
         return map.get(name);
     }
 }

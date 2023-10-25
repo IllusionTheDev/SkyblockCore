@@ -1,31 +1,55 @@
 package me.illusion.skyblockcore.common.databaserewrite.registry;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 
 public class SkyblockDatabaseCredentialRegistry {
 
     private final Map<String, String> dependencies = new ConcurrentHashMap<>();
-    private final Map<String, ReadOnlyConfigurationSection> credentialsMap = new ConcurrentHashMap<>();
+    private final Map<String, ConfigurationSection> credentialsMap = new ConcurrentHashMap<>();
 
-    public void registerCredentials(String name, ReadOnlyConfigurationSection credentials) {
+    private final Map<String, List<String>> adjacencyList = new ConcurrentHashMap<>();
+
+
+    public void registerCredentials(String name, ConfigurationSection credentials) {
+        if (credentialsMap.containsKey(name)) {
+            throw new IllegalStateException("Credentials " + name + " already registered, names are shared between files.");
+        }
+
         credentialsMap.put(name, credentials);
     }
 
     public void registerDependency(String name, String dependency) {
+        if (dependencies.containsKey(name)) {
+            throw new IllegalStateException("Dependency " + name + " already registered");
+        }
+
         dependencies.put(name, dependency);
+        adjacencyList.computeIfAbsent(dependency, s -> new ArrayList<>()).add(name);
     }
 
-    public ReadOnlyConfigurationSection getCredentials(String name) {
+    public Object get(String name) {
+        String dependency = dependencies.get(name);
+
+        if (dependency != null) {
+            return get(dependency);
+        }
+
+        return credentialsMap.get(name);
+    }
+
+    public ConfigurationSection getCredentials(String name) {
         if (name == null) {
             return null;
         }
 
-        ReadOnlyConfigurationSection section = credentialsMap.get(name);
+        ConfigurationSection section = credentialsMap.get(name);
 
         if (section == null) {
             return getCredentials(dependencies.get(name));
@@ -35,47 +59,42 @@ public class SkyblockDatabaseCredentialRegistry {
     }
 
     public void checkCyclicDependencies() {
-        Set<String> checked = new HashSet<>();
-        Set<String> checking = new HashSet<>();
+        Set<String> visited = new HashSet<>();
+        Set<String> currentlyChecking = new HashSet<>();
+        Stack<String> cyclicPath = new Stack<>();
 
-        for (String key : dependencies.keySet()) {
-            if (hasCyclicDependency(key, checked, checking)) {
-                throw new IllegalStateException(buildCyclicDependencyMessage(key, checking));
+        for (String vertex : adjacencyList.keySet()) {
+            if (hasCyclicDependency(vertex, visited, currentlyChecking, cyclicPath)) {
+                throw new IllegalStateException("Cyclic dependency found: " + String.join(" -> ", cyclicPath));
             }
         }
     }
 
-    private boolean hasCyclicDependency(String key, Collection<String> checked, Collection<String> checking) {
-        if (checked.contains(key)) {
-            return false;
+    private boolean hasCyclicDependency(String vertex, Set<String> visited, Set<String> currentlyChecking, Stack<String> cyclicPath) {
+        if (currentlyChecking.contains(vertex)) {
+            cyclicPath.push(vertex);
+            return true; // Cyclic dependency found
         }
 
-        if (checking.contains(key)) {
-            return true;
+        if (visited.contains(vertex)) {
+            return false; // Already visited, no cycle
         }
 
-        checking.add(key);
+        visited.add(vertex);
+        currentlyChecking.add(vertex);
+        cyclicPath.push(vertex);
 
-        String dependency = dependencies.get(key);
-
-        if (dependency == null) {
-            return false;
+        List<String> neighbors = adjacencyList.get(vertex);
+        if (neighbors != null) {
+            for (String neighbor : neighbors) {
+                if (hasCyclicDependency(neighbor, visited, currentlyChecking, cyclicPath)) {
+                    return true; // Cyclic dependency found
+                }
+            }
         }
 
-        return hasCyclicDependency(dependency, checked, checking);
-    }
-
-    private String buildCyclicDependencyMessage(String key, Collection<String> checking) {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("Cyclic dependency found: ");
-
-        for (String s : checking) {
-            builder.append(s).append(" -> ");
-        }
-
-        builder.append(key);
-
-        return builder.toString();
+        currentlyChecking.remove(vertex);
+        cyclicPath.pop();
+        return false;
     }
 }

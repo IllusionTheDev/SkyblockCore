@@ -7,7 +7,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.config.ReadOnlyConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.databaserewrite.persistence.AbstractPersistenceDatabase;
 import org.bson.codecs.Codec;
@@ -34,7 +34,7 @@ public abstract class MongoPersistenceDatabase extends AbstractPersistenceDataba
     }
 
     @Override
-    public CompletableFuture<Boolean> enable(ReadOnlyConfigurationSection properties) {
+    public CompletableFuture<Boolean> enable(ConfigurationSection properties) {
         setProperties(properties);
 
         return associate(() -> {
