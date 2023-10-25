@@ -19,13 +19,11 @@ public abstract class SQLitePersistenceDatabase extends AbstractSQLPersistenceDa
         File folder = platform.getConfigurationProvider().getDataFolder();
 
         return associate(() -> {
-            File file = new File(folder, name + ".db");
+            file = new File(folder, name + ".db");
 
             if (!file.exists()) {
                 IOUtils.createFile(file);
             }
-
-            this.file = file;
         }).thenCompose(value -> super.enable(properties));
     }
 

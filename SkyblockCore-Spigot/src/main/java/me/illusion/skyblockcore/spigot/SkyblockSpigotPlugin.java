@@ -1,6 +1,8 @@
 package me.illusion.skyblockcore.spigot;
 
 import java.io.File;
+import java.util.logging.Level;
+
 import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
@@ -62,27 +64,27 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
     @Override
     public void onEnable() {
-        System.out.println("Loading configuration provider");
+        log("Loading configuration provider");
         configurationProvider = new BukkitConfigurationProvider(this);
 
-        System.out.println("Loading network registry");
+        log("Loading network registry");
         networkRegistry = new SkyblockNetworkRegistryImpl(this);
 
-        System.out.println("Loading configuration files");
+        log("Loading configuration files");
         messagesFile = new SkyblockMessagesFile(this, "server-messages");
 
-        System.out.println("Loading database & grid");
+        log("Loading database & grid");
         databaseRegistry = new SkyblockDatabaseRegistry(this);
         gridRegistry = new SkyblockGridRegistry();
 
-        System.out.println("Loading events & commands");
+        log("Loading events & commands");
         eventManager = new SkyblockEventManagerImpl();
         commandManager = new SkyblockBukkitCommandManager(this);
 
-        System.out.println("Registering networks");
+        log("Registering networks");
         registerNetworks();
 
-        System.out.println("Finishing loading");
+        log("Finishing loading");
         Bukkit.getScheduler().runTask(this, this::load);
     }
 
@@ -103,13 +105,13 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     }
 
     private void load() {
-        System.out.println("Loading networks");
+        log("Loading networks");
         networkRegistry.load();
 
-        System.out.println("Initializing cosmos");
+        log("Initializing cosmos");
         initCosmos();
 
-        System.out.println("Enabling databases");
+        log("Enabling databases");
         loadDatabases();
         databaseRegistry.finishLoading().thenAccept(this::finishLoading);
     }
@@ -135,7 +137,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
             return;
         }
 
-        System.out.println("Enabling island manager");
+        log("Enabling island manager");
         playerManager = new SkyblockBukkitPlayerManager(this);
         islandManager = new IslandManagerImpl(this);
 
@@ -174,5 +176,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     @Override
     public void disableExceptionally() {
         Bukkit.getPluginManager().disablePlugin(this);
+    }
+    
+    private void log(String message, Object... objects) {
+        getLogger().log(Level.INFO, message, objects);
     }
 }

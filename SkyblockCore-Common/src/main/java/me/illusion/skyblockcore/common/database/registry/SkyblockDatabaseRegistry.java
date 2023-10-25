@@ -59,7 +59,7 @@ public class SkyblockDatabaseRegistry {
 
     // --- CORE LOGIC ---
 
-    public <T extends SkyblockDatabase> void register(String name, SkyblockDatabaseProvider provider) {
+    public void register(String name, SkyblockDatabaseProvider provider) {
         registeredDatabases.put(name, new RegisteredDatabase(provider, name));
         tryLoad(registeredDatabases.get(name));
     }
@@ -195,8 +195,8 @@ public class SkyblockDatabaseRegistry {
             return CompletableFuture.completedFuture(false);
         }
 
-        return addFuture(database.enable(platform, config).thenApply((v) -> {
-            if (v) {
+        return addFuture(database.enable(platform, config).thenApply(result -> {
+            if (Boolean.TRUE.equals(result)) {
                 registeredDatabase.setEnabled(true);
             } else {
                 warn("Database {0} failed to enable", registeredDatabase.getName());
@@ -233,7 +233,7 @@ public class SkyblockDatabaseRegistry {
     }
 
     public CompletableFuture<Boolean> finishLoading() {
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply((v) -> areAllLoaded());
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> areAllLoaded());
     }
 
     public CompletableFuture<Void> shutdown() {

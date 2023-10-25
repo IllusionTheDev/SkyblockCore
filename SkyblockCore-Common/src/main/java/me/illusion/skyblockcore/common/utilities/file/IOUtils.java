@@ -33,19 +33,21 @@ public final class IOUtils {
         }
     }
 
-    public static void createFile(File file) {
+    public static boolean createFile(File file) {
         if (file == null) {
-            return;
+            return false;
         }
 
         if (!file.exists()) {
             try {
                 file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                return file.createNewFile();
+            } catch (IOException ignored) {
+                // Ignored, return false
             }
         }
+
+        return false;
     }
 
     public static void copyFolder(SkyblockPlatform platform, File jarFile, String folderPath) {
