@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import me.illusion.skyblockcore.common.databaserewrite.persistence.mongo.MongoPersistenceDatabase;
-import me.illusion.skyblockcore.common.databaserewrite.persistence.mongo.MongoUUIDCodec;
+import me.illusion.skyblockcore.common.database.persistence.mongo.MongoPersistenceDatabase;
+import me.illusion.skyblockcore.common.database.persistence.mongo.MongoUUIDCodec;
 import me.illusion.skyblockcore.common.storage.profiles.SkyblockProfileStorage;
 import org.bson.codecs.Codec;
 

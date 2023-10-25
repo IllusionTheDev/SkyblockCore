@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Getter;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
 import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;

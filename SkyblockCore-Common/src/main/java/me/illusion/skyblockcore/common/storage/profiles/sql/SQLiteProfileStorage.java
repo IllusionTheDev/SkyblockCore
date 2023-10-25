@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import me.illusion.skyblockcore.common.databaserewrite.persistence.sql.impl.SQLitePersistenceDatabase;
-import me.illusion.skyblockcore.common.databaserewrite.sql.object.StringStatementObject;
+import me.illusion.skyblockcore.common.database.persistence.sql.impl.SQLitePersistenceDatabase;
+import me.illusion.skyblockcore.common.database.sql.object.StringStatementObject;
 import me.illusion.skyblockcore.common.storage.profiles.SkyblockProfileStorage;
 
 public class SQLiteProfileStorage extends SQLitePersistenceDatabase implements SkyblockProfileStorage {

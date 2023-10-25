@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.databaserewrite.cache.redis.AbstractRedisCacheDatabase;
+import me.illusion.skyblockcore.common.database.cache.redis.AbstractRedisCacheDatabase;
 import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
 
 public class RedisSkyblockIslandCache extends AbstractRedisCacheDatabase implements SkyblockIslandCache {

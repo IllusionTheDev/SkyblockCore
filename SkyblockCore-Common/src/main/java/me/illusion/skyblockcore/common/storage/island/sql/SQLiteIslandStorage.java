@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.data.IslandData;
-import me.illusion.skyblockcore.common.databaserewrite.persistence.sql.impl.SQLitePersistenceDatabase;
-import me.illusion.skyblockcore.common.databaserewrite.sql.object.StringStatementObject;
+import me.illusion.skyblockcore.common.database.persistence.sql.impl.SQLitePersistenceDatabase;
+import me.illusion.skyblockcore.common.database.sql.object.StringStatementObject;
 import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
 
 public class SQLiteIslandStorage extends SQLitePersistenceDatabase implements SkyblockIslandStorage {

@@ -10,7 +10,7 @@ import me.illusion.skyblockcore.bungee.instance.BungeeSkyblockMatchmaker;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
-import me.illusion.skyblockcore.common.databaserewrite.registry.SkyblockDatabaseRegistry;
+import me.illusion.skyblockcore.common.database.registry.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;

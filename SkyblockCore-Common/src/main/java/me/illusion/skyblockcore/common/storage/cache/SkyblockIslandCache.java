@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.databaserewrite.cache.SkyblockCache;
+import me.illusion.skyblockcore.common.database.cache.SkyblockCache;
 
 public interface SkyblockIslandCache extends SkyblockCache {
 

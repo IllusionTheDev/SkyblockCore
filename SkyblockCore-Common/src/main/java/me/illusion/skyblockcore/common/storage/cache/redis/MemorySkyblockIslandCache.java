@@ -6,8 +6,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
-import me.illusion.skyblockcore.common.databaserewrite.AbstractSkyblockDatabase;
-import me.illusion.skyblockcore.common.databaserewrite.SkyblockDatabaseTag;
+import me.illusion.skyblockcore.common.database.AbstractSkyblockDatabase;
+import me.illusion.skyblockcore.common.database.SkyblockDatabaseTag;
 import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
 
 public class MemorySkyblockIslandCache extends AbstractSkyblockDatabase implements SkyblockIslandCache {
