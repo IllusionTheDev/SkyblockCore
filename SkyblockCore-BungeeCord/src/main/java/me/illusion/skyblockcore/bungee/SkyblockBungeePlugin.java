@@ -13,6 +13,7 @@ import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.database.registry.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
+import me.illusion.skyblockcore.common.registry.Registries;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.command.PlaySkyblockCommand;
@@ -23,6 +24,7 @@ import me.illusion.skyblockcore.proxy.matchmaking.comparator.SkyblockServerCompa
 import me.illusion.skyblockcore.proxy.matchmaking.data.SkyblockServerMatchmaker;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginManager;
 
 /**
  * Bungee implementation of {@link SkyblockProxyPlatform}.
@@ -43,8 +45,11 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
     private SkyblockCommandManager<SkyblockAudience> commandManager;
     private SkyblockMessagesFile messagesFile;
 
+    private Registries registries;
+
     @Override
     public void onEnable() {
+        registries = new Registries();
         configurationProvider = new BungeeConfigurationProvider(this);
 
         commandManager = new BungeeSkyblockCommandManager(this);
@@ -103,7 +108,9 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
 
     @Override
     public void disableExceptionally() {
-        ProxyServer.getInstance().getPluginManager().unregisterListeners(this);
-        ProxyServer.getInstance().getPluginManager().unregisterCommands(this);
+        PluginManager pluginManager = ProxyServer.getInstance().getPluginManager();
+
+        pluginManager.unregisterListeners(this);
+        pluginManager.unregisterCommands(this);
     }
 }

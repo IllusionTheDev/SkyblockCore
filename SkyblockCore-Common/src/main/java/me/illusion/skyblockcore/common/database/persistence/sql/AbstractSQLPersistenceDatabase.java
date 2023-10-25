@@ -65,7 +65,7 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
 
             try {
                 return function.apply(set);
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             } finally {
                 try {

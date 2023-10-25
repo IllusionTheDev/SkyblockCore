@@ -12,7 +12,7 @@ public abstract class AbstractRemoteSQLPersistenceDatabase extends AbstractSQLPe
     protected String username;
     protected String password;
 
-    public AbstractRemoteSQLPersistenceDatabase() {
+    protected AbstractRemoteSQLPersistenceDatabase() {
         addTag(SkyblockDatabaseTag.REMOTE);
     }
 

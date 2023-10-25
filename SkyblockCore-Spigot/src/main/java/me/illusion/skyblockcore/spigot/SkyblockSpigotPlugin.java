@@ -14,6 +14,7 @@ import me.illusion.skyblockcore.common.event.impl.SkyblockPlatformEnabledEvent;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.registry.Registries;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
@@ -30,7 +31,9 @@ import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
 import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
+import me.illusion.skyblockcore.spigot.registries.BukkitMaterialRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -50,6 +53,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
     private ConfigurationProvider configurationProvider;
 
+    private Registries registries;
     private SkyblockDatabaseRegistry databaseRegistry;
     private SkyblockIslandManager islandManager;
     private SkyblockNetworkRegistry networkRegistry;
@@ -66,6 +70,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     public void onEnable() {
         log("Loading configuration provider");
         configurationProvider = new BukkitConfigurationProvider(this);
+
+        log("Loading minecraft registries..");
+        loadRegistries();
 
         log("Loading network registry");
         networkRegistry = new SkyblockNetworkRegistryImpl(this);
@@ -171,6 +178,12 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         cosmosPlugin.getGridRegistry().register(cosmosSetup.getIslandGrid());
         cosmosPlugin.getSessionHolderRegistry().registerHolder("skyblock", cosmosSetup.getSessionHolder());
+    }
+
+    private void loadRegistries() {
+        registries = new Registries();
+
+        registries.registerRegistry(new BukkitMaterialRegistry());
     }
 
     @Override

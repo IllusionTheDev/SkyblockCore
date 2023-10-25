@@ -7,6 +7,7 @@ import me.illusion.skyblockcore.common.config.ConfigurationProvider;
 import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.database.registry.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
+import me.illusion.skyblockcore.common.registry.Registries;
 
 /**
  * The SkyblockPlatform interface is a template that includes all the common methods across all platforms, such as Spigot, Bungee, Velocity etc. This interface
@@ -55,6 +56,12 @@ public interface SkyblockPlatform {
      * @return The messages file
      */
     SkyblockMessagesFile getMessagesFile();
+
+    /**
+     * Gets the registries for the platform
+     * @return the registries for the platform
+     */
+    Registries getRegistries();
 
     /**
      * Disables the platform due to an initialization error (e.g. incorrect configuration)
