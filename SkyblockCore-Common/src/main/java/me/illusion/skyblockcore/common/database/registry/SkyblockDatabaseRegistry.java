@@ -118,11 +118,17 @@ public class SkyblockDatabaseRegistry {
         credentialRegistry.checkCyclicDependencies();
 
         Set<CompletableFuture<?>> temp = new HashSet<>();
+        Collection<String> keys = section.getKeys();
 
         for (RegisteredDatabase registeredDatabase : registeredDatabases.values()) {
             if (registeredDatabase.isEnabled()) {
                 continue;
             }
+
+            if(keys.contains(registeredDatabase.getName())) {
+                registeredDatabase.setAttemptedLoad(true);
+            }
+
 
             temp.add(tryLoad(registeredDatabase));
         }
@@ -139,6 +145,10 @@ public class SkyblockDatabaseRegistry {
         Object credentials = credentialRegistry.get(registeredDatabase.getName());
 
         if (credentials == null) {
+            if (!registeredDatabase.hasAttemptedLoad()) { // The database credentials haven't been loaded yet
+                return CompletableFuture.completedFuture(false);
+            }
+
             warn("Database {0} has no credentials", registeredDatabase.getName());
             return CompletableFuture.completedFuture(false);
         }

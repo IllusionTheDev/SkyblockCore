@@ -9,6 +9,7 @@ public class RegisteredDatabase {
 
     private SkyblockDatabase database;
     private boolean enabled;
+    private boolean attemptedLoad;
 
     public RegisteredDatabase(SkyblockDatabaseProvider provider, String name) {
         this.provider = provider;
@@ -43,5 +44,13 @@ public class RegisteredDatabase {
 
     public SkyblockDatabaseProvider getProvider() {
         return provider;
+    }
+
+    public boolean hasAttemptedLoad() {
+        return attemptedLoad;
+    }
+
+    public void setAttemptedLoad(boolean attemptedLoad) {
+        this.attemptedLoad = attemptedLoad;
     }
 }
