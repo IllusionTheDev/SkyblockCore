@@ -4,7 +4,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.skyblockcore.common.communication.packet.PacketManager;
 import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
-import me.illusion.skyblockcore.common.storage.island.SkyblockIslandStorage;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
 import me.illusion.skyblockcore.server.network.complex.communication.packet.request.PacketRequestIslandTeleport;
@@ -19,13 +18,12 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
     private final PacketManager packetManager;
     private final String serverId;
     private final SkyblockIslandCache cacheDatabase;
-    private final SkyblockIslandStorage database;
 
     private final ComplexSkyblockNetwork network;
 
     public CommunicationsHandler(ComplexSkyblockNetwork network) {
         this.network = network;
-        this.database = network.getDatabase();
+
         this.cacheDatabase = network.getCacheDatabase();
         this.serverId = network.getConfiguration().getServerId();
 

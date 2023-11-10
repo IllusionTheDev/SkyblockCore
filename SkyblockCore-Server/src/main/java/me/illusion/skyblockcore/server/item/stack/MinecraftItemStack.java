@@ -37,6 +37,14 @@ public class MinecraftItemStack {
     }
 
     @Override
+    public int hashCode() {
+        int result = material.hashCode();
+        result = 31 * result + meta.hashCode();
+        result = 31 * result + amount;
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof MinecraftItemStack other)) {
             return false;

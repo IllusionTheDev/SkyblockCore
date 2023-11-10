@@ -58,6 +58,11 @@ public abstract class AbstractSkyblockCommandManager implements SkyblockCommandM
             return;
         }
 
+        if (!result.isSuccess()) {
+            messages.sendMessage(audience, "invalid-argument");
+            return;
+        }
+
         CommandContext context = result.getContext();
         SkyblockCommand<T> command = (SkyblockCommand<T>) argumentNode.getCommand();
 

@@ -82,8 +82,6 @@ public class IslandManagerImpl extends AbstractIslandManager {
             });
         }
 
-        System.out.println("Creating island for " + profileId);
-
         UUID islandId = UUID.randomUUID();
         IslandData data = new IslandData(islandId, profileId);
 

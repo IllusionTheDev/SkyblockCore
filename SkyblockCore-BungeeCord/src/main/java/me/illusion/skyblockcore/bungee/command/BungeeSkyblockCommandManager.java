@@ -31,7 +31,7 @@ public class BungeeSkyblockCommandManager extends AbstractSkyblockCommandManager
 
     @Override
     public void syncCommands() {
-
+        // BungeeCord does not need to sync commands
     }
 
     private class BungeeCommand extends Command implements TabExecutor {

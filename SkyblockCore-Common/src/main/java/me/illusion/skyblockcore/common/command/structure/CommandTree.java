@@ -53,7 +53,7 @@ public class CommandTree {
         }
 
         if (node.getChildren().isEmpty() && fullInput.equalsIgnoreCase(node.getName())) {
-            return new TargetResult(node, new MutatingCommandContext(fullInput));
+            return new TargetResult(node, new MutatingCommandContext(fullInput), true);
         }
 
         CommandNode target = node;
@@ -67,7 +67,7 @@ public class CommandTree {
             boolean isLast = index == split.length - 1;
 
             if (children == null) {
-                return null;
+                return new TargetResult(target, context, false);
             }
 
             CommandNode child = null;
@@ -86,17 +86,13 @@ public class CommandTree {
             }
 
             if (child == null) {
-                return null;
+                return new TargetResult(target, context, false);
             }
 
             target = child;
         }
 
-        if (!valid) {
-            return null;
-        }
-
-        return new TargetResult(target, context);
+        return new TargetResult(target, context, valid);
     }
 
     /**
@@ -235,10 +231,13 @@ public class CommandTree {
 
         private final CommandNode node;
         private final CommandContext context;
+        private final boolean success;
 
-        public TargetResult(CommandNode node, CommandContext context) {
+
+        public TargetResult(CommandNode node, CommandContext context, boolean success) {
             this.node = node;
             this.context = context;
+            this.success = success;
         }
 
     }

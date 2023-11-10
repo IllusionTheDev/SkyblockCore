@@ -17,6 +17,4 @@ public class IslandData implements Serializable {
     private final UUID islandId;
     private final UUID ownerId; // Profile ID, not player
 
-    // TODO: Add more data here
-
 }

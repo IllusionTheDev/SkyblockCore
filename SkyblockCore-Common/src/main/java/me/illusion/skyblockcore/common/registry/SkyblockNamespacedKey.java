@@ -52,7 +52,8 @@ public class SkyblockNamespacedKey {
     public SkyblockNamespacedKey fromInput(String input) {
         String[] split = input.split(":");
 
-        String namespace, key;
+        String namespace;
+        String key;
 
         if (split.length == 1) {
             namespace = MINECRAFT_NAMESPACE;

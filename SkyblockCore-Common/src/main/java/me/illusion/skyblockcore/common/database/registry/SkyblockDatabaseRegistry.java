@@ -130,10 +130,9 @@ public class SkyblockDatabaseRegistry {
                 continue;
             }
 
-            if(keys.contains(registeredDatabase.getName())) {
+            if (keys.contains(registeredDatabase.getName())) {
                 registeredDatabase.setAttemptedLoad(true);
             }
-
 
             temp.add(tryLoad(registeredDatabase));
         }
