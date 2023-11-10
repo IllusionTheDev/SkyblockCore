@@ -21,7 +21,7 @@ public class Time {
      * @param unit The unit to convert to
      * @return The converted time
      */
-    public long as(TimeUnit unit) {
+    public int as(TimeUnit unit) {
         return unit.convert(duration, this.unit);
     }
 

@@ -1,10 +1,10 @@
 package me.illusion.skyblockcore.spigot.registries;
 
 import me.illusion.skyblockcore.common.registry.SimpleRegistry;
-import me.illusion.skyblockcore.common.registry.SkyblockNamespacedKey;
 import me.illusion.skyblockcore.server.item.MinecraftItem;
 import me.illusion.skyblockcore.server.item.MinecraftMaterial;
 import me.illusion.skyblockcore.server.item.stack.ItemMeta;
+import me.illusion.skyblockcore.spigot.registries.meta.BukkitMetaAdapter;
 import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -51,8 +51,7 @@ public class BukkitMaterialRegistry extends SimpleRegistry<MinecraftItem> {
                 return null;
             }
 
-            // TODO: finish this
-            return null;
+            return BukkitMetaAdapter.adapt(bukkitMeta);
         }
     }
 }

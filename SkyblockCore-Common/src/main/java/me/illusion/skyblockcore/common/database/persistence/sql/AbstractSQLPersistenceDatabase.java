@@ -48,7 +48,7 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
             }
 
             return statement.executeQuery();
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
@@ -81,7 +81,7 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
         try (PreparedStatement statement = getConnection().prepareStatement(query)) {
             consumer.accept(statement);
             statement.executeUpdate();
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }

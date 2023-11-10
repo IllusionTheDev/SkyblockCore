@@ -1,5 +1,7 @@
 package me.illusion.skyblockcore.server.player;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -116,6 +118,11 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     @Override
     public CompletableFuture<Void> saveProfileId(UUID playerId, UUID profileId) {
         return database.setProfileId(playerId, profileId).thenRun(() -> setIdInternally(playerId, profileId));
+    }
+
+    @Override
+    public Collection<SkyblockPlayer> getPlayers() {
+        return List.copyOf(playerIdMap.values());
     }
 
     private UUID createProfileId(UUID playerId) {

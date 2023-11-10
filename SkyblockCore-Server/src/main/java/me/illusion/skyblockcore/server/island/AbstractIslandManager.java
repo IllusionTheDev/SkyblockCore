@@ -171,4 +171,9 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
 
         return null;
     }
+
+    @Override
+    public int getLoadedIslandCount() {
+        return loadedIslands.size();
+    }
 }

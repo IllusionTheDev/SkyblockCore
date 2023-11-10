@@ -2,7 +2,6 @@ package me.illusion.skyblockcore.spigot;
 
 import java.io.File;
 import java.util.logging.Level;
-
 import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
@@ -15,6 +14,7 @@ import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.registry.Registries;
+import me.illusion.skyblockcore.common.scheduler.SkyblockScheduler;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
@@ -32,8 +32,8 @@ import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
 import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
 import me.illusion.skyblockcore.spigot.registries.BukkitMaterialRegistry;
+import me.illusion.skyblockcore.spigot.scheduler.SkyblockBukkitScheduler;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -59,6 +59,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     private SkyblockNetworkRegistry networkRegistry;
     private SkyblockEventManager eventManager;
     private SkyblockPlayerManager playerManager;
+    private SkyblockScheduler scheduler;
     private SkyblockCommandManager<SkyblockAudience> commandManager;
 
     @Override
@@ -70,6 +71,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     public void onEnable() {
         log("Loading configuration provider");
         configurationProvider = new BukkitConfigurationProvider(this);
+
+        log("Loading scheduler");
+        scheduler = new SkyblockBukkitScheduler(this);
 
         log("Loading minecraft registries..");
         loadRegistries();
