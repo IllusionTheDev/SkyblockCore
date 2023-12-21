@@ -14,6 +14,7 @@ import me.illusion.skyblockcore.common.database.registry.SkyblockDatabaseRegistr
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.common.registry.Registries;
+import me.illusion.skyblockcore.common.scheduler.SkyblockScheduler;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.proxy.SkyblockProxyPlatform;
 import me.illusion.skyblockcore.proxy.command.PlaySkyblockCommand;
@@ -36,6 +37,7 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
 
     private SkyblockDatabaseRegistry databaseRegistry;
     private SkyblockEventManager eventManager;
+    private SkyblockScheduler scheduler;
 
     private SkyblockServerMatchmaker matchmaker;
     private SkyblockServerComparatorRegistry matchmakerComparatorRegistry;

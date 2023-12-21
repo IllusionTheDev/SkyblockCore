@@ -41,13 +41,19 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
         });
     }
 
-    protected ResultSet runQuery(String query, List<StatementObject> list) {
+    protected <T> T runQuery(String query, List<StatementObject> list, ResultSetFunction<T> function) {
         try (PreparedStatement statement = getConnection().prepareStatement(query)) {
             for (int index = 0; index < list.size(); index++) {
                 list.get(index).applyTo(statement, index + 1);
             }
 
-            return statement.executeQuery();
+            ResultSet set = statement.executeQuery(); // This will be auto-closed by the try-with-resources
+
+            try {
+                return function.apply(set);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -56,25 +62,7 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
     }
 
     protected <T> CompletableFuture<T> runQueryAsync(String query, List<StatementObject> list, ResultSetFunction<T> function) {
-        return associate(() -> {
-            ResultSet set = runQuery(query, list);
-
-            if (set == null) {
-                return null;
-            }
-
-            try {
-                return function.apply(set);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } finally {
-                try {
-                    set.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        return associate(() -> runQuery(query, list, function));
     }
 
     protected void runUpdate(String query, Consumer<PreparedStatement> consumer) {
