@@ -131,4 +131,11 @@ public interface SkyblockIslandManager {
      * @return The island at the location.
      */
     SkyblockIsland getIslandAt(SkyblockLocation location);
+
+    /**
+     * Gets the amount of loaded islands, useful for metrics.
+     *
+     * @return The amount of loaded islands.
+     */
+    int getLoadedIslandCount();
 }

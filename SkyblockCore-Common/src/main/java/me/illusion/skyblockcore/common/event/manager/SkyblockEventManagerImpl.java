@@ -15,14 +15,11 @@ public class SkyblockEventManagerImpl implements SkyblockEventManager {
 
     @Override
     public <T extends SkyblockEvent> void subscribe(Class<T> eventClass, SkyblockEventListener<T> listener) {
-        System.out.println("Subscribing to event " + eventClass.getSimpleName());
         handlers.add(new SkyblockEventHandler<>(eventClass, listener));
     }
 
     @Override
     public <T extends SkyblockEvent> void callEvent(T event) {
-        System.out.println("Calling event " + event.getClass().getSimpleName());
-
         for (SkyblockEventHandler<?> handler : handlers) {
             Class<?> eventClass = handler.getEventClass();
 

@@ -43,7 +43,7 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
         SkyblockIsland cached = getProfileIsland(profileId);
 
         if (cached != null) { // Idiots
-            System.out.println("Loaded cached island");
+            platform.getLogger().info("Loaded cached island");
             return CompletableFuture.completedFuture(cached);
         }
 
@@ -170,5 +170,10 @@ public abstract class AbstractIslandManager implements SkyblockIslandManager {
         }
 
         return null;
+    }
+
+    @Override
+    public int getLoadedIslandCount() {
+        return loadedIslands.size();
     }
 }

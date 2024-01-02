@@ -57,7 +57,3 @@ public final class BukkitConfigurationAdapter {
     }
 
 }
-
-/*
-{mongo=ReadOnlyConfigurationSection{internalMap={host=localhost, port=27017, database=island, username=root, password=12345}, name='mongo'}, island-cache=ReadOnlyConfigurationSection{internalMap={type=memory}, name='island-cache'}, sqlite=ReadOnlyConfigurationSection{internalMap={name=island-storage/database}, name='sqlite'}, island=ReadOnlyConfigurationSection{internalMap={type=sqlite}, name='island'}, profile=ReadOnlyConfigurationSection{internalMap={type=sqlite}, name='profile'}, remote-sql=ReadOnlyConfigurationSection{internalMap={host=localhost, port=3306, database=island, username=root, password=12345}, name='remote-sql'}, redis=ReadOnlyConfigurationSection{internalMap={host=localhost, port=6379, password=12345}, name='redis'}}
- */

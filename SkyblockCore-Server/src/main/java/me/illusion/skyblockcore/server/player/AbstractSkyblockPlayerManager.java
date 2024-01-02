@@ -1,5 +1,7 @@
 package me.illusion.skyblockcore.server.player;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +35,6 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     // Player management stuff
 
     protected void handleJoin(UUID playerId) {
-        System.out.println("Handling join for " + playerId);
         cacheProfileId(playerId).thenAccept(profileId -> {
             SkyblockPlayer player = createPlayer(playerId);
             playerIdMap.put(profileId, player);
@@ -82,8 +83,6 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
 
     private CompletableFuture<UUID> cacheProfileId(UUID playerId) {
         return fetchProfileId(playerId).thenCompose(profileId -> {
-            System.out.println("Profile ID for " + playerId + " is " + profileId);
-
             if (profileId == null) {
                 profileId = createProfileId(playerId);
                 setIdInternally(playerId, profileId);
@@ -116,6 +115,11 @@ public abstract class AbstractSkyblockPlayerManager implements SkyblockPlayerMan
     @Override
     public CompletableFuture<Void> saveProfileId(UUID playerId, UUID profileId) {
         return database.setProfileId(playerId, profileId).thenRun(() -> setIdInternally(playerId, profileId));
+    }
+
+    @Override
+    public Collection<SkyblockPlayer> getPlayers() {
+        return List.copyOf(playerIdMap.values());
     }
 
     private UUID createProfileId(UUID playerId) {

@@ -2,7 +2,6 @@ package me.illusion.skyblockcore.spigot;
 
 import java.io.File;
 import java.util.logging.Level;
-
 import lombok.Getter;
 import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
@@ -14,6 +13,9 @@ import me.illusion.skyblockcore.common.event.impl.SkyblockPlatformEnabledEvent;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatformProvider;
+import me.illusion.skyblockcore.common.registry.Registries;
+import me.illusion.skyblockcore.common.scheduler.SkyblockScheduler;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
@@ -30,6 +32,8 @@ import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
 import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
+import me.illusion.skyblockcore.spigot.registries.BukkitMaterialRegistry;
+import me.illusion.skyblockcore.spigot.scheduler.SkyblockBukkitScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,22 +54,31 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
     private ConfigurationProvider configurationProvider;
 
+    private Registries registries;
     private SkyblockDatabaseRegistry databaseRegistry;
     private SkyblockIslandManager islandManager;
     private SkyblockNetworkRegistry networkRegistry;
     private SkyblockEventManager eventManager;
     private SkyblockPlayerManager playerManager;
+    private SkyblockScheduler scheduler;
     private SkyblockCommandManager<SkyblockAudience> commandManager;
 
     @Override
     public void onLoad() {
         Bukkit.getServicesManager().register(SkyblockPlatform.class, this, this, ServicePriority.Normal);
+        SkyblockPlatformProvider.setPlatform(this);
     }
 
     @Override
     public void onEnable() {
         log("Loading configuration provider");
         configurationProvider = new BukkitConfigurationProvider(this);
+
+        log("Loading scheduler");
+        scheduler = new SkyblockBukkitScheduler(this);
+
+        log("Loading minecraft registries..");
+        loadRegistries();
 
         log("Loading network registry");
         networkRegistry = new SkyblockNetworkRegistryImpl(this);
@@ -171,6 +184,16 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         cosmosPlugin.getGridRegistry().register(cosmosSetup.getIslandGrid());
         cosmosPlugin.getSessionHolderRegistry().registerHolder("skyblock", cosmosSetup.getSessionHolder());
+    }
+
+    private void loadRegistries() {
+        registries = new Registries();
+
+        registries.registerRegistry(new BukkitMaterialRegistry());
+    }
+
+    public BukkitMaterialRegistry getMaterialRegistry() {
+        return registries.getSpecificRegistry(BukkitMaterialRegistry.class);
     }
 
     @Override

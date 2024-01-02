@@ -12,6 +12,7 @@ import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.config.section.WritableConfigurationSection;
 import me.illusion.skyblockcore.common.database.SkyblockDatabase;
 import me.illusion.skyblockcore.common.database.cache.SkyblockCache;
+import me.illusion.skyblockcore.common.database.metrics.influx.InfluxMetricsDatabase;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
 import me.illusion.skyblockcore.common.storage.SkyblockStorage;
 import me.illusion.skyblockcore.common.storage.cache.redis.MemorySkyblockIslandCache;
@@ -54,6 +55,10 @@ public class SkyblockDatabaseRegistry {
         register("island-cache", SkyblockDatabaseProvider.of(
             new RedisSkyblockIslandCache(),
             new MemorySkyblockIslandCache()
+        ));
+
+        register("metrics", SkyblockDatabaseProvider.of(
+            new InfluxMetricsDatabase()
         ));
     }
 
@@ -125,10 +130,9 @@ public class SkyblockDatabaseRegistry {
                 continue;
             }
 
-            if(keys.contains(registeredDatabase.getName())) {
+            if (keys.contains(registeredDatabase.getName())) {
                 registeredDatabase.setAttemptedLoad(true);
             }
-
 
             temp.add(tryLoad(registeredDatabase));
         }

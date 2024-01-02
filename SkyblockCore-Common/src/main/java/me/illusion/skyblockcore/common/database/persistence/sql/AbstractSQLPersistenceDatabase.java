@@ -41,47 +41,31 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
         });
     }
 
-    protected ResultSet runQuery(String query, List<StatementObject> list) {
+    protected <T> T runQuery(String query, List<StatementObject> list, ResultSetFunction<T> function) {
         try (PreparedStatement statement = getConnection().prepareStatement(query)) {
             for (int index = 0; index < list.size(); index++) {
                 list.get(index).applyTo(statement, index + 1);
             }
 
-            return statement.executeQuery();
-        } catch (Exception ex) {
+            ResultSet set = statement.executeQuery(); // This will be auto-closed by the try-with-resources
+
+            try {
+                return function.apply(set);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
         return null;
     }
 
-    protected <T> CompletableFuture<T> runQueryAsync(String query, List<StatementObject> list, ResultSetFunction<T> function) {
-        return associate(() -> {
-            ResultSet set = runQuery(query, list);
-
-            if (set == null) {
-                return null;
-            }
-
-            try {
-                return function.apply(set);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            } finally {
-                try {
-                    set.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
     protected void runUpdate(String query, Consumer<PreparedStatement> consumer) {
         try (PreparedStatement statement = getConnection().prepareStatement(query)) {
             consumer.accept(statement);
             statement.executeUpdate();
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
@@ -103,15 +87,12 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
         });
     }
 
+    protected <T> CompletableFuture<T> runQueryAsync(String query, List<StatementObject> list, ResultSetFunction<T> function) {
+        return associate(() -> runQuery(query, list, function));
+    }
+
     protected CompletableFuture<Void> runUpdateAsync(String query, Consumer<PreparedStatement> consumer) {
-        return associate(() -> {
-            try (PreparedStatement statement = getConnection().prepareStatement(query)) {
-                consumer.accept(statement);
-                statement.executeUpdate();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+        return associate(() -> runUpdate(query, consumer));
     }
 
     protected CompletableFuture<Void> runUpdateAsync(String query, StatementObject... objects) {

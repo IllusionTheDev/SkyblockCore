@@ -23,6 +23,7 @@ dependencies {
     implementation 'redis.clients:jedis:5.0.1'
 
     compileOnly 'org.mongodb:mongodb-driver-sync:4.10.2'
+    compileOnly "com.influxdb:influxdb-client-java:6.10.0"
 }
 
 def targetJavaVersion = 17

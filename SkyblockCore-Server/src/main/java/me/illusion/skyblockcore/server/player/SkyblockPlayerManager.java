@@ -1,5 +1,6 @@
 package me.illusion.skyblockcore.server.player;
 
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -49,5 +50,12 @@ public interface SkyblockPlayerManager {
      * @return The cached profile ID for the player.
      */
     UUID getCachedProfileId(UUID playerId);
+
+    /**
+     * Gets a snapshot of all the loaded players.
+     *
+     * @return A collection of all the loaded players.
+     */
+    Collection<SkyblockPlayer> getPlayers();
 
 }

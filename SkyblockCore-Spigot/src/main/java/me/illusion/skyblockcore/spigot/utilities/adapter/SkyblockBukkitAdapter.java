@@ -3,10 +3,12 @@ package me.illusion.skyblockcore.spigot.utilities.adapter;
 import java.util.concurrent.TimeUnit;
 import me.illusion.cosmos.utilities.geometry.Cuboid;
 import me.illusion.cosmos.utilities.time.Time;
+import me.illusion.skyblockcore.common.registry.SkyblockNamespacedKey;
 import me.illusion.skyblockcore.server.util.SkyblockCuboid;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.util.Vector;
 
 /**
@@ -87,4 +89,11 @@ public final class SkyblockBukkitAdapter {
         return new Cuboid(toBukkitLocation(cuboid.getMin()), toBukkitLocation(cuboid.getMax()));
     }
 
+    public static SkyblockNamespacedKey adapt(NamespacedKey key) {
+        return new SkyblockNamespacedKey(key.getNamespace(), key.getKey());
+    }
+
+    public static NamespacedKey adapt(SkyblockNamespacedKey key) {
+        return new NamespacedKey(key.getNamespace(), key.getKey());
+    }
 }

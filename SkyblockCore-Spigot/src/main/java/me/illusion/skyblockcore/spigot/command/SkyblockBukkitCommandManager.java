@@ -43,7 +43,7 @@ public class SkyblockBukkitCommandManager extends AbstractSkyblockCommandManager
             Class<PluginCommand> pluginCommandClass = PluginCommand.class;
 
             PLUGIN_COMMAND_CONSTRUCTOR = pluginCommandClass.getDeclaredConstructor(String.class, Plugin.class);
-            PLUGIN_COMMAND_CONSTRUCTOR.setAccessible(true);
+            PLUGIN_COMMAND_CONSTRUCTOR.setAccessible(true); // Need to use the constructor as the class has a protected constructor and is final
 
             SYNC_COMMANDS_METHOD = serverClass.getDeclaredMethod("syncCommands");
             SYNC_COMMANDS_METHOD.setAccessible(true);
