@@ -1,19 +1,33 @@
 package me.illusion.skyblockcore.server.item;
 
-import me.illusion.skyblockcore.server.item.stack.ItemMeta;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatformProvider;
 import me.illusion.skyblockcore.common.registry.Keyed;
+import me.illusion.skyblockcore.common.registry.Registry;
 import me.illusion.skyblockcore.common.registry.SkyblockNamespacedKey;
 
-public interface MinecraftMaterial extends Keyed {
+public abstract class MinecraftMaterial implements Keyed {
 
-    MinecraftItem getItem();
+    private final SkyblockNamespacedKey key;
 
-    int getMaxStackSize();
+    protected MinecraftMaterial(SkyblockNamespacedKey key) {
+        this.key = key;
+    }
 
-    ItemMeta createItemMeta();
+    public static MinecraftMaterial of(SkyblockNamespacedKey key) {
+        SkyblockPlatform platform = SkyblockPlatformProvider.getPlatform();
+        Registry<MinecraftMaterial> registry = platform.getRegistries().getRegistry(MinecraftMaterial.class);
+        return registry.get(key);
+    }
+
+    public static MinecraftMaterial of(String key) {
+        return MinecraftMaterial.of(SkyblockNamespacedKey.minecraft(key));
+    }
+
+    public abstract MinecraftItem attemptCreateItem();
 
     @Override
-    default SkyblockNamespacedKey getKey() {
-        return getItem().getKey();
+    public SkyblockNamespacedKey getKey() {
+        return key;
     }
 }

@@ -1,35 +1,41 @@
 package me.illusion.skyblockcore.spigot.registries.meta;
 
 import java.util.List;
-import me.illusion.skyblockcore.spigot.registries.meta.converter.LeatherMetaConverter;
-import me.illusion.skyblockcore.spigot.registries.meta.converter.MetaConverter;
-import me.illusion.skyblockcore.spigot.registries.meta.converter.SimpleMetaConverter;
-import org.bukkit.inventory.meta.ItemMeta;
+import me.illusion.skyblockcore.server.item.stack.meta.ItemMeta;
+import me.illusion.skyblockcore.server.item.stack.meta.impl.ItemMetaFactory;
+import me.illusion.skyblockcore.spigot.registries.meta.converter.DefaultItemMetaAdapter;
+import me.illusion.skyblockcore.spigot.registries.meta.converter.LeatherItemMetaAdapter;
+import me.illusion.skyblockcore.spigot.registries.meta.converter.MetaAdapter;
 
 public final class BukkitMetaAdapter {
 
-    private static final List<MetaConverter<?, ?>> ADAPTERS = List.of(
-        new LeatherMetaConverter(),
-        new SimpleMetaConverter()
+    private static final List<MetaAdapter<?, ?>> META_ADAPTERS = List.of(
+        new DefaultItemMetaAdapter(),
+        new LeatherItemMetaAdapter()
     );
 
     private BukkitMetaAdapter() {
 
     }
 
-    public static <K extends ItemMeta, V extends me.illusion.skyblockcore.server.item.stack.ItemMeta> me.illusion.skyblockcore.server.item.stack.ItemMeta adapt(
-        ItemMeta bukkitMeta) {
-        for (MetaConverter<?, ?> adapter : ADAPTERS) {
-            MetaConverter<K, V> metaConverter = (MetaConverter<K, V>) adapter;
-            Class<K> metaClass = metaConverter.getMetaClass();
+    public static <B, P extends ItemMeta> ItemMeta adapt(org.bukkit.inventory.meta.ItemMeta bukkitMeta) {
+        ItemMeta platformMeta = ItemMetaFactory.create(ItemMeta.class);
 
-            if (metaClass.isAssignableFrom(bukkitMeta.getClass())) {
-                return metaConverter.convert(metaClass.cast(bukkitMeta));
+        for (MetaAdapter<?, ?> adapter : META_ADAPTERS) {
+            MetaAdapter<B, P> metaAdapter = (MetaAdapter<B, P>) adapter;
+
+            Class<B> bukkitMetaClass = metaAdapter.getBukkitMetaClass();
+            Class<P> platformMetaClass = metaAdapter.getPlatformMetaClass();
+
+            if (!bukkitMetaClass.isAssignableFrom(bukkitMeta.getClass())) {
+                continue;
             }
+
+            P platformMetaInstance = platformMeta.as(platformMetaClass);
+            metaAdapter.convertToPlatform(bukkitMetaClass.cast(bukkitMeta), platformMetaInstance);
         }
 
-        throw new IllegalArgumentException("No adapter found for " + bukkitMeta.getClass().getName());
+        return platformMeta;
     }
-
 
 }

@@ -13,6 +13,7 @@ import me.illusion.skyblockcore.common.event.impl.SkyblockPlatformEnabledEvent;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatformProvider;
 import me.illusion.skyblockcore.common.registry.Registries;
 import me.illusion.skyblockcore.common.scheduler.SkyblockScheduler;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
@@ -65,6 +66,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     @Override
     public void onLoad() {
         Bukkit.getServicesManager().register(SkyblockPlatform.class, this, this, ServicePriority.Normal);
+        SkyblockPlatformProvider.setPlatform(this);
     }
 
     @Override
@@ -188,6 +190,10 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         registries = new Registries();
 
         registries.registerRegistry(new BukkitMaterialRegistry());
+    }
+
+    public BukkitMaterialRegistry getMaterialRegistry() {
+        return registries.getSpecificRegistry(BukkitMaterialRegistry.class);
     }
 
     @Override

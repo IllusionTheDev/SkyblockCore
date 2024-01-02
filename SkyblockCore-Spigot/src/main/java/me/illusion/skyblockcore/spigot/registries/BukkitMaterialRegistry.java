@@ -3,7 +3,7 @@ package me.illusion.skyblockcore.spigot.registries;
 import me.illusion.skyblockcore.common.registry.SimpleRegistry;
 import me.illusion.skyblockcore.server.item.MinecraftItem;
 import me.illusion.skyblockcore.server.item.MinecraftMaterial;
-import me.illusion.skyblockcore.server.item.stack.ItemMeta;
+import me.illusion.skyblockcore.server.item.stack.meta.ItemMeta;
 import me.illusion.skyblockcore.spigot.registries.meta.BukkitMetaAdapter;
 import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
 import org.bukkit.Bukkit;
@@ -19,7 +19,11 @@ public class BukkitMaterialRegistry extends SimpleRegistry<MinecraftItem> {
         }
     }
 
-    private static class MaterialItem extends MinecraftItem implements MinecraftMaterial {
+    public MinecraftItem getItem(Material material) {
+        return get(SkyblockBukkitAdapter.adapt(material.getKey()));
+    }
+
+    private static class MaterialItem extends MinecraftMaterial implements MinecraftItem {
 
         private final Material material;
 
@@ -29,12 +33,12 @@ public class BukkitMaterialRegistry extends SimpleRegistry<MinecraftItem> {
         }
 
         @Override
-        public MinecraftMaterial attemptCreateMaterial() {
-            return this;
+        public MinecraftItem attemptCreateItem() {
+            return material.isItem() ? this : null;
         }
 
         @Override
-        public MinecraftItem getItem() {
+        public MinecraftMaterial getMaterial() {
             return this;
         }
 

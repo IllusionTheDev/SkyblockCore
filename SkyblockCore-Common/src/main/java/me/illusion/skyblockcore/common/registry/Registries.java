@@ -33,4 +33,14 @@ public class Registries {
         return null;
     }
 
+    public <T extends Registry<?>> T getSpecificRegistry(Class<T> clazz) {
+        for (Registry<?> registry : internalCollection) {
+            if (clazz.isAssignableFrom(registry.getClass())) {
+                return (T) registry;
+            }
+        }
+
+        return null;
+    }
+
 }

@@ -1,27 +1,41 @@
 package me.illusion.skyblockcore.server.item.stack;
 
-import me.illusion.skyblockcore.server.item.MinecraftMaterial;
+import java.util.function.UnaryOperator;
+import me.illusion.skyblockcore.server.item.MinecraftItem;
+import me.illusion.skyblockcore.server.item.stack.meta.ItemMeta;
 
 public class MinecraftItemStack {
 
-    private final MinecraftMaterial material;
-    private final ItemMeta meta;
+    private final MinecraftItem item;
+    private ItemMeta meta;
 
     private int amount;
 
-    public MinecraftItemStack(MinecraftMaterial material, int amount) {
-        this.material = material;
+    private MinecraftItemStack(MinecraftItem item, int amount) {
+        this.item = item;
         this.amount = amount;
 
-        this.meta = material.createItemMeta();
+        this.meta = item.createItemMeta();
     }
 
-    public MinecraftItemStack(MinecraftMaterial material) {
-        this(material, 1);
+    public MinecraftItemStack(MinecraftItem item) {
+        this(item, 1);
+    }
+
+    public static MinecraftItemStack create(MinecraftItem item, int amount) {
+        return new MinecraftItemStack(item, amount);
+    }
+
+    public static MinecraftItemStack create(MinecraftItem item) {
+        return new MinecraftItemStack(item);
     }
 
     public ItemMeta getMeta() {
         return meta;
+    }
+
+    public void modifyMeta(UnaryOperator<ItemMeta> operator) {
+        meta = operator.apply(meta);
     }
 
     public int getAmount() {
@@ -33,12 +47,12 @@ public class MinecraftItemStack {
     }
 
     public boolean isSimilar(MinecraftItemStack other) {
-        return material == other.material && meta.equals(other.meta);
+        return item == other.item && meta.equals(other.meta);
     }
 
     @Override
     public int hashCode() {
-        int result = material.hashCode();
+        int result = item.hashCode();
         result = 31 * result + meta.hashCode();
         result = 31 * result + amount;
         return result;

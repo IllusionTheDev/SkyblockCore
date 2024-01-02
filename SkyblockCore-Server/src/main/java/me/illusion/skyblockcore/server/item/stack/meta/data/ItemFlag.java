@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.server.item.stack.meta;
+package me.illusion.skyblockcore.server.item.stack.meta.data;
 
 public enum ItemFlag {
 

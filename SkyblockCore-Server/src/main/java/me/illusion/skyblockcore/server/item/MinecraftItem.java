@@ -2,19 +2,18 @@ package me.illusion.skyblockcore.server.item;
 
 import me.illusion.skyblockcore.common.registry.Keyed;
 import me.illusion.skyblockcore.common.registry.SkyblockNamespacedKey;
+import me.illusion.skyblockcore.server.item.stack.meta.ItemMeta;
 
-public abstract class MinecraftItem implements Keyed {
+public interface MinecraftItem extends Keyed {
 
-    private final SkyblockNamespacedKey key;
+    MinecraftMaterial getMaterial();
 
-    protected MinecraftItem(SkyblockNamespacedKey key) {
-        this.key = key;
-    }
+    int getMaxStackSize();
 
-    public abstract MinecraftMaterial attemptCreateMaterial();
+    ItemMeta createItemMeta();
 
     @Override
-    public SkyblockNamespacedKey getKey() {
-        return key;
+    default SkyblockNamespacedKey getKey() {
+        return getMaterial().getKey();
     }
 }

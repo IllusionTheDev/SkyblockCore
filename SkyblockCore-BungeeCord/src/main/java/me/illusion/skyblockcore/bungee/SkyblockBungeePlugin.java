@@ -13,6 +13,7 @@ import me.illusion.skyblockcore.common.config.SkyblockMessagesFile;
 import me.illusion.skyblockcore.common.database.registry.SkyblockDatabaseRegistry;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManager;
 import me.illusion.skyblockcore.common.event.manager.SkyblockEventManagerImpl;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatformProvider;
 import me.illusion.skyblockcore.common.registry.Registries;
 import me.illusion.skyblockcore.common.scheduler.SkyblockScheduler;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
@@ -67,6 +68,11 @@ public class SkyblockBungeePlugin extends Plugin implements SkyblockProxyPlatfor
         new PlaySkyblockCommand(this);
 
         ProxyServer.getInstance().getScheduler().schedule(this, this::loadDatabase, 1, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void onLoad() {
+        SkyblockPlatformProvider.setPlatform(this);
     }
 
     private void finishEnable() {

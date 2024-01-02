@@ -61,10 +61,6 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
         return null;
     }
 
-    protected <T> CompletableFuture<T> runQueryAsync(String query, List<StatementObject> list, ResultSetFunction<T> function) {
-        return associate(() -> runQuery(query, list, function));
-    }
-
     protected void runUpdate(String query, Consumer<PreparedStatement> consumer) {
         try (PreparedStatement statement = getConnection().prepareStatement(query)) {
             consumer.accept(statement);
@@ -91,15 +87,12 @@ public abstract class AbstractSQLPersistenceDatabase extends AbstractPersistence
         });
     }
 
+    protected <T> CompletableFuture<T> runQueryAsync(String query, List<StatementObject> list, ResultSetFunction<T> function) {
+        return associate(() -> runQuery(query, list, function));
+    }
+
     protected CompletableFuture<Void> runUpdateAsync(String query, Consumer<PreparedStatement> consumer) {
-        return associate(() -> {
-            try (PreparedStatement statement = getConnection().prepareStatement(query)) {
-                consumer.accept(statement);
-                statement.executeUpdate();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+        return associate(() -> runUpdate(query, consumer));
     }
 
     protected CompletableFuture<Void> runUpdateAsync(String query, StatementObject... objects) {

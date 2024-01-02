@@ -7,6 +7,7 @@ public class SkyblockNamespacedKey {
 
     private static final Pattern PATTERN = Pattern.compile("^[a-z0-9._-]+$");
     private static final String MINECRAFT_NAMESPACE = "minecraft";
+    private static final String SKYBLOCK_NAMESPACE = "skyblock";
 
     private final String namespace;
     private final String key;
@@ -23,7 +24,7 @@ public class SkyblockNamespacedKey {
     }
 
     public static SkyblockNamespacedKey skyblock(String key) {
-        return new SkyblockNamespacedKey("skyblock", key);
+        return new SkyblockNamespacedKey(SKYBLOCK_NAMESPACE, key);
     }
 
     public String getNamespace() {
