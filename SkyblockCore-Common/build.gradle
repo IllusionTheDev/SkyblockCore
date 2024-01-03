@@ -16,11 +16,11 @@ repositories {
 }
 
 dependencies {
-    implementation('org.projectlombok:lombok:1.18.30')
+    compileOnly('org.projectlombok:lombok:1.18.30')
     annotationProcessor('org.projectlombok:lombok:1.18.30')
 
-    implementation 'com.google.guava:guava:32.1.1-jre'
-    implementation 'redis.clients:jedis:5.0.1'
+    compileOnly 'com.google.guava:guava:32.1.1-jre'
+    compileOnly 'redis.clients:jedis:5.0.1'
 
     compileOnly 'org.mongodb:mongodb-driver-sync:4.10.2'
     compileOnly "com.influxdb:influxdb-client-java:6.10.0"

@@ -3,9 +3,11 @@ package me.illusion.skyblockcore.spigot.player;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
+import me.illusion.skyblockcore.server.inventory.PlayerItemContainer;
 import me.illusion.skyblockcore.server.player.AbstractSkyblockPlayer;
 import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
+import me.illusion.skyblockcore.spigot.inventory.container.BukkitPlayerItemContainer;
 import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -41,6 +43,12 @@ public class SkyblockBukkitPlayer extends AbstractSkyblockPlayer {
         }
 
         getBukkitPlayer().teleport(SkyblockBukkitAdapter.toBukkitLocation(location));
+    }
+
+    @Override
+    public PlayerItemContainer getInventory() {
+        verifyOnline();
+        return BukkitPlayerItemContainer.create(getBukkitPlayer().getInventory());
     }
 
     private void verifyOnline() {

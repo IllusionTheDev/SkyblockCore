@@ -6,6 +6,8 @@ import me.illusion.skyblockcore.server.item.stack.meta.impl.ItemMetaFactory;
 import me.illusion.skyblockcore.spigot.registries.meta.converter.DefaultItemMetaAdapter;
 import me.illusion.skyblockcore.spigot.registries.meta.converter.LeatherItemMetaAdapter;
 import me.illusion.skyblockcore.spigot.registries.meta.converter.MetaAdapter;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 
 public final class BukkitMetaAdapter {
 
@@ -36,6 +38,30 @@ public final class BukkitMetaAdapter {
         }
 
         return platformMeta;
+    }
+
+    public static <B, P extends ItemMeta> org.bukkit.inventory.meta.ItemMeta adapt(Material bukkitMaterial, ItemMeta platformMeta) {
+        org.bukkit.inventory.meta.ItemMeta bukkitMeta = Bukkit.getItemFactory().getItemMeta(bukkitMaterial);
+
+        if (bukkitMeta == null) {
+            return null;
+        }
+
+        for (MetaAdapter<?, ?> adapter : META_ADAPTERS) {
+            MetaAdapter<B, P> metaAdapter = (MetaAdapter<B, P>) adapter;
+
+            Class<B> bukkitMetaClass = metaAdapter.getBukkitMetaClass();
+            Class<P> platformMetaClass = metaAdapter.getPlatformMetaClass();
+
+            if (!bukkitMetaClass.isAssignableFrom(bukkitMeta.getClass())) {
+                continue;
+            }
+
+            B bukkitMetaInstance = bukkitMetaClass.cast(bukkitMeta);
+            metaAdapter.convertToBukkit(platformMeta.as(platformMetaClass), bukkitMetaInstance);
+        }
+
+        return bukkitMeta;
     }
 
 }

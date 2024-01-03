@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.server.item.stack.meta.impl;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,11 +30,6 @@ public class ItemMetaView implements ItemMeta {
     @Override
     public <T extends ItemMeta> T as(Class<T> clazz) {
         return ItemMetaFactory.create(clazz, container);
-    }
-
-    @Override
-    public Collection<MetaValue<?>> getSetValues() {
-        return Set.copyOf(container.getValues().keySet());
     }
 
     @Override

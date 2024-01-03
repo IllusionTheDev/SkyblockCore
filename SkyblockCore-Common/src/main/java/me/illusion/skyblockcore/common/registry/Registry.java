@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Registry<T extends Keyed> {
 
-    protected final Map<SkyblockNamespacedKey, T> internalMap = new ConcurrentHashMap<>();
+    protected Map<SkyblockNamespacedKey, T> internalMap = new ConcurrentHashMap<>();
     protected boolean locked = false;
 
     public void register(T value) {
@@ -26,6 +26,7 @@ public abstract class Registry<T extends Keyed> {
 
     public void lock() {
         locked = true;
+        internalMap = Map.copyOf(internalMap);
     }
 
     public abstract Class<T> getObjectType();

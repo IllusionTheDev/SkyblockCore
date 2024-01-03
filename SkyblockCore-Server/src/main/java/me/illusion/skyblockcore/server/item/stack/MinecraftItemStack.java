@@ -46,6 +46,10 @@ public class MinecraftItemStack {
         this.amount = amount;
     }
 
+    public MinecraftItem getItem() {
+        return item;
+    }
+
     public boolean isSimilar(MinecraftItemStack other) {
         return item == other.item && meta.equals(other.meta);
     }

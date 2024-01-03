@@ -1,6 +1,5 @@
 package me.illusion.skyblockcore.server.item.stack.meta;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import me.illusion.skyblockcore.server.item.stack.meta.data.ItemFlag;
@@ -14,8 +13,6 @@ public interface ItemMeta {
     <T> T getValue(MetaValue<T> value);
 
     <T extends ItemMeta> T as(Class<T> clazz);
-
-    Collection<MetaValue<?>> getSetValues();
 
     default String getDisplayName() {
         return getValue(BuiltinMetaValues.DISPLAY_NAME);

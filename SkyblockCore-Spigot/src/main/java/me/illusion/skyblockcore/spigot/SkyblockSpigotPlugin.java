@@ -18,6 +18,7 @@ import me.illusion.skyblockcore.common.registry.Registries;
 import me.illusion.skyblockcore.common.scheduler.SkyblockScheduler;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
+import me.illusion.skyblockcore.server.inventory.platform.SkyblockInventoryFactory;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistry;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistryImpl;
@@ -30,6 +31,8 @@ import me.illusion.skyblockcore.spigot.config.BukkitConfigurationProvider;
 import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
+import me.illusion.skyblockcore.spigot.inventory.BukkitInventoryFactory;
+import me.illusion.skyblockcore.spigot.inventory.BukkitInventoryTracker;
 import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
 import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
 import me.illusion.skyblockcore.spigot.registries.BukkitMaterialRegistry;
@@ -51,6 +54,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
     // Server-platform specific things
     private SkyblockMessagesFile messagesFile;
+    private SkyblockInventoryFactory inventoryFactory;
 
     private ConfigurationProvider configurationProvider;
 
@@ -76,6 +80,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         log("Loading scheduler");
         scheduler = new SkyblockBukkitScheduler(this);
+
+        log("Loading providers");
+        inventoryFactory = new BukkitInventoryFactory(this);
 
         log("Loading minecraft registries..");
         loadRegistries();
@@ -153,6 +160,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         log("Enabling island manager");
         playerManager = new SkyblockBukkitPlayerManager(this);
         islandManager = new IslandManagerImpl(this);
+        new BukkitInventoryTracker(this);
 
         networkRegistry.enable();
 

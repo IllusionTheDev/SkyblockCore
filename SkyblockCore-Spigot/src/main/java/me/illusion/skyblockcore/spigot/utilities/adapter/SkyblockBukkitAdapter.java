@@ -3,12 +3,24 @@ package me.illusion.skyblockcore.spigot.utilities.adapter;
 import java.util.concurrent.TimeUnit;
 import me.illusion.cosmos.utilities.geometry.Cuboid;
 import me.illusion.cosmos.utilities.time.Time;
+import me.illusion.skyblockcore.common.platform.SkyblockPlatformProvider;
 import me.illusion.skyblockcore.common.registry.SkyblockNamespacedKey;
+import me.illusion.skyblockcore.server.SkyblockServerPlatform;
+import me.illusion.skyblockcore.server.item.MinecraftItem;
+import me.illusion.skyblockcore.server.item.stack.MinecraftItemStack;
+import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 import me.illusion.skyblockcore.server.util.SkyblockCuboid;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
+import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
+import me.illusion.skyblockcore.spigot.registries.BukkitMaterialRegistry;
+import me.illusion.skyblockcore.spigot.registries.meta.BukkitMetaAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 /**
@@ -56,7 +68,7 @@ public final class SkyblockBukkitAdapter {
      * @return The converted time.
      */
     public static Time asCosmosTime(me.illusion.skyblockcore.common.utilities.time.Time time) {
-        return new Time((int) time.as(TimeUnit.SECONDS), TimeUnit.SECONDS);
+        return new Time(time.as(TimeUnit.SECONDS), TimeUnit.SECONDS);
     }
 
     /**
@@ -95,5 +107,52 @@ public final class SkyblockBukkitAdapter {
 
     public static NamespacedKey adapt(SkyblockNamespacedKey key) {
         return new NamespacedKey(key.getNamespace(), key.getKey());
+    }
+
+    public static Player adapt(SkyblockPlayer player) {
+        return Bukkit.getPlayer(player.getUniqueId());
+    }
+
+    public static SkyblockPlayer adapt(Player player) {
+        SkyblockServerPlatform platform = (SkyblockServerPlatform) SkyblockPlatformProvider.getPlatform();
+        return platform.getPlayerManager().getPlayer(player.getUniqueId());
+    }
+
+    public static ItemStack adapt(MinecraftItemStack platformItem) {
+        if (platformItem == null) {
+            return null;
+        }
+
+        BukkitMaterialRegistry registry = SkyblockBukkitAdapter.getMaterialRegistry();
+
+        MinecraftItem item = platformItem.getItem();
+        Material material = registry.getMaterial(item);
+        ItemMeta meta = BukkitMetaAdapter.adapt(material, platformItem.getMeta());
+
+        ItemStack bukkitItem = new ItemStack(material, platformItem.getAmount());
+        bukkitItem.setItemMeta(meta);
+
+        return bukkitItem;
+    }
+
+    public static MinecraftItemStack adapt(ItemStack bukkitItem) {
+        if (bukkitItem == null) {
+            return null;
+        }
+
+        BukkitMaterialRegistry registry = SkyblockBukkitAdapter.getMaterialRegistry();
+
+        MinecraftItem item = registry.getItem(bukkitItem.getType());
+        me.illusion.skyblockcore.server.item.stack.meta.ItemMeta meta = BukkitMetaAdapter.adapt(bukkitItem.getItemMeta());
+
+        MinecraftItemStack platformItem = MinecraftItemStack.create(item, bukkitItem.getAmount());
+        platformItem.modifyMeta(m -> meta);
+
+        return platformItem;
+    }
+
+    private static BukkitMaterialRegistry getMaterialRegistry() {
+        SkyblockSpigotPlugin plugin = (SkyblockSpigotPlugin) SkyblockPlatformProvider.getPlatform();
+        return plugin.getMaterialRegistry();
     }
 }

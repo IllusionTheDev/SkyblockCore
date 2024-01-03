@@ -23,6 +23,10 @@ public class BukkitMaterialRegistry extends SimpleRegistry<MinecraftItem> {
         return get(SkyblockBukkitAdapter.adapt(material.getKey()));
     }
 
+    public Material getMaterial(MinecraftItem item) {
+        return Material.getMaterial(item.getKey().toString());
+    }
+
     private static class MaterialItem extends MinecraftMaterial implements MinecraftItem {
 
         private final Material material;

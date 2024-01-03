@@ -77,8 +77,8 @@ public interface SkyblockIslandManager {
     /**
      * Disable the island manager.
      *
-     * @param save  Whether or not to save the islands.
-     * @param async Whether or not to disable asynchronously. Bukkit does not allow disabling asynchronously, so it sets to false.
+     * @param save  Whether to save the islands.
+     * @param async Whether to disable asynchronously. Bukkit does not allow disabling asynchronously, so it sets to false.
      * @return A future which completes when the island manager is disabled.
      */
     CompletableFuture<Void> disable(boolean save, boolean async);
