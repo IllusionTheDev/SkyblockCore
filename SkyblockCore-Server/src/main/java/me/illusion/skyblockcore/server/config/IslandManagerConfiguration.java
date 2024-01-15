@@ -9,7 +9,7 @@ public class IslandManagerConfiguration extends AbstractConfiguration {
     private final String provider;
 
     public IslandManagerConfiguration(SkyblockPlatform platform) {
-        super(platform, "island-config.yml");
+        super(platform, "island-settings.yml");
         this.provider = getString("provider");
     }
 
