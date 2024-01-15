@@ -6,25 +6,23 @@ import me.illusion.cosmos.database.CosmosDataContainer;
 import me.illusion.cosmos.grid.CosmosGrid;
 import me.illusion.cosmos.grid.impl.WorldPerAreaGrid;
 import me.illusion.cosmos.session.CosmosSessionHolder;
-import me.illusion.cosmos.utilities.storage.YMLBase;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 
 /**
  * Represents the cosmos setup file. This is used to load the cosmos setup.
  */
-public class SkyblockCosmosSetupFile extends YMLBase {
+public class SkyblockCosmosSetupFile {
 
+    private final ConfigurationSection configuration;
     private final SkyblockCosmosSetup setup;
 
     private final CosmosPlugin cosmosPlugin;
     private final SkyblockSpigotPlugin skyblockPlugin;
 
-    public SkyblockCosmosSetupFile(CosmosPlugin plugin, SkyblockSpigotPlugin skyblockPlugin) {
-        super(skyblockPlugin, "cosmos-setup.yml");
-
+    public SkyblockCosmosSetupFile(ConfigurationSection section, CosmosPlugin plugin, SkyblockSpigotPlugin skyblockPlugin) {
+        this.configuration = section;
         this.cosmosPlugin = plugin;
         this.skyblockPlugin = skyblockPlugin;
 
@@ -37,8 +35,6 @@ public class SkyblockCosmosSetupFile extends YMLBase {
     }
 
     private CosmosDataContainer setupContainer() {
-        FileConfiguration configuration = getConfiguration();
-
         String preferredContainer = configuration.getString("preferred-container");
         CosmosContainerRegistry registry = cosmosPlugin.getContainerRegistry();
 
@@ -52,16 +48,14 @@ public class SkyblockCosmosSetupFile extends YMLBase {
     }
 
     private CosmosGrid setupGrid() {
-        FileConfiguration configuration = getConfiguration();
-
         String preferredGrid = configuration.getString("preferred-grid", "world-per-area");
-        ConfigurationSection section = configuration.getConfigurationSection(preferredGrid);
+        ConfigurationSection section = configuration.getSection(preferredGrid);
 
         if (section == null) {
             return new WorldPerAreaGrid();
         }
 
-        return skyblockPlugin.getGridRegistry().getProvider(preferredGrid).provide(section);
+        return skyblockPlugin.getCosmosGridRegistry().getProvider(preferredGrid).provide(section);
     }
 
     public SkyblockCosmosSetup getSetup() {

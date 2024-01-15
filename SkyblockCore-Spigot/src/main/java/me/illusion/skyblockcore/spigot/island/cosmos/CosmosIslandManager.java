@@ -1,10 +1,12 @@
-package me.illusion.skyblockcore.spigot.island;
+package me.illusion.skyblockcore.spigot.island.cosmos;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.cosmos.session.CosmosSession;
 import me.illusion.cosmos.template.TemplatedArea;
 import me.illusion.cosmos.utilities.concurrency.MainThreadExecutor;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.common.data.IslandData;
 import me.illusion.skyblockcore.common.utilities.time.Time;
 import me.illusion.skyblockcore.server.event.island.SkyblockIslandLoadEvent;
@@ -14,23 +16,37 @@ import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.util.SkyblockCuboid;
 import me.illusion.skyblockcore.server.util.SkyblockLocation;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
+import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
 import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.utilities.adapter.SkyblockBukkitAdapter;
+import org.bukkit.Bukkit;
 
 /**
  * Manages islands. The lifecycle of an island is tied to a CosmosSession, which means that if the session is destroyed, the island is destroyed.
  */
-public class IslandManagerImpl extends AbstractIslandManager {
+public class CosmosIslandManager extends AbstractIslandManager {
 
     private final SkyblockCosmosSetup cosmosSetup;
 
-    public IslandManagerImpl(SkyblockSpigotPlugin plugin) {
+    public CosmosIslandManager(ConfigurationSection section, SkyblockSpigotPlugin plugin) {
         super(plugin);
 
-        this.cosmosSetup = plugin.getCosmosSetup();
+        this.cosmosSetup = initCosmos(section, plugin);
 
-        new IllegalIslandUnloadCatcher(this,
-            plugin).register(); // This is a listener that catches when an island is unloaded illegally, through Cosmos directly.
+        // This is a listener that catches when an island is unloaded illegally, through Cosmos directly.
+        new IllegalIslandUnloadCatcher(this, plugin).register();
+    }
+
+    private SkyblockCosmosSetup initCosmos(ConfigurationSection section, SkyblockSpigotPlugin plugin) {
+        // We get the cosmos plugin
+        CosmosPlugin cosmosPlugin = (CosmosPlugin) Bukkit.getPluginManager().getPlugin("Cosmos");
+
+        SkyblockCosmosSetupFile cosmosSetupFile = new SkyblockCosmosSetupFile(section, cosmosPlugin, plugin);
+        SkyblockCosmosSetup setup = cosmosSetupFile.getSetup();
+
+        cosmosPlugin.getGridRegistry().register(setup.getIslandGrid());
+
+        return setup;
     }
 
     /**

@@ -1,6 +1,7 @@
 package me.illusion.skyblockcore.server;
 
 import me.illusion.skyblockcore.common.platform.SkyblockPlatform;
+import me.illusion.skyblockcore.server.config.IslandManagerConfiguration;
 import me.illusion.skyblockcore.server.inventory.platform.SkyblockInventoryFactory;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
 import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
@@ -25,4 +26,6 @@ public interface SkyblockServerPlatform extends SkyblockPlatform {
     SkyblockPlayerManager getPlayerManager();
 
     SkyblockInventoryFactory getInventoryFactory();
+
+    IslandManagerConfiguration getIslandManagerConfiguration();
 }

@@ -1,4 +1,4 @@
-package me.illusion.skyblockcore.spigot.island;
+package me.illusion.skyblockcore.spigot.island.cosmos;
 
 import me.illusion.cosmos.event.session.CosmosUnloadSessionEvent;
 import me.illusion.skyblockcore.spigot.SkyblockSpigotPlugin;
@@ -11,9 +11,9 @@ import org.bukkit.event.Listener;
 public class IllegalIslandUnloadCatcher implements Listener {
 
     private final SkyblockSpigotPlugin plugin;
-    private final IslandManagerImpl impl;
+    private final CosmosIslandManager impl;
 
-    public IllegalIslandUnloadCatcher(IslandManagerImpl impl, SkyblockSpigotPlugin plugin) {
+    public IllegalIslandUnloadCatcher(CosmosIslandManager impl, SkyblockSpigotPlugin plugin) {
         this.plugin = plugin;
         this.impl = impl;
     }

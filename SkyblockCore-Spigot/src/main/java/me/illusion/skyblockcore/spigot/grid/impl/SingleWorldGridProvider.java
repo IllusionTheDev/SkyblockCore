@@ -4,11 +4,11 @@ import java.util.UUID;
 import me.illusion.cosmos.grid.CosmosGrid;
 import me.illusion.cosmos.grid.impl.SingleWorldGrid;
 import me.illusion.cosmos.world.VoidGenerator;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.ChunkGenerator;
 
 /**

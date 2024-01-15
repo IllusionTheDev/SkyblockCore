@@ -1,7 +1,7 @@
 package me.illusion.skyblockcore.spigot.grid;
 
 import me.illusion.cosmos.grid.CosmosGrid;
-import org.bukkit.configuration.ConfigurationSection;
+import me.illusion.skyblockcore.common.config.section.ConfigurationSection;
 
 public interface SkyblockGridProvider {
 

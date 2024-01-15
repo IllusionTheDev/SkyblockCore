@@ -44,4 +44,28 @@ public abstract class AbstractConfiguration {
     public void reload() {
         configuration = provider.loadConfiguration(file);
     }
+
+    protected ConfigurationSection getSection(String path) {
+        return configuration.getSection(path);
+    }
+
+    protected String getString(String path) {
+        return configuration.getString(path);
+    }
+
+    protected int getInt(String path) {
+        return configuration.getInt(path);
+    }
+
+    protected boolean getBoolean(String path) {
+        return configuration.getBoolean(path);
+    }
+
+    protected double getDouble(String path) {
+        return configuration.getDouble(path);
+    }
+
+    protected long getLong(String path) {
+        return configuration.getLong(path);
+    }
 }

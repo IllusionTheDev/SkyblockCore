@@ -3,7 +3,6 @@ package me.illusion.skyblockcore.spigot;
 import java.io.File;
 import java.util.logging.Level;
 import lombok.Getter;
-import me.illusion.cosmos.CosmosPlugin;
 import me.illusion.skyblockcore.common.command.audience.SkyblockAudience;
 import me.illusion.skyblockcore.common.command.manager.SkyblockCommandManager;
 import me.illusion.skyblockcore.common.config.ConfigurationProvider;
@@ -18,8 +17,10 @@ import me.illusion.skyblockcore.common.registry.Registries;
 import me.illusion.skyblockcore.common.scheduler.SkyblockScheduler;
 import me.illusion.skyblockcore.common.utilities.file.IOUtils;
 import me.illusion.skyblockcore.server.SkyblockServerPlatform;
+import me.illusion.skyblockcore.server.config.IslandManagerConfiguration;
 import me.illusion.skyblockcore.server.inventory.platform.SkyblockInventoryFactory;
 import me.illusion.skyblockcore.server.island.SkyblockIslandManager;
+import me.illusion.skyblockcore.server.island.provider.SkyblockIslandManagerProviderRegistry;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistry;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkRegistryImpl;
 import me.illusion.skyblockcore.server.network.SkyblockNetworkStructure;
@@ -28,12 +29,11 @@ import me.illusion.skyblockcore.server.network.simple.SimpleSkyblockNetwork;
 import me.illusion.skyblockcore.server.player.SkyblockPlayerManager;
 import me.illusion.skyblockcore.spigot.command.SkyblockBukkitCommandManager;
 import me.illusion.skyblockcore.spigot.config.BukkitConfigurationProvider;
-import me.illusion.skyblockcore.spigot.config.cosmos.SkyblockCosmosSetupFile;
-import me.illusion.skyblockcore.spigot.cosmos.SkyblockCosmosSetup;
 import me.illusion.skyblockcore.spigot.grid.SkyblockGridRegistry;
 import me.illusion.skyblockcore.spigot.inventory.BukkitInventoryFactory;
 import me.illusion.skyblockcore.spigot.inventory.BukkitInventoryTracker;
-import me.illusion.skyblockcore.spigot.island.IslandManagerImpl;
+import me.illusion.skyblockcore.spigot.island.PluginIslandManagerProvider;
+import me.illusion.skyblockcore.spigot.island.cosmos.CosmosIslandManager;
 import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
 import me.illusion.skyblockcore.spigot.registries.BukkitMaterialRegistry;
 import me.illusion.skyblockcore.spigot.scheduler.SkyblockBukkitScheduler;
@@ -48,13 +48,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPlatform {
 
     // Spigot-specific things
-    private SkyblockCosmosSetup cosmosSetup;
-    private SkyblockGridRegistry gridRegistry;
-
+    private SkyblockGridRegistry cosmosGridRegistry;
 
     // Server-platform specific things
     private SkyblockMessagesFile messagesFile;
     private SkyblockInventoryFactory inventoryFactory;
+    private IslandManagerConfiguration islandManagerConfiguration;
+    private SkyblockIslandManagerProviderRegistry islandManagerProviders;
 
     private ConfigurationProvider configurationProvider;
 
@@ -66,6 +66,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
     private SkyblockPlayerManager playerManager;
     private SkyblockScheduler scheduler;
     private SkyblockCommandManager<SkyblockAudience> commandManager;
+
 
     @Override
     public void onLoad() {
@@ -83,6 +84,10 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         log("Loading providers");
         inventoryFactory = new BukkitInventoryFactory(this);
+        islandManagerProviders = new SkyblockIslandManagerProviderRegistry(this);
+        cosmosGridRegistry = new SkyblockGridRegistry();
+
+        registerDefaultProviders();
 
         log("Loading minecraft registries..");
         loadRegistries();
@@ -92,10 +97,10 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         log("Loading configuration files");
         messagesFile = new SkyblockMessagesFile(this, "server-messages");
+        islandManagerConfiguration = new IslandManagerConfiguration(this);
 
         log("Loading database & grid");
         databaseRegistry = new SkyblockDatabaseRegistry(this);
-        gridRegistry = new SkyblockGridRegistry();
 
         log("Loading events & commands");
         eventManager = new SkyblockEventManagerImpl();
@@ -128,8 +133,6 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         log("Loading networks");
         networkRegistry.load();
 
-        log("Initializing cosmos");
-        initCosmos();
 
         log("Enabling databases");
         loadDatabases();
@@ -159,7 +162,14 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
         log("Enabling island manager");
         playerManager = new SkyblockBukkitPlayerManager(this);
-        islandManager = new IslandManagerImpl(this);
+        islandManager = islandManagerProviders.tryProvide();
+
+        if (islandManager == null) {
+            getLogger().severe("Failed to enable island manager, disabling plugin...");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         new BukkitInventoryTracker(this);
 
         networkRegistry.enable();
@@ -176,22 +186,9 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
         networkRegistry.register(new SimpleSkyblockNetwork(this));
     }
 
-    /**
-     * Initializes the cosmos setup
-     */
-    private void initCosmos() {
-        if (cosmosSetup != null) {
-            throw new IllegalStateException("Cosmos setup already initialized!");
-
-        }
-        // We get the cosmos plugin
-        CosmosPlugin cosmosPlugin = (CosmosPlugin) Bukkit.getPluginManager().getPlugin("Cosmos");
-
-        SkyblockCosmosSetupFile cosmosSetupFile = new SkyblockCosmosSetupFile(cosmosPlugin, this);
-        cosmosSetup = cosmosSetupFile.getSetup();
-
-        cosmosPlugin.getGridRegistry().register(cosmosSetup.getIslandGrid());
-        cosmosPlugin.getSessionHolderRegistry().registerHolder("skyblock", cosmosSetup.getSessionHolder());
+    private void registerDefaultProviders() {
+        islandManagerProviders.registerProvider("cosmos", PluginIslandManagerProvider.of(section -> new CosmosIslandManager(section, this), "Cosmos"));
+        // islandManagerProviders.registerProvider("slime", PluginIslandManagerProvider.of(section -> new SlimeWorldIslandManager(section, this), "SlimeWorldManager"));
     }
 
     private void loadRegistries() {
