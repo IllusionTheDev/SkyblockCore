@@ -13,8 +13,6 @@
 
 This project is currently in ALPHA. Feel free to test it by compiling the code yourself. Basic island loading functionality is tested and working.
 
-This project's backbone is [Cosmos](https://github.com/IllusionTheDev/Cosmos/), and at the moment is under heavy development, with no builds available.
-
 ------------
 
 ### Technologies Used:
@@ -27,7 +25,8 @@ This project's backbone is [Cosmos](https://github.com/IllusionTheDev/Cosmos/), 
 - MongoDB
 
 #### Plugin Hooks
-- Cosmos (Handles all the loading/saving logic, hooks with WorldEdit, SWM support is planned)
+- [Cosmos](https://github.com/IllusionTheDev/Cosmos/) (Handles all the loading/saving logic, hooks with WorldEdit or Bukkit)
+- ~SlimeWorldManager~ support is under development.
 
 
 
