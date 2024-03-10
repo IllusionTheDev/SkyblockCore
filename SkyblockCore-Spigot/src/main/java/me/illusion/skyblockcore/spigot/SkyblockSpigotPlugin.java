@@ -34,6 +34,7 @@ import me.illusion.skyblockcore.spigot.inventory.BukkitInventoryFactory;
 import me.illusion.skyblockcore.spigot.inventory.BukkitInventoryTracker;
 import me.illusion.skyblockcore.spigot.island.PluginIslandManagerProvider;
 import me.illusion.skyblockcore.spigot.island.cosmos.CosmosIslandManager;
+import me.illusion.skyblockcore.spigot.island.slime.SWMIslandManager;
 import me.illusion.skyblockcore.spigot.player.SkyblockBukkitPlayerManager;
 import me.illusion.skyblockcore.spigot.registries.BukkitMaterialRegistry;
 import me.illusion.skyblockcore.spigot.scheduler.SkyblockBukkitScheduler;
@@ -188,7 +189,7 @@ public class SkyblockSpigotPlugin extends JavaPlugin implements SkyblockServerPl
 
     private void registerDefaultProviders() {
         islandManagerProviders.registerProvider("cosmos", PluginIslandManagerProvider.of(section -> new CosmosIslandManager(section, this), "Cosmos"));
-        // islandManagerProviders.registerProvider("slime", PluginIslandManagerProvider.of(section -> new SlimeWorldIslandManager(section, this), "SlimeWorldManager"));
+        islandManagerProviders.registerProvider("slime", PluginIslandManagerProvider.of(section -> new SWMIslandManager(section, this), "SlimeWorldManager"));
     }
 
     private void loadRegistries() {

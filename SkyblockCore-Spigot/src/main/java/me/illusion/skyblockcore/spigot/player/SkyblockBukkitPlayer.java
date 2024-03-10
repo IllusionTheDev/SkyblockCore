@@ -48,7 +48,7 @@ public class SkyblockBukkitPlayer extends AbstractSkyblockPlayer {
     @Override
     public PlayerItemContainer getInventory() {
         verifyOnline();
-        return BukkitPlayerItemContainer.create(getBukkitPlayer().getInventory());
+        return BukkitPlayerItemContainer.wrap(getBukkitPlayer().getInventory());
     }
 
     private void verifyOnline() {

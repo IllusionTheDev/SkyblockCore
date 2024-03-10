@@ -41,6 +41,9 @@ repositories {
         name = "illusion"
         url = "https://repo.illusionthe.dev/releases/"
     }
+
+    maven { url = 'https://repo.infernalsuite.com/repository/maven-snapshots/' }
+
 }
 
 dependencies {
@@ -57,6 +60,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
 
     compileOnly("me.illusion:cosmos-plugin:1.0")
+    compileOnly 'com.infernalsuite.aswm:api:1.20.4-R0.1-SNAPSHOT'
 
     implementation(project(":SkyblockCore-Common"))
     implementation(project(":SkyblockCore-Server"))

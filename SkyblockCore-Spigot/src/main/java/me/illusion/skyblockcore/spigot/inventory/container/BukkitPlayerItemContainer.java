@@ -16,7 +16,7 @@ public class BukkitPlayerItemContainer implements PlayerItemContainer {
         this.inventory = inventory;
     }
 
-    public static BukkitPlayerItemContainer create(PlayerInventory inventory) {
+    public static BukkitPlayerItemContainer wrap(PlayerInventory inventory) {
         return new BukkitPlayerItemContainer(inventory);
     }
 
