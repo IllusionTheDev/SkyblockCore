@@ -3,7 +3,8 @@ package me.illusion.skyblockcore.server.network.complex.communication.listener;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import me.illusion.skyblockcore.common.communication.packet.PacketHandler;
+import me.illusion.skyblockcore.common.packet.channel.PacketChannel;
+import me.illusion.skyblockcore.common.packet.processing.PacketSubscriber;
 import me.illusion.skyblockcore.server.event.player.SkyblockPlayerJoinEvent;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
@@ -14,7 +15,7 @@ import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 /**
  * Handles island teleport requests. This will keep a 30 second cache of player requests.
  */
-public class TeleportRequestPacketHandler implements PacketHandler<PacketRequestIslandTeleport> {
+public class TeleportRequestPacketHandler implements PacketSubscriber<PacketRequestIslandTeleport> {
 
     private final ComplexSkyblockNetwork network;
 
@@ -26,7 +27,7 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
     }
 
     @Override
-    public void onReceive(PacketRequestIslandTeleport packet) {
+    public void onReceive(String sourceChannel, PacketRequestIslandTeleport packet) {
         UUID playerId = packet.getPlayerId();
         UUID islandId = packet.getIslandId();
 
@@ -36,7 +37,10 @@ public class TeleportRequestPacketHandler implements PacketHandler<PacketRequest
 
         PacketResponseIslandTeleport response = new PacketResponseIslandTeleport(playerId, allowed);
 
-        network.getCommunicationsHandler().getPacketManager().send(packet.getOriginServer(), response);
+        network
+            .getCommunicationsHandler()
+            .getPacketManager()
+            .sendPacket(PacketChannel.individual(packet.getOriginServer()), response);
 
         // Internal logic
 

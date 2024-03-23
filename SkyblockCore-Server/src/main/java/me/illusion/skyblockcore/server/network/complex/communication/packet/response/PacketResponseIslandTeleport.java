@@ -1,7 +1,9 @@
 package me.illusion.skyblockcore.server.network.complex.communication.packet.response;
 
 import java.util.UUID;
-import me.illusion.skyblockcore.common.communication.packet.Packet;
+import me.illusion.skyblockcore.common.packet.Packet;
+import me.illusion.skyblockcore.common.packet.stream.FriendlyByteInputStream;
+import me.illusion.skyblockcore.common.packet.stream.FriendlyByteOutputStream;
 import me.illusion.skyblockcore.server.network.complex.communication.packet.request.PacketRequestIslandTeleport;
 
 /**
@@ -9,22 +11,28 @@ import me.illusion.skyblockcore.server.network.complex.communication.packet.requ
  */
 public class PacketResponseIslandTeleport extends Packet {
 
-    private final UUID playerId;
-    private final boolean allowed;
+    private UUID playerId;
+    private boolean allowed;
 
     public PacketResponseIslandTeleport(UUID playerId, boolean allowed) {
         this.playerId = playerId;
         this.allowed = allowed;
-
-        writeUUID(playerId);
-        writeByte((byte) (allowed ? 1 : 0));
     }
 
-    public PacketResponseIslandTeleport(byte[] bytes) {
-        super(bytes);
+    public PacketResponseIslandTeleport() {
 
-        this.playerId = readUUID();
-        this.allowed = readByte() == 1;
+    }
+
+    @Override
+    protected void read(FriendlyByteInputStream stream) {
+        playerId = stream.readUUID();
+        allowed = stream.readBoolean();
+    }
+
+    @Override
+    protected void write(FriendlyByteOutputStream stream) {
+        stream.writeUUID(playerId);
+        stream.writeBoolean(allowed);
     }
 
     public UUID getPlayerId() {

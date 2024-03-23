@@ -2,12 +2,13 @@ package me.illusion.skyblockcore.server.network.complex.communication;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.illusion.skyblockcore.common.communication.packet.PacketManager;
+import me.illusion.skyblockcore.common.packet.channel.PacketChannel;
+import me.illusion.skyblockcore.common.packet.processing.PacketManager;
 import me.illusion.skyblockcore.common.storage.cache.SkyblockIslandCache;
 import me.illusion.skyblockcore.server.island.SkyblockIsland;
 import me.illusion.skyblockcore.server.network.complex.ComplexSkyblockNetwork;
+import me.illusion.skyblockcore.server.network.complex.communication.cache.IslandTeleportRequestCache;
 import me.illusion.skyblockcore.server.network.complex.communication.packet.request.PacketRequestIslandTeleport;
-import me.illusion.skyblockcore.server.network.complex.communication.packet.response.PacketResponseIslandTeleport;
 import me.illusion.skyblockcore.server.player.SkyblockPlayer;
 
 /**
@@ -20,12 +21,14 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
     private final SkyblockIslandCache cacheDatabase;
 
     private final ComplexSkyblockNetwork network;
+    private final IslandTeleportRequestCache teleportRequestCache;
 
     public CommunicationsHandler(ComplexSkyblockNetwork network) {
         this.network = network;
 
         this.cacheDatabase = network.getCacheDatabase();
         this.serverId = network.getConfiguration().getServerId();
+        this.teleportRequestCache = new IslandTeleportRequestCache(network);
 
         // We need to init the other values
         // TODO: Write a config for this
@@ -115,14 +118,10 @@ public class CommunicationsHandler { // Potential problem: If an island is reque
                 return network.getIslandManager().loadIsland(islandId).thenApply(island -> tryTeleportExisting(player, islandId));
             }
 
-            packetManager.send(serverId,
+            packetManager.sendPacket(PacketChannel.individual(instanceId),
                 new PacketRequestIslandTeleport(this.serverId, player.getUniqueId(), islandId)); // This is the packet that is sent to the other server.
 
-            return packetManager.await(
-                    PacketResponseIslandTeleport.class,
-                    packet -> packet.getPlayerId().equals(player.getUniqueId()) // Filter the player ID we're looking for
-                )
-                .thenApply(packet -> packet != null && packet.isAllowed());
+            return teleportRequestCache.createRequest(player.getUniqueId(), islandId).getFuture();
         });
     }
 

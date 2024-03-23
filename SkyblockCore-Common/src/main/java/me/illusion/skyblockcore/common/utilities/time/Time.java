@@ -15,6 +15,10 @@ public class Time {
         this.unit = unit;
     }
 
+    public static Time seconds(int duration) {
+        return new Time(duration, TimeUnit.SECONDS);
+    }
+
     /**
      * Converts the time to the specified unit.
      *
